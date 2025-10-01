@@ -2,13 +2,13 @@
 
 ## Learn
 
-Our frontend's development server uses Vite. Learn more about it here:
+We'll be using Vite for a frontend dev server. Learn more about it here:
 <https://vite.dev/guide/>
 
 We're also using react to add 'reactivity' and 'componentization' to our website. Read about those here:
 <https://react.dev/learn>
 
-Four our backend, we'll be using Node.js. It's a rabbit hole, so here's a quick guide:
+For our backend, we'll be using Node.js. It's a rabbit hole, so here's a quick guide:
 <https://www.youtube.com/watch?v=ENrzD9HAZK4>
 
 ## Get started
