@@ -19,4 +19,4 @@ After cloning this repo, run `npm install` in the project root (npm is the Node 
 
 To spin up a dev server to view our frontend, run `npm run dev` when in the /frontend folder.
 
-To start the NodeJS server for our backend, run `node dev-server.js` when in the /backend folder.
+To start the NodeJS server for our backend, run `node server.js` when in the /backend folder.

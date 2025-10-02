@@ -2,4 +2,4 @@
 // so they can be imported from a single location
 // (just makes imports cleaner in index.js)
 
-export * from './auth';
+export * from './auth.js';
