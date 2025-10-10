@@ -66,10 +66,23 @@ export class App {
 
 		let path = event.path;
 
+		// strip the /api prefix
+		if (path.startsWith('/api')) {
+			path = path.replace('/api', '');
+		}
+
 		// ensures path starts with /
 		if (!path.startsWith('/')) {
 			path = '/' + path;
 		}
+
+		console.log('Processed path:', path);
+		console.log(
+			'Available routes for',
+			event.httpMethod,
+			':',
+			Object.keys(this.routes[event.httpMethod] || {})
+		);
 
 		const controller = this.routes[event.httpMethod]?.[path];
 
