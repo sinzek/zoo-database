@@ -5,7 +5,7 @@
 
 # settings for backend node.js functions
 [functions]
-  directory = "backend"
+  directory = "backend/api"
 
 # rewrite rule to let frontend talk to backend
 [[redirects]]
