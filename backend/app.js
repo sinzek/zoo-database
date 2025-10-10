@@ -9,8 +9,8 @@ import http from 'http';
  * REGISTERING ROUTES:
  * app.{get/post/put/delete}('/path', (req, res) => { ... });
  *
- * STARTING THE SERVER:
- * app.listen(3000, () => { console.log('Server running on port 3000'); });
+ * this is intended to work with serverless platforms like netlify
+ * (which is what we're using as our web hosting provider)
  */
 export class App {
 	constructor() {
@@ -36,7 +36,9 @@ export class App {
 		this.routes.DELETE[path] = handler;
 	}
 
-	listen(port, callback) {
+	// use this for development only!
+	// (in production, serverless platforms remove the need for an always-on server)
+	startDevServer(port, callback) {
 		// create server object
 		const server = http.createServer((req, res) => {
 			const { method, url } = req;
@@ -56,5 +58,49 @@ export class App {
 
 		// starts server, keeps node process running to listen for incoming HTTP requests on the specified port
 		server.listen(port, callback);
+	}
+
+	async serverlessHandler(event) {
+		const controller = this.routes[event.httpMethod]?.[event.path];
+
+		if (!controller) {
+			return {
+				statusCode: 404,
+				body: JSON.stringify({ error: 'Not Found' }),
+			};
+		}
+
+		// creating compatibility layer for controllers (fake req and res)
+		const req = {
+			headers: event.headers,
+			body: event.body, // netlify provides the body directly
+			// add any other properties from `event` we might need
+			query: event.queryStringParameters || {},
+		};
+
+		// this promise-based "res" object will capture what a
+		// controller tries to send and format it for netlify
+		const res = {
+			_headers: {},
+			_statusCode: 200,
+			_body: '',
+			writeHead: function (statusCode, headers) {
+				this._statusCode = statusCode;
+				this._headers = { ...this._headers, ...headers };
+			},
+			end: function (body) {
+				this._body = body;
+			},
+		};
+
+		// execute the controller with the fake req and res objects
+		await controller(req, res);
+
+		// returns the final response object that netlify expects
+		return {
+			statusCode: res._statusCode,
+			headers: res._headers,
+			body: res._body,
+		};
 	}
 }

@@ -9,7 +9,16 @@ const app = new App();
 // register routes
 registerAuthRoutes(app);
 
-// start server (begin listening for requests)
-app.listen(PORT, () => {
-	console.log(`Server running on port ${PORT} (http://localhost:${PORT})`);
-});
+if (process.env.NODE_ENV !== 'production') {
+	// start dev server (begin listening for requests)
+	app.startDevServer(PORT, () => {
+		console.log(
+			`Development server running on port ${PORT} (http://localhost:${PORT})`
+		);
+	});
+}
+
+// export handler for netlify to use in production
+export const handler = (event) => {
+	return app.serverlessHandler(event);
+};
