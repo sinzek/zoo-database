@@ -77,6 +77,8 @@ export class App {
 		}
 
 		console.log('Processed path:', path);
+		console.log('Processed path length:', path.length);
+		console.log('Processed path as JSON:', JSON.stringify(path));
 		console.log(
 			'Available routes for',
 			event.httpMethod,
@@ -84,7 +86,20 @@ export class App {
 			Object.keys(this.routes[event.httpMethod] || {})
 		);
 
+		console.log(
+			'Looking for route:',
+			JSON.stringify(path),
+			'in method:',
+			event.httpMethod
+		);
+		console.log(
+			'Routes object:',
+			JSON.stringify(this.routes[event.httpMethod], null, 2)
+		);
+
 		const controller = this.routes[event.httpMethod]?.[path];
+		console.log('Controller found:', controller ? 'YES' : 'NO');
+		console.log('Controller type:', typeof controller);
 
 		if (!controller) {
 			console.log('No controller found for this path and method');
