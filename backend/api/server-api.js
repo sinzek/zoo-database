@@ -1,5 +1,5 @@
-import { App } from './app.js';
-import { registerAuthRoutes } from './routes/index.js';
+import { App } from './src/app.js';
+import { registerAuthRoutes } from './src/routes/index.js';
 
 const PORT = 3000;
 
