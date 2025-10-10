@@ -51,8 +51,8 @@ CREATE TABLE Employee (
 	deletedAt DATE NULL,
 	supervisorId CHAR(36) NULL,
 
-	FOREIGN KEY (businessId) REFERENCES Business(businessId) ON DELETE CASCADE,
-	FOREIGN KEY (supervisorId) REFERENCES Employee(employeeId) ON DELETE SET NULL,
+	FOREIGN KEY (businessId) REFERENCES Business(businessId) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (supervisorId) REFERENCES Employee(employeeId) ON DELETE SET NULL ON UPDATE CASCADE,
     CHECK(terminationDate IS NULL OR terminationDate > hireDate)
 );
 
@@ -63,7 +63,7 @@ CREATE TABLE Transaction (
     amount DECIMAL(24, 2) NOT NULL CHECK (amount >= 0),
     deletedAt DATETIME NULL, -- soft delete (null if not deleted)
 
-    FOREIGN KEY (businessId) REFERENCES Business(businessId) ON DELETE RESTRICT
+    FOREIGN KEY (businessId) REFERENCES Business(businessId) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE TABLE Membership (
@@ -75,8 +75,8 @@ CREATE TABLE Membership (
     autoRenew BOOLEAN NOT NULL DEFAULT FALSE,
     transactionId CHAR(36) UNIQUE NOT NULL, -- uuid, foreign key to Transaction(id)
 
-    FOREIGN KEY (customerId) REFERENCES Customer(customerId) ON DELETE CASCADE,
-    FOREIGN KEY (transactionId) REFERENCES Transaction(transactionId) ON DELETE CASCADE,
+    FOREIGN KEY (customerId) REFERENCES Customer(customerId) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (transactionId) REFERENCES Transaction(transactionId) ON DELETE CASCADE ON UPDATE CASCADE,
     CHECK (expireDate > startDate)
 );
 
@@ -89,7 +89,7 @@ CREATE TABLE Item (
     deletedAt DATETIME NULL, -- soft delete (null if not deleted)
     businessId CHAR(36) NOT NULL, -- uuid, foreign key to Business(id)
 
-    FOREIGN KEY (businessId) REFERENCES Business(businessId) ON DELETE CASCADE
+    FOREIGN KEY (businessId) REFERENCES Business(businessId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE PurchasedItem (
@@ -98,9 +98,9 @@ CREATE TABLE PurchasedItem (
     transactionId CHAR(36) NULL, -- uuid, foreign key to Transaction(id)
     itemId CHAR(36) NULL, -- uuid, foreign key to Item(id)
 
-    FOREIGN KEY (customerId) REFERENCES Customer(customerId) ON DELETE SET NULL,
-    FOREIGN KEY (transactionId) REFERENCES Transaction(transactionId) ON DELETE SET NULL,
-    FOREIGN KEY (itemId) REFERENCES Item(itemId) ON DELETE SET NULL
+    FOREIGN KEY (customerId) REFERENCES Customer(customerId) ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (transactionId) REFERENCES Transaction(transactionId) ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (itemId) REFERENCES Item(itemId) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE TABLE BusinessHoursDay (
@@ -110,7 +110,7 @@ CREATE TABLE BusinessHoursDay (
     openTime TIME NOT NULL, -- time only (no date)
     closeTime TIME NOT NULL, -- must be after openTime
 
-    FOREIGN KEY (businessId) REFERENCES Business(businessId) ON DELETE CASCADE,
+    FOREIGN KEY (businessId) REFERENCES Business(businessId) ON DELETE CASCADE ON UPDATE CASCADE,
     CHECK (closeTime > openTime)
 );
 
@@ -133,7 +133,7 @@ CREATE TABLE AttractionHoursDay (
     openTime TIME NOT NULL, -- time only (no date)
     closeTime TIME NOT NULL, -- must be after openTime
 
-    FOREIGN KEY (attractionId) REFERENCES Attraction(attractionId) ON DELETE CASCADE,
+    FOREIGN KEY (attractionId) REFERENCES Attraction(attractionId) ON DELETE CASCADE ON UPDATE CASCADE,
     CHECK (closeTime > openTime)
 );
 
@@ -143,7 +143,7 @@ CREATE TABLE AttractionPhoto (
     url VARCHAR(200) NOT NULL CHECK (url LIKE 'http%'), -- basic URL format check
     subtitle VARCHAR(500) NULL, -- optional subtitle for photo
 
-    FOREIGN KEY (attractionId) REFERENCES Attraction(attractionId) ON DELETE CASCADE
+    FOREIGN KEY (attractionId) REFERENCES Attraction(attractionId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE Shift (
@@ -153,7 +153,7 @@ CREATE TABLE Shift (
 	attractionId CHAR(36) NULL, -- uuid, optional FK
 	deletedAt DATETIME NULL,
 	
-	FOREIGN KEY (attractionId) REFERENCES Attraction(attractionId) ON DELETE SET NULL,
+	FOREIGN KEY (attractionId) REFERENCES Attraction(attractionId) ON DELETE SET NULL ON UPDATE CASCADE,
     CHECK (end > start)
 );
 
@@ -163,8 +163,8 @@ CREATE TABLE EmployeeTakesShift(
 	employeeId CHAR(36) NOT NULL,
 	totalHours DECIMAL(4,2) NOT NULL CHECK(totalHours > 0.00 AND totalHours < 16.00),
 
-    FOREIGN KEY (shiftId) REFERENCES Shift(shiftId) ON DELETE CASCADE,
-	FOREIGN KEY (employeeId) REFERENCES Employee(employeeId) ON DELETE CASCADE
+    FOREIGN KEY (shiftId) REFERENCES Shift(shiftId) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (employeeId) REFERENCES Employee(employeeId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE EmployeeClockTime(
@@ -173,7 +173,7 @@ CREATE TABLE EmployeeClockTime(
 	startTime DATETIME NOT NULL,
 	endTime DATETIME NOT NULL,
 
-	FOREIGN KEY (shiftId) REFERENCES Shift(shiftId) ON DELETE CASCADE,
+	FOREIGN KEY (shiftId) REFERENCES Shift(shiftId) ON DELETE CASCADE ON UPDATE CASCADE,
     CHECK(endTime > startTime)
 );
 
@@ -190,7 +190,7 @@ CREATE TABLE HabitatPhoto(
 	url VARCHAR(255) NOT NULL CHECK(url LIKE 'http%'),
 	subtitle VARCHAR(500) NULL,
 
-	FOREIGN KEY (habitatId) REFERENCES Habitat(habitatId) ON DELETE CASCADE
+	FOREIGN KEY (habitatId) REFERENCES Habitat(habitatId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE Diet (
@@ -206,7 +206,7 @@ CREATE TABLE DietScheduleDay (
     feedTime TIME NOT NULL, -- HH:mm format
     food VARCHAR(100) NOT NULL CHECK (LENGTH(food) >= 1),
 
-    FOREIGN KEY (dietId) REFERENCES Diet(dietId) ON DELETE CASCADE
+    FOREIGN KEY (dietId) REFERENCES Diet(dietId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE Animal (
@@ -226,8 +226,8 @@ CREATE TABLE Animal (
     dietId CHAR(36) NOT NULL,
     deletedAt DATETIME NULL,
 
-    FOREIGN KEY (habitatId) REFERENCES Habitat(habitatId) ON DELETE RESTRICT,
-    FOREIGN KEY (dietId) REFERENCES Diet(dietId) ON DELETE RESTRICT,
+    FOREIGN KEY (habitatId) REFERENCES Habitat(habitatId) ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (dietId) REFERENCES Diet(dietId) ON DELETE RESTRICT ON UPDATE CASCADE,
     CHECK (deathDate IS NULL OR deathDate > birthDate)
 );
 
@@ -236,8 +236,8 @@ CREATE TABLE TakesCareOf(
 	animalId CHAR(36) NOT NULL,
 
 	PRIMARY KEY (employeeId, animalId),
-	FOREIGN KEY (employeeId) REFERENCES Employee(employeeId) ON DELETE CASCADE,
-	FOREIGN KEY (animalId) REFERENCES Animal(animalId) ON DELETE CASCADE
+	FOREIGN KEY (employeeId) REFERENCES Employee(employeeId) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (animalId) REFERENCES Animal(animalId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE MedicalRecord (
@@ -249,7 +249,7 @@ CREATE TABLE MedicalRecord (
     checkoutDate DATETIME NULL,
     deletedAt DATETIME NULL,
 
-    FOREIGN KEY (animalId) REFERENCES Animal(animalId) ON DELETE SET NULL,
+    FOREIGN KEY (animalId) REFERENCES Animal(animalId) ON DELETE SET NULL ON UPDATE CASCADE,
     CHECK (checkoutDate IS NULL OR checkoutDate > visitDate)
 );
 
@@ -258,7 +258,7 @@ CREATE TABLE PrescribedMedication (
     medicalRecordId CHAR(36) NOT NULL,
     medication VARCHAR(200) NOT NULL CHECK (LENGTH(medication) > 0),
 
-    FOREIGN KEY (medicalRecordId) REFERENCES MedicalRecord(medicalRecordId) ON DELETE CASCADE
+    FOREIGN KEY (medicalRecordId) REFERENCES MedicalRecord(medicalRecordId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE AssignedVeterinarian (
@@ -268,7 +268,7 @@ CREATE TABLE AssignedVeterinarian (
     vetEmail VARCHAR(100) NOT NULL CHECK (LENGTH(vetEmail) >= 3),
     vetOffice VARCHAR(100) NOT NULL CHECK (LENGTH(vetOffice) > 0),
 
-    FOREIGN KEY (medicalRecordId) REFERENCES MedicalRecord(medicalRecordId) ON DELETE CASCADE
+    FOREIGN KEY (medicalRecordId) REFERENCES MedicalRecord(medicalRecordId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE Expense (
@@ -279,9 +279,9 @@ CREATE TABLE Expense (
     businessId CHAR(36) NOT NULL,
     deletedAt DATETIME NULL,
 
-    FOREIGN KEY (businessId) REFERENCES Business(businessId) ON DELETE CASCADE
+    FOREIGN KEY (businessId) REFERENCES Business(businessId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 ALTER TABLE Business
 ADD CONSTRAINT fk_business_owner
-FOREIGN KEY (ownerId) REFERENCES Employee(employeeId) ON DELETE SET NULL;
+FOREIGN KEY (ownerId) REFERENCES Employee(employeeId) ON DELETE SET NULL ON UPDATE CASCADE;
