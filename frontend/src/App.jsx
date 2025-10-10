@@ -2,7 +2,28 @@ import { useState } from 'react';
 import './App.css';
 
 function App() {
-	const [count, setCount] = useState(0);
+	const handleSendTestAPIRequest = async () => {
+		try {
+			const response = await fetch('/api/signup', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+
+			const data = await response.json();
+
+			if (!response.ok) {
+				throw new Error(data.error || 'Something went wrong');
+			}
+
+			console.log('Response from API:', data);
+			alert(`Response from API: ${data.message}`);
+		} catch (err) {
+			console.error('Error calling API:', err);
+			alert(`Error: ${err.message}`);
+		}
+	};
 
 	return (
 		<>
@@ -14,9 +35,9 @@ function App() {
 				</p>
 				<button
 					className='btn-outline'
-					onClick={() => setCount((count) => count + 1)}
+					onClick={async () => await handleSendTestAPIRequest()}
 				>
-					Count is {count}
+					Test the API
 				</button>
 			</div>
 		</>
