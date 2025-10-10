@@ -86,18 +86,53 @@ export class App {
 			Object.keys(this.routes[event.httpMethod] || {})
 		);
 
+		const methodRoutes = this.routes[event.httpMethod] || {};
 		console.log(
-			'Looking for route:',
-			JSON.stringify(path),
-			'in method:',
-			event.httpMethod
-		);
-		console.log(
-			'Routes object:',
-			JSON.stringify(this.routes[event.httpMethod], null, 2)
+			'Available routes for',
+			event.httpMethod,
+			':',
+			Object.keys(methodRoutes)
 		);
 
-		const controller = this.routes[event.httpMethod]?.[path];
+		// More detailed debugging
+		console.log('Method routes object type:', typeof methodRoutes);
+		console.log(
+			'Method routes object constructor:',
+			methodRoutes.constructor.name
+		);
+		console.log('Method routes is array:', Array.isArray(methodRoutes));
+		console.log(
+			'Method routes own properties:',
+			Object.getOwnPropertyNames(methodRoutes)
+		);
+
+		// Check each route individually
+		for (const routePath of Object.keys(methodRoutes)) {
+			console.log(`Route ${routePath}:`, typeof methodRoutes[routePath]);
+			console.log(
+				`Route ${routePath} === processed path:`,
+				routePath === path
+			);
+			console.log(
+				`Route ${routePath} strict equality:`,
+				Object.is(routePath, path)
+			);
+		}
+
+		// Try direct property access
+		console.log(
+			'Direct property access:',
+			methodRoutes[path] ? 'EXISTS' : 'DOES NOT EXIST'
+		);
+		console.log('hasOwnProperty check:', methodRoutes.hasOwnProperty(path));
+
+		// Check if it's a prototype issue
+		console.log(
+			'Property descriptor:',
+			Object.getOwnPropertyDescriptor(methodRoutes, path)
+		);
+
+		const controller = methodRoutes[path];
 		console.log('Controller found:', controller ? 'YES' : 'NO');
 		console.log('Controller type:', typeof controller);
 
