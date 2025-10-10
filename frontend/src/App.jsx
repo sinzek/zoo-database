@@ -4,7 +4,7 @@ import './App.css';
 function App() {
 	const handleSendTestAPIRequest = async () => {
 		try {
-			const response = await fetch('/api/signup', {
+			const response = await fetch('/api/auth/signup', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
