@@ -3,15 +3,11 @@ import { registerAuthRoutes } from './src/routes/index.js';
 
 const PORT = 3000;
 
-// create app instance
-const app = new App();
-
-// register routes
-registerAuthRoutes(app);
-
 if (process.env.NODE_ENV === 'development') {
+	const devApp = new App();
+	registerAuthRoutes(devApp);
 	// start dev server (begin listening for requests)
-	app.startDevServer(PORT, () => {
+	devApp.startDevServer(PORT, () => {
 		console.log(
 			`Development server running on port ${PORT} (http://localhost:${PORT})`
 		);
@@ -20,5 +16,10 @@ if (process.env.NODE_ENV === 'development') {
 
 // export handler for netlify to use in production
 export const handler = (event) => {
+	// create app instance
+	const app = new App();
+
+	// register routes
+	registerAuthRoutes(app);
 	return app.serverlessHandler(event);
 };
