@@ -9,7 +9,7 @@ const app = new App();
 // register routes
 registerAuthRoutes(app);
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
 	// start dev server (begin listening for requests)
 	app.startDevServer(PORT, () => {
 		console.log(
