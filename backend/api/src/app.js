@@ -61,12 +61,34 @@ export class App {
 	}
 
 	async serverlessHandler(event) {
-		const controller = this.routes[event.httpMethod]?.[event.path];
+		console.log('Event path:', event.path);
+		console.log('Event httpMethod:', event.httpMethod);
+
+		let path = event.path;
+
+		if (path.startsWith('/api')) {
+			path = path.replace('/api', '');
+		}
+
+		// ensures path starts with /
+		if (!path.startsWith('/')) {
+			path = '/' + path;
+		}
+
+		const controller = this.routes[event.httpMethod]?.[path];
 
 		if (!controller) {
 			return {
 				statusCode: 404,
-				body: JSON.stringify({ error: 'Not Found' }),
+				body: JSON.stringify({
+					error: 'Not Found',
+					requestedPath: path,
+					receivedPath: event.path,
+					httpMethod: event.httpMethod,
+					availableRoutes: Object.keys(
+						this.routes[event.httpMethod] || {}
+					),
+				}),
 			};
 		}
 
@@ -74,7 +96,6 @@ export class App {
 		const req = {
 			headers: event.headers,
 			body: event.body, // netlify provides the body directly
-			// add any other properties from `event` we might need
 			query: event.queryStringParameters || {},
 		};
 

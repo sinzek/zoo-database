@@ -22,3 +22,7 @@ if (process.env.NODE_ENV === 'development') {
 export const handler = (event) => {
 	return app.serverlessHandler(event);
 };
+
+export const config = {
+	path: '/api/*',
+};

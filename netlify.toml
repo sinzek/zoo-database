@@ -6,9 +6,3 @@
 # settings for backend node.js functions
 [functions]
   directory = "backend/api"
-
-# rewrite rule to let frontend talk to backend
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/server-api/:splat"
-  status = 200
