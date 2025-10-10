@@ -10,5 +10,5 @@
 # rewrite rule to let frontend talk to backend
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  to = "/.netlify/functions/server-api/:splat"
   status = 200
