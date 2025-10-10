@@ -1,8 +1,14 @@
 # build settings for frontend vite app
 [build]
-  command = "cd frontend && npm run build"
-  publish = "frontend/dist"
+    command = "cd frontend && npm run build"
+    publish = "frontend/dist"
 
 # settings for backend node.js functions
 [functions]
-  directory = "backend/api"
+    directory = "backend/api"
+
+# rewrite rule to let frontend talk to backend
+[[redirects]]
+    from = "/api/*"
+    to = "/.netlify/functions/server-api/:splat"
+    status = 200

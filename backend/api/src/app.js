@@ -66,10 +66,6 @@ export class App {
 
 		let path = event.path;
 
-		if (path.startsWith('/api')) {
-			path = path.replace('/api', '');
-		}
-
 		// ensures path starts with /
 		if (!path.startsWith('/')) {
 			path = '/' + path;
@@ -78,6 +74,7 @@ export class App {
 		const controller = this.routes[event.httpMethod]?.[path];
 
 		if (!controller) {
+			console.log('No controller found for this path and method');
 			return {
 				statusCode: 404,
 				body: JSON.stringify({
