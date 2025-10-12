@@ -76,9 +76,7 @@ export class App {
 		if (!handler) {
 			console.log(`No handler found for ${method} ${pathname}`);
 
-			for(const route in this.routes[method]) {
-				console.log(`Available route for ${method}: ${route}`);
-			}
+			
 			
 			res.statusCode = 404;
 			return res.end(JSON.stringify({ error: 'Not Found' }));
@@ -110,12 +108,15 @@ export class App {
 			}
 		};
 
-		console.log('Calling handler functon...');
+		console.log('Available routes:', this.routes);
+		console.log('Available routes for method:', this.routes[method]);
+
+		console.log('Invoking handler functon...');
 		// call the handler
 		try {
 			await handler(req, res);
 		} catch(err) {
-			console.error('Error in handler function:', err);
+			console.log('Error in handler function:', err);
 			res.statusCode = 500;
 			return res.end(JSON.stringify({ error: 'Internal Server Error' }));
 		}
