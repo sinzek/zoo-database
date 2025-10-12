@@ -19,7 +19,7 @@ export default async function handler(req, res) {
 	const requestApp = new App();
 	registerAuthRoutes(requestApp);
 	try {
-		await requestApp.handleVercel(req, res);
+		return await requestApp.handleVercel(req, res);
 	} catch(error) {
 		console.error('Error handling request:', error);
 		res.statusCode = 500;

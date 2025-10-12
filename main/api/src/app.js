@@ -110,7 +110,9 @@ export class App {
 			}
 		};
 
+		console.log('Calling handler functon...');
 		// call the handler
 		await handler(req, res);
+		console.log('Handler function completed.');
 	}
 }
