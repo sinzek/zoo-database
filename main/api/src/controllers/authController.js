@@ -1,8 +1,8 @@
-import { sendJSON } from '../utils/endpoint-utils';
+import { sendJSON } from '../utils/endpoint-utils.js';
 // im using underscore-prefixed variables to avoid linting errors
 // about unused variables since these are just placeholders
 
-function signup(_req, res) {
+function signup(req, res) {
 	sendJSON(res, 201, { message: 'Hello from the API!' });
 }
 
