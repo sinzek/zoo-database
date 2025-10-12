@@ -9,7 +9,7 @@ import http from 'http';
  * REGISTERING ROUTES:
  * app.{get/post/put/delete}('/path', (req, res) => { ... });
  *
- * this is intended to work with serverless platforms like netlify
+ * this is intended to work with serverless platforms like vercel
  * (which is what we're using as our web hosting provider)
  */
 export class App {
@@ -60,128 +60,40 @@ export class App {
 		server.listen(port, callback);
 	}
 
-	async serverlessHandler(event) {
-		console.log('Event path:', event.path);
-		console.log('Event httpMethod:', event.httpMethod);
+	// this is the function that vercel will call when a request comes in
+	// event: object, contains details about the incoming request
+	// returns a response object that vercel understands
+	async handleVercel(req, res) {
+		const method = req.method;
+		const url = new URL(req.url, `http://${req.headers.host}`);
+		const pathname = url.pathname.replace(/^\/api/, '') || '/';
 
-		let path = event.path;
-
-		// strip the /api prefix
-		if (path.startsWith('/api')) {
-			path = path.replace('/api', '');
+		// find the appropriate handler based on method and pathname
+		const handler = this.routes[method]?.[pathname];
+		if (!handler) {
+			res.statusCode = 404;
+			return res.end(JSON.stringify({ error: 'Not Found' }));
 		}
 
-		// ensures path starts with /
-		if (!path.startsWith('/')) {
-			path = '/' + path;
-		}
+		// parse query parameters and body (if any)
+		req.query = Object.fromEntries(url.searchParams.entries());
+		let body = '';
+		for await (const chunk of req) body += chunk;
+		req.body = body ? JSON.parse(body) : {};
 
-		console.log('Processed path:', path);
-		console.log('Processed path length:', path.length);
-		console.log('Processed path as JSON:', JSON.stringify(path));
-		console.log(
-			'Available routes for',
-			event.httpMethod,
-			':',
-			Object.keys(this.routes[event.httpMethod] || {})
-		);
-
-		const methodRoutes = this.routes[event.httpMethod] || {};
-		console.log(
-			'Available routes for',
-			event.httpMethod,
-			':',
-			Object.keys(methodRoutes)
-		);
-
-		// More detailed debugging
-		console.log('Method routes object type:', typeof methodRoutes);
-		console.log(
-			'Method routes object constructor:',
-			methodRoutes.constructor.name
-		);
-		console.log('Method routes is array:', Array.isArray(methodRoutes));
-		console.log(
-			'Method routes own properties:',
-			Object.getOwnPropertyNames(methodRoutes)
-		);
-
-		// Check each route individually
-		for (const routePath of Object.keys(methodRoutes)) {
-			console.log(`Route ${routePath}:`, typeof methodRoutes[routePath]);
-			console.log(
-				`Route ${routePath} === processed path:`,
-				routePath === path
-			);
-			console.log(
-				`Route ${routePath} strict equality:`,
-				Object.is(routePath, path)
-			);
-		}
-
-		// Try direct property access
-		console.log(
-			'Direct property access:',
-			methodRoutes[path] ? 'EXISTS' : 'DOES NOT EXIST'
-		);
-		console.log('hasOwnProperty check:', methodRoutes.hasOwnProperty(path));
-
-		// Check if it's a prototype issue
-		console.log(
-			'Property descriptor:',
-			Object.getOwnPropertyDescriptor(methodRoutes, path)
-		);
-
-		const controller = methodRoutes[path];
-		console.log('Controller found:', controller ? 'YES' : 'NO');
-		console.log('Controller type:', typeof controller);
-
-		if (!controller) {
-			console.log('No controller found for this path and method');
-			return {
-				statusCode: 404,
-				body: JSON.stringify({
-					error: 'Not Found',
-					requestedPath: path,
-					receivedPath: event.path,
-					httpMethod: event.httpMethod,
-					availableRoutes: Object.keys(
-						this.routes[event.httpMethod] || {}
-					),
-				}),
-			};
-		}
-
-		// creating compatibility layer for controllers (fake req and res)
-		const req = {
-			headers: event.headers,
-			body: event.body, // netlify provides the body directly
-			query: event.queryStringParameters || {},
+		// mock express's res.writeHead function
+		// so that our route handlers can set status code and headers
+		// in a familiar way
+		res.writeHead = (code, headers) => {
+			res.statusCode = code;
+			if (headers) {
+				for (const [k, v] of Object.entries(headers)) {
+					res.setHeader(k, v);
+				}
+			}
 		};
 
-		// this promise-based "res" object will capture what a
-		// controller tries to send and format it for netlify
-		const res = {
-			_headers: {},
-			_statusCode: 200,
-			_body: '',
-			writeHead: function (statusCode, headers) {
-				this._statusCode = statusCode;
-				this._headers = { ...this._headers, ...headers };
-			},
-			end: function (body) {
-				this._body = body;
-			},
-		};
-
-		// execute the controller with the fake req and res objects
-		await controller(req, res);
-
-		// returns the final response object that netlify expects
-		return {
-			statusCode: res._statusCode,
-			headers: res._headers,
-			body: res._body,
-		};
+		// call the handler
+		await handler(req, res);
 	}
 }

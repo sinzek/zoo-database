@@ -14,12 +14,10 @@ if (process.env.NODE_ENV === 'development') {
 	});
 }
 
-// export handler for netlify to use in production
-export const handler = (event) => {
-	// create app instance
-	const app = new App();
+const app = new App();
 
-	// register routes
-	registerAuthRoutes(app);
-	return app.serverlessHandler(event);
-};
+registerAuthRoutes(app);
+
+export default async function handler(req, res) {
+	await app.handleVercel(req, res);
+}
