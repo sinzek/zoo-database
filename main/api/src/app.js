@@ -68,12 +68,23 @@ export class App {
 		const url = new URL(req.url, `http://${req.headers.host}`);
 		const pathname = url.pathname || '/';
 
+		console.log(`Incoming request: ${method} ${pathname}`);
+		console.log('Headers:', req.headers);
+
 		// find the appropriate handler based on method and pathname
 		const handler = this.routes[method]?.[pathname];
 		if (!handler) {
+			console.log(`No handler found for ${method} ${pathname}`);
+
+			for(const route in this.routes[method]) {
+				console.log(`Available route for ${method}: ${route}`);
+			}
+			
 			res.statusCode = 404;
 			return res.end(JSON.stringify({ error: 'Not Found' }));
 		}
+
+		console.log(`Handler found for ${method} ${pathname}, processing request...`);
 
 		// parse query parameters and body (if any)
 		req.query = Object.fromEntries(url.searchParams.entries());
