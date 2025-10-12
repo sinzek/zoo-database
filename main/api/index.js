@@ -14,10 +14,12 @@ if (process.env.NODE_ENV === 'development') {
 	});
 }
 
-const app = new App();
 
-registerAuthRoutes(app);
+
+
 
 export default async function handler(req, res) {
-	await app.handleVercel(req, res);
+	const requestApp = new App();
+	registerAuthRoutes(requestApp);
+	await requestApp.handleVercel(req, res);
 }
