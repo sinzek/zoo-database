@@ -11,7 +11,7 @@ export default defineConfig([
 
 	// --- frontend ---
 	{
-		files: ['frontend/**/*.{js,jsx}'],
+		files: ['main/**/*.{js,jsx}'],
 		extends: [
 			js.configs.recommended,
 			reactHooks.configs['recommended-latest'],

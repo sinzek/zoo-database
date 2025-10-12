@@ -2,7 +2,6 @@
 	"name": "zoo-db-team-10",
 	"private": true,
 	"workspaces": [
-		"frontend",
-		"backend"
+		"main"
 	]
 }
