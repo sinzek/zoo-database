@@ -9,6 +9,7 @@
  * @param {*} payload data to send as JSON
  */
 export function sendJSON(res, statusCode, payload) {
-	res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+	res.statusCode = statusCode;
+	res.setHeader('Content-Type', 'application/json');
 	return JSON.stringify(payload);
 }

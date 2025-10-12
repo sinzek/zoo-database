@@ -69,7 +69,6 @@ export class App {
 		const pathname = url.pathname || '/';
 
 		console.log(`Incoming request: ${method} ${pathname}`);
-		console.log('Headers:', req.headers);
 
 		// find the appropriate handler based on method and pathname
 		const handler = this.routes[method]?.[pathname];
@@ -84,7 +83,6 @@ export class App {
 
 		console.log(`Handler found for ${method} ${pathname}, processing request...`);
 
-
 		req.query = Object.fromEntries(url.searchParams.entries());
 		let body = '';
 		for await (const chunk of req) body += chunk;
@@ -96,19 +94,6 @@ export class App {
 			return res.end(JSON.stringify({ error: 'Invalid JSON in request body' }));
 		}
 
-		// mock express's res.writeHead function
-		// so that our route handlers can set status code and headers
-		// in a familiar way
-		res.writeHead = (code, headers) => {
-			res.statusCode = code;
-			if (headers) {
-				for (const [k, v] of Object.entries(headers)) {
-					res.setHeader(k, v);
-				}
-			}
-		};
-
-		console.log('Available routes:', this.routes);
 		console.log('Available routes for method:', this.routes[method]);
 
 		console.log('Invoking handler functon...');

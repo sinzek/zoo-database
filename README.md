@@ -17,7 +17,7 @@ Install NodeJS to your system: <https://nodejs.org/en/download>
 
 After cloning this repo, run `npm install` in the /main folder (npm is the Node Package Manager).
 
-To spin up a dev server to view our frontend, run `npm run dev` when in the /main folder.
+To spin up a dev server, run `npm run dev` when in the /main folder.
 
 To start the NodeJS server for our backend, run `node api/index.js` when in the /backend folder.
 
