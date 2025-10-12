@@ -112,7 +112,14 @@ export class App {
 
 		console.log('Calling handler functon...');
 		// call the handler
-		await handler(req, res);
+		try {
+			await handler(req, res);
+		} catch(err) {
+			console.error('Error in handler function:', err);
+			res.statusCode = 500;
+			return res.end(JSON.stringify({ error: 'Internal Server Error' }));
+		}
+		
 		console.log('Handler function completed.');
 	}
 }
