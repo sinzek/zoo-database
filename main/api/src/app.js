@@ -114,7 +114,16 @@ export class App {
 		console.log('Invoking handler functon...');
 		// call the handler
 		try {
-			await handler(req, res);
+			const responseBody = await handler(req, res);
+
+			// if the handler sends a response body, end the response
+			if(responseBody) {
+				res.end(responseBody);
+			} else if(!res.writableEnded) {
+				// if the handler didn't send a response, and the response isn't already ended, end it with no content
+				res.statusCode = res.statusCode || 204; // default to 204 No Content
+				res.end();
+			}
 		} catch(err) {
 			console.log('Error in handler function:', err);
 			res.statusCode = 500;

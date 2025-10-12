@@ -3,7 +3,7 @@ import { sendJSON } from '../utils/endpoint-utils.js';
 // about unused variables since these are just placeholders
 
 function signup(req, res) {
-	sendJSON(res, 201, { message: 'Hello from the API!' });
+	return sendJSON(res, 201, { message: 'Hello from the API!' });
 }
 
 function login(_req, _res) {

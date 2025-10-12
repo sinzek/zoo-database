@@ -6,9 +6,9 @@
  *
  * @param {*} res response object
  * @param {*} statusCode HTTP status code
- * @param {*} data data to send as JSON
+ * @param {*} payload data to send as JSON
  */
-export function sendJSON(res, statusCode, data) {
+export function sendJSON(res, statusCode, payload) {
 	res.writeHead(statusCode, { 'Content-Type': 'application/json' });
-	res.end(JSON.stringify(data));
+	return JSON.stringify(payload);
 }
