@@ -18,5 +18,12 @@ if (process.env.NODE_ENV === 'development') {
 export default async function handler(req, res) {
 	const requestApp = new App();
 	registerAuthRoutes(requestApp);
-	await requestApp.handleVercel(req, res);
+	try {
+		await requestApp.handleVercel(req, res);
+	} catch(error) {
+		console.error('Error handling request:', error);
+		res.statusCode = 500;
+		res.end(JSON.stringify({ error: 'Oopsie: Internal Server Error' }));
+	}
+	
 }

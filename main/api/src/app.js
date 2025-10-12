@@ -86,11 +86,17 @@ export class App {
 
 		console.log(`Handler found for ${method} ${pathname}, processing request...`);
 
-		// parse query parameters and body (if any)
+
 		req.query = Object.fromEntries(url.searchParams.entries());
 		let body = '';
 		for await (const chunk of req) body += chunk;
-		req.body = body ? JSON.parse(body) : {};
+		try {
+			req.body = body ? JSON.parse(body) : {};
+		} catch(err) {
+			console.error('Error parsing JSON body:', err);
+			res.statusCode = 400;
+			return res.end(JSON.stringify({ error: 'Invalid JSON in request body' }));
+		}
 
 		// mock express's res.writeHead function
 		// so that our route handlers can set status code and headers
