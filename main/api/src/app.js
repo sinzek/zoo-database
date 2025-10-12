@@ -66,7 +66,7 @@ export class App {
 	async handleVercel(req, res) {
 		const method = req.method;
 		const url = new URL(req.url, `http://${req.headers.host}`);
-		const pathname = url.pathname.replace(/^\/api/, '') || '/';
+		const pathname = url.pathname || '/';
 
 		// find the appropriate handler based on method and pathname
 		const handler = this.routes[method]?.[pathname];
