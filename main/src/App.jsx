@@ -27,18 +27,22 @@ function App() {
 
 	return (
 		<>
-			<div className='app-container'>
-				<h1>Zoo Database Project</h1>
-				<p>
-					This is a placeholder. Make sure you watch a video about the
-					fundamentals of JavaScript and React!
-				</p>
-				<button
-					className='btn-outline'
-					onClick={async () => await handleSendTestAPIRequest()}
-				>
-					Test the API
-				</button>
+
+			<div className="header">
+
+				<div className="header-content">
+					<h1>Zoo Database Project</h1>
+					<p>
+						This is a placeholder. Make sure you watch a video about the
+						fundamentals of JavaScript and React!
+					</p>
+					<button
+						className='btn-outline'
+						onClick={async () => await handleSendTestAPIRequest()}
+					>
+						Test the API
+					</button>
+				</div>
 			</div>
 		</>
 	);
