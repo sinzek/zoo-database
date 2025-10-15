@@ -1,0 +1,14 @@
+{
+	"builds": [
+		{
+			"src": "main/api/index.js",
+			"use": "@vercel/node"
+		}
+	],
+	"rewrites": [
+		{
+			"source": "/api/(.*)",
+			"destination": "/main/api/index.js"
+		}
+	]
+}

@@ -1,7 +1,6 @@
-import { useState } from 'react';
 import './App.css';
 
-function App() {
+export default function App() {
 	const handleSendTestAPIRequest = async () => {
 		try {
 			const response = await fetch('/api/auth/signup', {
@@ -18,7 +17,7 @@ function App() {
 			}
 
 			console.log('Response from API:', data);
-			alert(`Response from API: ${data.message}`);
+			alert(`Solution: 1+1=${data.solution}`);
 		} catch (err) {
 			console.error('Error calling API:', err);
 			alert(`Error: ${err.message}`);
@@ -37,11 +36,9 @@ function App() {
 					className='btn-outline'
 					onClick={async () => await handleSendTestAPIRequest()}
 				>
-					Test the API
+					What is 1+1?
 				</button>
 			</div>
 		</>
 	);
 }
-
-export default App;
