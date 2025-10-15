@@ -14,6 +14,7 @@ For our backend, we'll be using Node.js. It's a rabbit hole, so here's a quick g
 ## Get started
 
 Install NodeJS to your system: <https://nodejs.org/en/download>
+
 Install the Vercel CLI: `npm i -g vercel@latest`
 
 After cloning this repo, run `npm install` in the project root (npm is the Node Package Manager).
