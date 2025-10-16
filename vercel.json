@@ -21,5 +21,5 @@
 			"destination": "/main/index.html"
 		}
 	],
-	"outputDirectory": "main/dist"
+	"outputDirectory": "dist"
 }
