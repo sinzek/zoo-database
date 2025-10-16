@@ -7,13 +7,17 @@
 		{
 			"src": "package.json",
 			"use": "@vercel/static-build",
-			"config": { "distDir": "main/dist" }
+			"config": { "distDir": "dist" }
 		}
 	],
 	"rewrites": [
 		{
 			"source": "/api/(.*)",
 			"destination": "/main/api/index.js"
+		},
+		{
+			"source": "/((?!api/|@|.*\\.).*)",
+			"destination": "/main/index.html"
 		}
 	]
 }
