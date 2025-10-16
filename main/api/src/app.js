@@ -97,16 +97,21 @@ export class App {
 		);
 
 		req.query = Object.fromEntries(url.searchParams.entries());
-		let body = '';
-		for await (const chunk of req) body += chunk;
-		try {
-			req.body = body ? JSON.parse(body) : {};
-		} catch (err) {
-			console.error('Error parsing JSON body:', err);
-			res.statusCode = 400;
-			return res.end(
-				JSON.stringify({ error: 'Invalid JSON in request body' })
-			);
+
+		// in Vercel, the body might already be parsed.
+		// if not, we parse it from the stream
+		if (!req.body) {
+			let body = '';
+			for await (const chunk of req) body += chunk;
+			try {
+				req.body = body ? JSON.parse(body) : {};
+			} catch (err) {
+				console.error('Error parsing JSON body:', err);
+				res.statusCode = 400;
+				return res.end(
+					JSON.stringify({ error: 'Invalid JSON in request body' })
+				);
+			}
 		}
 
 		console.log('Available routes for method:', this.routes[method]);
