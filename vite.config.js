@@ -11,6 +11,6 @@ export default defineConfig({
 	envDir: './',
 	root: 'main',
 	build: {
-		outDir: 'dist',
+		outDir: '../dist',
 	},
 });
