@@ -1,13 +1,14 @@
-import http from 'http';
-
 /**
  * a simple express-like framework for handling HTTP requests.
  * supports GET, POST, PUT, DELETE methods.
  * usage:
  * const app = new App();
  *
- * REGISTERING ROUTES:
- * app.{get/post/put/delete}('/path', (req, res) => { ... });
+ * *ROUTE DEFINITION EXAMPLE:*
+ * ```js
+ * app.post('/api/some-path', controller.handlerFunction);
+ * ```
+ *
  *
  * this is intended to work with serverless platforms like vercel
  * (which is what we're using as our web hosting provider)
@@ -17,52 +18,64 @@ export class App {
 		this.routes = { GET: {}, POST: {}, PUT: {}, DELETE: {} };
 	}
 
-	// requests with method GET
-	// path: string, path of the endpoint
-	// handler: function, handles the request
+	/**
+	 * Register a route handler for a GET request at the specified path.
+	 * @example
+	 * app.get('/api/some-path', (req, res) => { ... });
+	 * @example
+	 * app.get('/api/some-path', controller.handlerFunction);
+	 * @param {string} path The URL path for the GET request.
+	 * @param {function} handler The function to handle the GET request.
+	 */
 	get(path, handler) {
 		this.routes.GET[path] = handler;
 	}
 
+	/**
+	 * Register a route handler for a POST request at the specified path.
+	 * @example
+	 * app.post('/api/some-path', (req, res) => { ... });
+	 * @example
+	 * app.post('/api/some-path', controller.handlerFunction);
+	 * @param {string} path The URL path for the POST request.
+	 * @param {function} handler The function to handle the POST request.
+	 */
 	post(path, handler) {
 		this.routes.POST[path] = handler;
 	}
 
+	/**
+	 * Register a route handler for a PUT request at the specified path.
+	 * @example
+	 * app.put('/api/some-path', (req, res) => { ... });
+	 * @example
+	 * app.put('/api/some-path', controller.handlerFunction);
+	 * @param {string} path The URL path for the PUT request.
+	 * @param {function} handler The function to handle the PUT request.
+	 */
 	put(path, handler) {
 		this.routes.PUT[path] = handler;
 	}
 
+	/**
+	 * Register a route handler for a DELETE request at the specified path.
+	 * @example
+	 * app.delete('/api/some-path', (req, res) => { ... });
+	 * @example
+	 * app.delete('/api/some-path', controller.handlerFunction);
+	 * @param {string} path The URL path for the DELETE request.
+	 * @param {function} handler The function to handle the DELETE request.
+	 */
 	delete(path, handler) {
 		this.routes.DELETE[path] = handler;
 	}
 
-	// use this for development only!
-	// (in production, serverless platforms remove the need for an always-on server)
-	startDevServer(port, callback) {
-		// create server object
-		const server = http.createServer((req, res) => {
-			const { method, url } = req;
-			const parsedUrl = new URL(url, `http://${req.headers.host}`);
-			const pathname = parsedUrl.pathname;
-
-			// find the appropriate handler based on method and pathname
-			const handler = this.routes[method]?.[pathname];
-
-			if (handler) {
-				handler(req, res);
-			} else {
-				res.writeHead(404, { 'Content-Type': 'application/json' });
-				res.end(JSON.stringify({ error: 'Not Found' }));
-			}
-		});
-
-		// starts server, keeps node process running to listen for incoming HTTP requests on the specified port
-		server.listen(port, callback);
-	}
-
-	// this is the function that vercel will call when a request comes in
-	// event: object, contains details about the incoming request
-	// returns a response object that vercel understands
+	/**
+	 * This is the function that vercel will call when a request comes in
+	 * @param {any} req The incoming request object
+	 * @param {any} res The response object to send data back
+	 * @returns {any} Returns a response object that vercel understands
+	 */
 	async handleVercel(req, res) {
 		const method = req.method;
 		const url = new URL(req.url, `http://${req.headers.host}`);
@@ -75,23 +88,25 @@ export class App {
 		if (!handler) {
 			console.log(`No handler found for ${method} ${pathname}`);
 
-			
-			
 			res.statusCode = 404;
 			return res.end(JSON.stringify({ error: 'Not Found' }));
 		}
 
-		console.log(`Handler found for ${method} ${pathname}, processing request...`);
+		console.log(
+			`Handler found for ${method} ${pathname}, processing request...`
+		);
 
 		req.query = Object.fromEntries(url.searchParams.entries());
 		let body = '';
 		for await (const chunk of req) body += chunk;
 		try {
 			req.body = body ? JSON.parse(body) : {};
-		} catch(err) {
+		} catch (err) {
 			console.error('Error parsing JSON body:', err);
 			res.statusCode = 400;
-			return res.end(JSON.stringify({ error: 'Invalid JSON in request body' }));
+			return res.end(
+				JSON.stringify({ error: 'Invalid JSON in request body' })
+			);
 		}
 
 		console.log('Available routes for method:', this.routes[method]);
@@ -102,19 +117,19 @@ export class App {
 			const responseBody = await handler(req, res);
 
 			// if the handler sends a response body, end the response
-			if(responseBody) {
+			if (responseBody) {
 				res.end(responseBody);
-			} else if(!res.writableEnded) {
+			} else if (!res.writableEnded) {
 				// if the handler didn't send a response, and the response isn't already ended, end it with no content
 				res.statusCode = res.statusCode || 204; // default to 204 No Content
 				res.end();
 			}
-		} catch(err) {
+		} catch (err) {
 			console.log('Error in handler function:', err);
 			res.statusCode = 500;
 			return res.end(JSON.stringify({ error: 'Internal Server Error' }));
 		}
-		
+
 		console.log('Handler function completed.');
 	}
 }

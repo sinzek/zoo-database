@@ -14,10 +14,16 @@ if (!host || !user || !password || !database || !port) {
 	);
 }
 
+/**
+ * Database connection pool
+ * @type {mysql.Connection}
+ */
 export const db = await mysql.createConnection({
-	host: process.env.MYSQL_HOST,
-	user: process.env.MYSQL_USER,
-	password: process.env.MYSQL_PASSWORD,
-	database: process.env.MYSQL_DATABASE,
-	port: process.env.MYSQL_PORT,
+	host,
+	user,
+	password,
+	database,
+	port,
+	multipleStatements: true, // allow executing multiple SQL statements in one query
+	rowsAsArray: false, // return rows as objects instead of arrays
 });
