@@ -282,6 +282,14 @@ CREATE TABLE Expense (
     FOREIGN KEY (businessId) REFERENCES Business(businessId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE AuthSession (
+    id CHAR(36) PRIMARY KEY, -- uuid
+    customerId CHAR(36) NULL, -- uuid, foreign key to Customer(id)
+    employeeId CHAR(36) NULL, -- uuid, foreign key to Employee(id)
+    expiresAt DATETIME NOT NULL, -- session expiration datetime
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP -- defaults to current timestamp
+);
+
 ALTER TABLE Business
 ADD CONSTRAINT fk_business_owner
 FOREIGN KEY (ownerId) REFERENCES Employee(employeeId) ON DELETE SET NULL ON UPDATE CASCADE;

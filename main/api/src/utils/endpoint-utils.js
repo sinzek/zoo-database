@@ -16,7 +16,13 @@ export function sendJSON(res, statusCode, payload, ...cookies) {
 
 	if (cookies && cookies.length > 0) {
 		for (const cookie of cookies) {
-			res.setHeader('Set-Cookie', cookie);
+			res.setHeader('Set-Cookie', {
+				name: cookie.name,
+				value: cookie.value,
+				httpOnly: true,
+				secure: process.env.NODE_ENV === 'production',
+				sameSite: 'lax',
+			});
 		}
 	}
 

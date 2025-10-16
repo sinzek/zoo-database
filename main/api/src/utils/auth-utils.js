@@ -1,7 +1,8 @@
 import crypto from 'crypto';
+import { db } from '../db/mysql';
 
 /**
- * For hashing passwords using SHA-256 (this is pretty insecure)
+ * For hashing passwords using SHA-256 (this is pretty insecure, but it's good enough for this project lol)
  * @param {string} password
  * @returns {string} Hashed password
  */
@@ -11,59 +12,6 @@ export function sha256Hash(password) {
 	}
 
 	return crypto.createHash('sha256').update(password).digest('hex');
-}
-
-/**
- * Validates password against basic rules:
- * - at least 8 characters
- * - at least one uppercase letter
- * - at least one lowercase letter
- * - at least one number
- * - at least one special character
- * @param {string} password
- * @returns {{valid: boolean, error?: string}} if not valid, error contains reason
- */
-export function validatePasswordRules(password) {
-	if (typeof password !== 'string') {
-		return { valid: false, error: 'Password must be a string' };
-	}
-
-	if (password.length < 8) {
-		return {
-			valid: false,
-			error: 'Password must be at least 8 characters long',
-		};
-	}
-
-	if (!/[A-Z]/.test(password)) {
-		return {
-			valid: false,
-			error: 'Password must contain at least one uppercase letter',
-		};
-	}
-
-	if (!/[a-z]/.test(password)) {
-		return {
-			valid: false,
-			error: 'Password must contain at least one lowercase letter',
-		};
-	}
-
-	if (!/[0-9]/.test(password)) {
-		return {
-			valid: false,
-			error: 'Password must contain at least one number',
-		};
-	}
-
-	if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-		return {
-			valid: false,
-			error: 'Password must contain at least one special character',
-		};
-	}
-
-	return { valid: true };
 }
 
 /**
@@ -90,4 +38,46 @@ export function validateStrings(...strings) {
 	}
 
 	return true;
+}
+
+export function determineEmptyFields(obj) {
+	const affected = [];
+	for (const [key, value] of Object.entries(obj)) {
+		if (!value || (typeof value === 'string' && value.trim() === '')) {
+			affected.push(key);
+		}
+	}
+
+	return affected;
+}
+
+/**
+ * Creates a new authentication session for either a customer or an employee. Only one of customerId or employeeId should be provided.
+ * @param {string} customerId Optional ID of customer
+ * @param {string} employeeId Optional ID of employee
+ * @returns {Promise<string>} ID of newly created session
+ */
+export async function createSession(customerId, employeeId) {
+	if (!customerId && !employeeId) {
+		throw new Error(
+			'Must provide either customerId or employeeId to create a session'
+		);
+	}
+
+	if (customerId && employeeId) {
+		throw new Error(
+			'Cannot provide both customerId and employeeId to create a session'
+		);
+	}
+
+	const uuid = crypto.randomUUID();
+
+	// add session to db, return session id to be stored in cookie
+	await db.query(
+		`INSERT INTO AuthSession (id, customerId, employeeId) VALUES (?, ?, ?)`,
+		[uuid, customerId || null, employeeId || null]
+	);
+
+	// successful, return session id
+	return uuid;
 }
