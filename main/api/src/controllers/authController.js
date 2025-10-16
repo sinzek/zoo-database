@@ -44,7 +44,7 @@ async function signup(req, res) {
 	try {
 		const newUUID = crypto.randomUUID();
 
-		// will throw ER_DUP_ENTRY, code 1062 if email already exists
+		// will throw code ER_DUP_ENTRY if email already exists
 		await db.query(
 			`
 		INSERT INTO Customer (customerId, firstName, lastName, middleInitial, email, passwordHash, deletedAt)
@@ -74,7 +74,7 @@ async function signup(req, res) {
 			res,
 			201,
 			{ user: newUserData },
-			// cookies to send (all will be HttpOnly and Secure)
+			// cookies to send (all will be httpOnly and secure in prod)
 			[
 				{
 					name: 'session',
@@ -85,7 +85,7 @@ async function signup(req, res) {
 	} catch (err) {
 		if (err.code === 'ER_DUP_ENTRY') {
 			return sendJSON(res, 409, {
-				error: 'Email already in use',
+				error: 'Email already in use. Did you mean to log in?',
 				affectedFields: ['email'],
 			});
 		}
