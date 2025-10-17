@@ -2,7 +2,7 @@ import { sendJSON } from '../utils/endpoint-utils.js';
 import { db } from '../db/mysql.js';
 import crypto from 'crypto';
 
-async function createAnimal(req, res){
+async function createOne(req, res){
 	const newAnimal = req.body;
 
 	const {firstName, lastName, commonName, species, genus, birthDate, importedFrom, importDate, sex, behavior, habitatID} = newAnimal;
@@ -35,10 +35,10 @@ async function createAnimal(req, res){
 		);
 }
 
-async function updateAnimal(req, res){
+async function updateOne(req, res){
 	//body has ALL the attributes, on the frontend their default values are set to the values on the db. we just check differences?
 	const updatedAnimal = req.body;
-	
+
 	const {animalId, firstName, lastName, commonName, species, genus, birthDate, deathDate, importedFrom, importDate, sex, behavior} = updatedAnimal;
 
 //what if animal dont exist?
@@ -60,7 +60,7 @@ async function updateAnimal(req, res){
 		)
 }
 
-async function getAnimalByID(req, res){
+async function getOneByID(req, res){
 	//you can get an animal many ways, but in the frontend, it queries based on some "filter", ie; only show me animals living in X habitat. Clicking on them returns the animalID.
 	const findAnimal = req.body; //findAnimal only has the animalID
 	const findAnimalID = findAnimal.animalID;
@@ -80,7 +80,7 @@ async function getAnimalByID(req, res){
 		);
 }
 
-async function getAnimalByHabitat(req, res){
+async function getManyByHabitat(req, res){
 	const requestedHabitat = req.body;
 	const habitatID = requestedHabitat.habitatID;
 	const [result] = await db.query(
@@ -99,7 +99,7 @@ async function getAnimalByHabitat(req, res){
 	);
 }
 
-async function getAnimalByHandler(req, res){ //by employeeid
+async function getManyByHandler(req, res){ //by employeeid
 	const handlerInfo = req.body;
 
 	const [AnimalsTakenCareBy] = await db.query(
@@ -121,4 +121,4 @@ async function getAnimalByHandler(req, res){ //by employeeid
 	)
 }
 
-export default {createAnimal, updateAnimal, getAnimalByID, getAnimalByHandler, getAnimalByHabitat};
+export default {createOne, updateOne, getOneByID, getManyByHabitat, getManyByHandler};

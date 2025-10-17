@@ -81,6 +81,10 @@ async function updateOne(req, res){
 			accessLevel, jobTitle, firstName, lastName, middleInitial, sex, ssn, hourlyWage, jobDescription, addressPostalCode, addressCity, addressState, payInfoAccountNum, payInfoPaymentMethod, businessId, terminationDate, birthDate, phone, email, supervisorId
 		]
 	);
+	return sendJSON(res,
+		201,
+		{message: 'Employee successfully updated'}
+	);
 }
 
 

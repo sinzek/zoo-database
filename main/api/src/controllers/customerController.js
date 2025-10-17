@@ -17,6 +17,10 @@ async function createOne(req, res){
 		[customerID, firstName, lastName, middleInitial]
 	);
 
+	return sendJSON(res,
+		201,
+		{message: 'Customer successfully created'}
+	);
 }
 
 async function getOne(req, res){

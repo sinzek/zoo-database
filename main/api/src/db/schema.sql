@@ -104,7 +104,7 @@ CREATE TABLE PurchasedItem (
 );
 
 CREATE TABLE BusinessHoursDay (
-    businessHoursDayId CHAR(36) PRIMARY KEY, -- uuid
+    --weak entity
     businessId CHAR(36) NOT NULL, -- uuid, foreign key to Business(id)
     dayOfWeek ENUM('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NOT NULL,
     openTime TIME NOT NULL, -- time only (no date)
@@ -127,7 +127,7 @@ CREATE TABLE Attraction (
 );
 
 CREATE TABLE AttractionHoursDay (
-    attractionHoursDayId CHAR(36) PRIMARY KEY, -- uuid
+    -- weak entity 
     attractionId CHAR(36) NOT NULL, -- uuid, foreign key to Attraction(id)
     dayOfWeek ENUM('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NOT NULL,
     openTime TIME NOT NULL, -- time only (no date)
