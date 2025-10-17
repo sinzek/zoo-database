@@ -15,6 +15,31 @@ async function createOne(req, res){
 		`,
 		[newBusinessID, name, address, phone, email, uiDesc, businessType, createdAt, ownerID]
 	);
+
+	const {mondayOpen, mondayClose,	tuesdayOpen, tuesdayClose,	wednesdayOpen,	wednesdayClose,	thursdayOpen,	thursdayClose,
+		fridayOpen,	fridayClose,	saturdayOpen,	saturdayClose,	sundayOpen,	sundayClose} = newBusiness;
+
+		//update business hours
+	const hours = [
+		['Sunday', sundayOpen, sundayClose],
+		['Monday', mondayOpen, mondayClose],
+		['Tuesday', tuesdayOpen, tuesdayClose],
+		['Wednesday', wednesdayOpen, wednesdayClose],
+		['Thursday', thursdayOpen, thursdayClose],
+		['Friday', fridayOpen, fridayClose],
+		['Saturday', saturdayOpen, saturdayClose]
+	];
+
+	for (const [dayOfWeek, openTime, closeTime] of hours){
+		await db.query(
+			`
+			INSERT INTO BusinessHoursDay (businessId, dayOfWeek, openTime, closeTime)
+			VALUES(?, ?, ?, ?);
+			`,
+			[newBusinessID, dayOfWeek, openTime, closeTime]
+		);
+	}
+
 	return sendJSON(res,
 		201,
 		{message: 'Business successfully created'}
@@ -42,7 +67,7 @@ async function deleteOne(req, res){
 	);
 }
 
-async function updateOne(req, res){
+async function updateOneInfo(req, res){
 	const updatedBusiness = req.body;
 	const {name, address, phone, email, uiDesc} = updatedBusiness; //if updating a business, only these fields can be updated. If you try to update the ID it could break things, and a business type shouldnt be changed, just create another and delete the old one.
 
@@ -58,6 +83,38 @@ async function updateOne(req, res){
 	return sendJSON(res,
 		201,
 		{message: 'Business successfully updated'}
+	);
+}
+
+async function updateOneHours(req, res){
+	const updatedBusinessHours = req.body;
+	const {mondayOpen, mondayClose,	tuesdayOpen,	tuesdayClose,	wednesdayOpen,	wednesdayClose,	thursdayOpen,	thursdayClose,
+		fridayOpen,	fridayClose,	saturdayOpen,	saturdayClose,	sundayOpen,	sundayClose} = updatedBusinessHours;
+		
+		//update business hours
+	const hours = [
+		['Sunday', sundayOpen, sundayClose],
+		['Monday', mondayOpen, mondayClose],
+		['Tuesday', tuesdayOpen, tuesdayClose],
+		['Wednesday', wednesdayOpen, wednesdayClose],
+		['Thursday', thursdayOpen, thursdayClose],
+		['Friday', fridayOpen, fridayClose],
+		['Saturday', saturdayOpen, saturdayClose]
+	];
+	
+	for (const [dayOfWeek, openTime, closeTime] of hours){
+		await db.query(`
+			UPDATE BusinessHoursDay
+			SET openTime = ?, closeTime = ?
+			WHERE businessId = ? AND dayOfWeek = ?;
+			`,
+		[
+			openTime, closeTime, updatedBusinessHours.businessId, dayOfWeek
+		]);
+	}
+	return sendJSON(res,
+		201,
+		{message: 'Business hours successfully updated'}
 	);
 }
 
@@ -79,4 +136,4 @@ async function getEmployees(req, res){
 	);
 }
 
-export default {createOne, updateOne, deleteOne, getEmployees};
+export default {createOne, updateOneInfo, updateOneHours, deleteOne, getEmployees};
