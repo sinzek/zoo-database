@@ -10,7 +10,7 @@ const MembershipCard = ({ title, price, details, bestValue = false, image, link 
       </div>
       <div className="card-content">
         <h3 className="card-title">{title} {bestValue && <span className="best-value-tag">(Best Value)</span>}</h3>
-        <p className="card-price">**${price}**</p>
+        <p className="card-price">${price}</p>
         <p className="card-details">{details}</p>
       </div>
     </div>
