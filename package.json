@@ -1,7 +1,33 @@
 {
-	"name": "zoo-db-team-10",
+	"name": "zoo-database",
 	"private": true,
-	"workspaces": [
-		"main"
-	]
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"lint": "eslint .",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"mysql2": "^3.15.2",
+		"prop-types": "^15.8.1",
+		"react": "^19.2.0",
+		"react-dom": "^19.2.0"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.37.0",
+		"@types/react": "^19.2.2",
+		"@types/react-dom": "^19.2.2",
+		"@vitejs/plugin-react-swc": "^4.1.0",
+		"eslint": "^9.33.0",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-n": "^17.23.1",
+		"eslint-plugin-react": "^7.37.5",
+		"eslint-plugin-react-hooks": "^5.2.0",
+		"eslint-plugin-react-refresh": "^0.4.23",
+		"globals": "^16.3.0",
+		"prettier": "^3.6.2",
+		"vite": "^7.1.10"
+	}
 }

@@ -1,0 +1,98 @@
+.navbar {
+	background-color: var(--color-dgreen);
+	padding: 10px 60px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	position: fixed;
+	top: 0;
+	z-index: 100;
+	overflow: hidden;
+	max-width: 100vw;
+	box-sizing: border-box;
+}
+
+.navbar-content {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 20px;
+}
+
+.buttons {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 10px;
+}
+
+.navbar-logo {
+	color: var(--color-dbrown);
+	font-size: 1.5em;
+	font-weight: bold;
+	text-decoration: none;
+	display: flex;
+	align-items: center;
+	flex-direction: row;
+	gap: 10px;
+	font-family:
+		'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans',
+		Arial, sans-serif;
+	transition: color 0.15s;
+	letter-spacing: -0.05em;
+}
+
+.navbar-logo:hover {
+	color: var(--color-lgreen);
+	text-decoration: none;
+}
+
+.navbar-logo img {
+	height: 50px;
+	width: 50px;
+	object-fit: cover;
+	border-radius: 10px;
+}
+
+.navbar-logo:hover img {
+	transform: scale(1.05);
+	transition: transform 0.15s;
+}
+
+.navbar-links {
+	padding-top: 3px;
+	display: flex;
+	gap: 20px;
+	list-style-type: none;
+}
+
+.navbar-item {
+	text-transform: uppercase;
+}
+
+.navbar-link {
+	color: var(--color-dbrown);
+	font-size: 1.1em;
+	text-decoration: none;
+	transition: color 0.15s;
+	font-weight: 600;
+}
+
+.navbar-link:hover {
+	color: var(--color-lgreen);
+	text-decoration: none;
+}
+
+.navbar-underline {
+	height: 1.5px;
+	background-color: var(--color-lgreen);
+	scale: 0;
+	transform-origin: center;
+	transition: all 0.3s;
+	margin-top: 3px;
+}
+
+.navbar-item:hover .navbar-underline {
+	scale: 1;
+}

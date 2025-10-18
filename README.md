@@ -15,11 +15,24 @@ For our backend, we'll be using Node.js. It's a rabbit hole, so here's a quick g
 
 Install NodeJS to your system: <https://nodejs.org/en/download>
 
-After cloning this repo, run `npm install` in the /main folder (npm is the Node Package Manager).
+Install the Vercel CLI: `npm i -g vercel@latest`
 
-To spin up a dev server, run `npm run dev` when in the /main folder.
+After cloning this repo, run `npm install` in the project root (npm is the Node Package Manager).
 
-To start the NodeJS server for our backend, run `node api/index.js` when in the /backend folder.
+To spin up a dev server, run `vercel dev` when in the project root.
+
+### Vercel Setup for Teammates
+
+Since we are on the Vercel free plan, each team member must link to their own Vercel project for local development.
+
+When you run `vercel dev` for the first time:
+
+1. It will ask to set up the project. Answer **Yes**.
+2. It will ask to link to an existing project. Answer **No**.
+3. Give your new project a unique name (e.g., `yourname-zoo-db`).
+4. After the project is created, you must add your own environment variables (e.g., database credentials) to your new Vercel project via the Vercel dashboard or by running `vercel env add <VARIABLE_NAME>`. All environment variables used in this project can be found in the `#resources` channel on Discord.
+
+This will create a `.vercel` directory locally that links to your personal project. This directory is in `.gitignore` and should not be committed.
 
 ## Commit naming conventions
 
