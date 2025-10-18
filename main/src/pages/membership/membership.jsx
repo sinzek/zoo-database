@@ -1,5 +1,5 @@
 import React from 'react';
-import './Membership.css'; // Import the CSS file
+import './membership.css'; // Import the CSS file
 
 
 const MembershipCard = ({ title, price, details, bestValue = false, image, link }) => (

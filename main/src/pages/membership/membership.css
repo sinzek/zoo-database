@@ -1,10 +1,10 @@
-/* --- General Styling --- */
+
 .membership-page {
   text-align: center;
   padding: 40px 20px;
-  font-family: 'Georgia', serif; /* Use a serif font for a classic, elegant look */
-  color: #333; /* Dark text color */
-  background-color: #f7f5ef; /* Light, off-white background for the page */
+  font-family: 'Georgia', serif; 
+  color: #333; 
+  background-color: #f7f5ef; 
 }
 
 .page-title {
@@ -12,33 +12,33 @@
   font-weight: normal;
   margin-bottom: 60px;
   letter-spacing: 1px;
-  color: #5d5d5d; /* Slightly darker than body text */
+  color: #5d5d5d; 
 }
 
-/* --- Grid Layout (Top Row) --- */
+
 .membership-grid {
   display: flex;
-  justify-content: center; /* Center the entire row horizontally */
-  gap: 30px; /* Space between cards */
+  justify-content: center; 
+  gap: 30px; 
   margin-bottom: 50px;
-  flex-wrap: wrap; /* Allows cards to wrap on smaller screens */
+  flex-wrap: wrap; 
 }
 
-/* --- Donor Club Section (Bottom Row) --- */
+
 .donor-club-section {
   display: flex;
-  justify-content: center; /* Center the bottom row's cards */
+  justify-content: center; 
   gap: 30px;
   margin-top: 50px;
   flex-wrap: wrap;
 }
 
-/* --- Individual Card Styling --- */
+
 .membership-card-link {
-  text-decoration: none; /* Remove default link underline */
-  color: inherit; /* Inherit text color */
-  display: block; /* Allows margin/padding/width to be set */
-  width: 250px; /* Set a fixed width for consistent card size */
+  text-decoration: none; 
+  color: inherit; 
+  display: block; 
+  width: 250px; 
 }
 
 .membership-card {
@@ -46,7 +46,7 @@
   flex-direction: column;
   align-items: center;
   padding: 10px;
-  /* Optional: subtle shadow or border on hover */
+ 
   transition: transform 0.3s ease;
 }
 
@@ -54,24 +54,24 @@
   transform: translateY(-5px);
 }
 
-/* --- Circular Image Styling --- */
+
 .card-image-container {
-  width: 150px; /* Size of the circle */
+  width: 150px; 
   height: 150px;
-  border-radius: 50%; /* **Creates the circular shape** */
-  overflow: hidden; /* Clips the image to the circle */
+  border-radius: 50%; 
+  overflow: hidden; 
   margin-bottom: 15px;
-  border: 1px solid #ccc; /* Optional light border */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow on image */
+  border: 1px solid #ccc; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
 }
 
 .card-image {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures the image covers the entire circle without distortion */
+  object-fit: cover; 
 }
 
-/* --- Card Content Styling --- */
+
 .card-content {
   text-align: center;
 }
@@ -84,26 +84,26 @@
 
 .card-price {
   font-size: 1em;
-  color: #4a755d; /* A soft green for the price/key info */
+  color: #4a755d; 
   font-weight: bold;
   margin: 0 0 5px 0;
 }
 
 .card-details {
   font-size: 0.9em;
-  color: #666; /* Lighter text for details */
+  color: #666; 
   font-style: italic;
   margin: 0;
 }
 
-/* --- Best Value Tag Styling --- */
+
 .best-value .card-price {
-    /* Optionally make the price stand out more for the best value */
-    color: #cc6633; /* A warm color */
+    
+    color: #cc6633; 
 }
 
 .best-value-tag {
-    /* Style for the (Best Value) text */
+    
     font-size: 0.8em;
     font-weight: bold;
     color: #cc6633;
