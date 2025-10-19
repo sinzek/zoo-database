@@ -2,6 +2,14 @@ import "./habitats.css";
 import { Link } from "../../components/link";
 import { BackgroundDots } from "../home/components/backgroundDots";
 
+function toSlug(name) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
+
 export default function HabitatsPage() {
   const habitats = [
     {
@@ -54,6 +62,7 @@ export default function HabitatsPage() {
           src="/images/habitats/habitats-hero.webp"
           alt="Habitats Hero"
         />
+        <div className="accent-bar" />
         <h4 className="hero-pre-text">Explore our environments</h4>
         <h1 className="hero-main-text">Habitats</h1>
         <p className="hero-sub-text">
@@ -80,13 +89,25 @@ export default function HabitatsPage() {
 
         <div className="section">
           <div className="habitat-grid">
-            {habitats.map((h) => (
-              <div className="habitat-card" key={h.name}>
-                <img src={h.img} alt={h.name} className="habitat-img" />
-                <h3>{h.name}</h3>
-                <p>{h.desc}</p>
-              </div>
-            ))}
+            {habitats.map((h) => {
+              const slug = toSlug(h.name);
+              return (
+                <div className="habitat-card" key={h.name}>
+                  <img src={h.img} alt={h.name} className="habitat-img" />
+                  <h3>{h.name}</h3>
+                  <p>{h.desc}</p>
+                  <div className="card-actions">
+                    <Link
+                      to={`/habitats/${slug}`}
+                      href={`/habitats/${slug}`}
+                      className="text-link"
+                    >
+                      Learn more →
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
