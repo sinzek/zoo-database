@@ -6,42 +6,42 @@ export default function HabitatsPage() {
   const habitats = [
     {
       name: "African Savanna",
-      img: "/images/savanna.webp",
+      img: "/images/habitats/savanna.webp",
       desc: "Grassy plains dotted with acacia trees. Home to lions, zebras, and giraffes.",
     },
     {
       name: "Tropical Rainforest",
-      img: "/images/rainforest.webp",
+      img: "/images/habitats/rainforest.webp",
       desc: "Dense canopy and lush greenery housing parrots, monkeys, and frogs.",
     },
     {
       name: "Arctic Tundra",
-      img: "/images/tundra.webp",
+      img: "/images/habitats/tundra.webp",
       desc: "Cold, windswept plains where arctic foxes and caribou thrive.",
     },
     {
       name: "Coastal Wetlands",
-      img: "/images/wetlands.webp",
+      img: "/images/habitats/wetlands.webp",
       desc: "Shallow pools and marsh grasses supporting otters, herons, and amphibians.",
     },
     {
       name: "Mountain Highlands",
-      img: "/images/mountains.webp",
+      img: "/images/habitats/mountains.webp",
       desc: "Steep cliffs and rocky slopes where snow leopards and mountain goats live.",
     },
     {
       name: "Coral Reef",
-      img: "/images/coralreef.webp",
+      img: "/images/habitats/coralreef.webp",
       desc: "Vibrant underwater worlds teeming with fish, coral, and sea turtles.",
     },
     {
       name: "Grasslands",
-      img: "/images/grasslands.webp",
+      img: "/images/habitats/grasslands.webp",
       desc: "Wide open plains with tall grasses where elephants and antelopes roam.",
     },
     {
       name: "Temperate Forest",
-      img: "/images/forest.webp",
+      img: "/images/habitats/forest.webp",
       desc: "Deciduous and conifer trees with deer, bears, and diverse birdlife.",
     },
   ];
@@ -51,7 +51,7 @@ export default function HabitatsPage() {
       <div className="hero-container habitat-hero">
         <img
           className="hero-image"
-          src="/images/habitats-hero.webp"
+          src="/images/habitats/habitats-hero.webp"
           alt="Habitats Hero"
         />
         <h4 className="hero-pre-text">Explore our environments</h4>
