@@ -59,12 +59,12 @@ h1 {
 	color: var(--color-lgreen);
 }
 
-/* .pwd-row {
+.pwd-row {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 	gap: 15px;
-} */
+}
 
 .show-pwd-btn {
 	background: var(--color-brown);

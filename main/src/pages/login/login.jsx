@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import './login.css';
 //import { useRouter } from '../../context/routerContext';
-import { showToast } from '../../components/toast/showToast';
 import { Loader } from '../../components/loader/loader';
-import { api } from '../../utils/client-api-utils';
+import { useUserData } from '../../context/userDataContext';
 
 export default function LoginPage() {
+	const { login } = useUserData();
+
 	const [formData, setFormData] = useState({
 		email: '',
 		password: '',
@@ -19,22 +20,8 @@ export default function LoginPage() {
 
 		setIsSubmitting(true);
 
-		const result = await api('/api/auth/login', 'POST', {
-			email: formData.email,
-			password: formData.password,
-		});
+		await login(formData.email, formData.password);
 
-		if (!result.success) {
-			console.error('Login error:', result.error);
-			showToast(`ERROR: ${result.error || 'Failed to log in'}`);
-			setError(result.error || 'Failed to log in');
-			setIsSubmitting(false);
-			return;
-		}
-
-		const { data } = result;
-		console.log('Login successful:', data);
-		showToast('Success! Logged in.');
 		setIsSubmitting(false);
 		//router.navigateTo('/portal'); --- IGNORE ---
 	}
@@ -47,7 +34,7 @@ export default function LoginPage() {
 				Log in to access your account and explore the wild side!
 			</p>
 			{error && <p className='error-message'>{error}</p>}
-			<form
+			<div
 				className='login-form'
 				id='login-form'
 			>
@@ -58,28 +45,38 @@ export default function LoginPage() {
 						autoComplete='email'
 						type='email'
 						value={formData.email}
-						onChange={(e) =>
+						onChange={(e) => {
 							setFormData({
 								...formData,
 								email: e.target.value,
-							})
-						}
+							});
+							setError(null);
+						}}
 						placeholder='Enter your email address'
 					/>
 				</div>
 				<div className='form-group'>
-					<label htmlFor='password'>Password</label>
+					<div className='pwd-row'>
+						<label htmlFor='password'>Password</label>
+						<button
+							className='show-pwd-btn'
+							onClick={() => setShowPassword(!showPassword)}
+						>
+							{showPassword ? '🙈 Hide' : '🐵 Show'}
+						</button>
+					</div>
 					<input
 						id='password'
 						autoComplete='current-password'
-						type='password'
+						type={showPassword ? 'text' : 'password'}
 						value={formData.password}
-						onChange={(e) =>
+						onChange={(e) => {
 							setFormData({
 								...formData,
 								password: e.target.value,
-							})
-						}
+							});
+							setError(null);
+						}}
 						placeholder='Enter your password'
 					/>
 				</div>
@@ -96,7 +93,7 @@ export default function LoginPage() {
 					{isSubmitting && <Loader />}
 					{isSubmitting ? 'Logging in...' : 'Log In'}
 				</button>
-			</form>
+			</div>
 		</div>
 	);
 }

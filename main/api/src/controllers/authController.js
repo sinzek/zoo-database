@@ -5,7 +5,7 @@ import { getCustomerOrEmployeeById } from '../utils/auth-utils.js';
 // im using underscore-prefixed variables to avoid linting errors
 // about unused variables since these are just placeholders
 
-async function login(req, res) {
+async function login(req, _res) {
 	const { email, password } = req.body;
 
 	if (!email || !password) throw new Error('Missing email or password');
@@ -26,19 +26,58 @@ async function login(req, res) {
 
 	const token = signJWT({ id: user.userId });
 
-	res.setHeader('Set-Cookie', [
-		`session=${token}; HttpOnly; Path=/; Max-Age=${30 * 24 * 60 * 60}; SameSite=Strict; Secure`,
-	]); // 30 days
+	const cookie = {
+		name: 'session',
+		value: token,
+		options: {
+			HttpOnly: true,
+			Path: '/',
+			MaxAge: 30 * 24 * 60 * 60, // 30 days
+			SameSite: 'Strict',
+			Secure: true,
+		},
+	};
 
-	return [{ user, relatedInfo }];
+	return [
+		{ user: { userId: user.userId, email: user.email }, relatedInfo },
+		[cookie],
+	]; // omit passwordHash
 }
 
-async function logout(_req, res) {
-	res.setHeader('Set-Cookie', [
-		`session=; HttpOnly; Path=/; Max-Age=0; SameSite=Strict; Secure`,
-	]);
+async function logout(_req, _res) {
+	console.log('LOGOUT CALLED');
 
-	return [null, [], 204]; // no content status
+	const expiredCookie = {
+		name: 'session',
+		value: '',
+		options: {
+			HttpOnly: true,
+			Path: '/',
+			MaxAge: 0,
+			SameSite: 'Strict',
+			Secure: true,
+		},
+	};
+
+	return [null, [expiredCookie], 204]; // no content status
 }
 
-export default { login, logout };
+async function getUserData(req, _res) {
+	const userId = req.session.data.id;
+	console.log('GET USER DATA CALLED FOR USER ID:', userId);
+
+	const [user] = await query(
+		`SELECT userId, email FROM User WHERE userId = ?`,
+		[userId]
+	);
+
+	if (!user) throw new Error('User not found!');
+
+	const relatedInfo = await getCustomerOrEmployeeById(user.userId);
+
+	if (!relatedInfo) throw new Error('No related user info found'); // should not happen
+
+	return [{ user, relatedInfo }]; // omit passwordHash
+}
+
+export default { login, logout, getUserData };
