@@ -1,14 +1,9 @@
 import { sendJSON } from '../utils/endpoint-utils.js';
 import { db } from '../db/mysql.js';
-import { validateStrings, determineEmptyFields } from '../utils/auth-utils.js';
 import crypto from 'crypto';
 
-async function createOne(req, res) {
+async function createOne(req, res){
 	const newAnimal = req.body;
-
-	if (!newAnimal || typeof newAnimal !== 'object') {
-		return sendJSON(res, 400, { error: 'Invalid request body' });
-	}
 
 	const {
 		firstName,
@@ -24,82 +19,25 @@ async function createOne(req, res) {
 		habitatId,
 	} = newAnimal;
 
-	//stop code injection
-	if (
-		!validateStrings(
-			firstName,
-			lastName,
-			commonName,
-			species,
-			genus,
-			behavior,
-			importedFrom
-		)
-	) {
-		return sendJSON(res, 400, {
-			error: 'Missing required fields',
-			affectedFields: determineEmptyFields(newAnimal),
-		});
-	}
-	//Code to validate dates? validate that birthDate not in future and same for importdate
-	try {
-		const newAnimalUUId = crypto.randomUUId();
+		const newAnimalUUID = crypto.randomUUID();
 
-		await db.query(
-			`
-			INSERT INTO Animal (animalId, firstName, lastName, commonName, species, genus, birthDate, importedFrom, importDate, sex, behavior, habitatId)
-			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-			`,
-			[
-				newAnimalUUId,
-				firstName,
-				lastName,
-				commonName,
-				species,
-				genus,
-				birthDate,
-				importedFrom,
-				importDate,
-				sex,
-				behavior,
-				habitatId,
-			]
-		);
-
-		//select data that you want the user to see
 		const [result] = await db.query(
 			`
-			SELECT *
-			FROM Animal
-			WHERE animalId = ?
+			INSERT INTO Animal (animalID, firstName, lastName, commonName, species, genus, birthDate, importedFrom, importDate, sex, behavior, habitatId)
+			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);	
 			`,
-			[newAnimalUUId]
+			[newAnimalUUID, firstName, lastName, commonName, species, genus, birthDate, importedFrom, importDate, sex, behavior, habitatId]
 		);
 
-		if (result.length === 0) {
-			//bro what happened we just inserted
-			throw new Error('Newly created animal is not found');
-		}
-		const newAnimal = result[0];
-
-		return sendJSON(res, 201, { animal: newAnimal });
-	} catch (err) {
-		if (err.code === 'ER_DUP_ENTRY') {
-			return sendJSON(res, 409, {
-				error: 'Animal already exists',
-				affectedFields: ['animalUUId'],
-			});
-		}
-	}
+		return sendJSON(
+			res,
+			201,
+			{animal: result[0]}
+		);
 }
 
-async function updateOne(req, res) {
-	//body has ALL the attributes, on the frontend their default values are set to the values on the db. we just check differences?
+async function updateOne(req, res){
 	const updatedAnimal = req.body;
-
-	if (!updatedAnimal || typeof updatedAnimal !== 'object') {
-		return sendJSON(res, 400, { error: 'Invalid request body' });
-	}
 	const {
 		animalId,
 		firstName,
@@ -114,127 +52,66 @@ async function updateOne(req, res) {
 		sex,
 		behavior,
 	} = updatedAnimal;
-	if (
-		!validateStrings(
-			firstName,
-			lastName,
-			commonName,
-			species,
-			genus,
-			behavior,
-			importedFrom
+
+	const [result] = await db.query(
+		`
+			UPDATE Animal
+			SET firstName = ?, lastName = ?, commonName = ?, species = ?, genus = ?, birthDate = ?, deathDate = ?, importedFrom = ?, importDate = ?, sex = ?, behavior = ?
+			WHERE animalID = ? AND deletedAt IS NULL;
+		`,
+		[firstName, lastName, commonName, species, genus, birthDate, deathDate, importedFrom, importDate, sex, behavior, animalId]
+	);
+
+		const animal = result[0];
+		return sendJSON(
+			res,
+			201,
+			{animal}
 		)
-	) {
-		return sendJSON(res, 400, {
-			error: 'Missing required fields',
-			affectedFields: determineEmptyFields(updatedAnimal),
-		});
-	}
-
-	//what if animal dont exist?
-	try {
-		const [result] = await db.query(
-			`
-				UPDATE Animal
-				SET firstName = ?, lastName = ?, commonName = ?, species = ?, genus = ?, birthDate = ?, deathDate = ?, importedFrom = ?, importDate = ?, sex = ?, behavior = ?
-				WHERE animalId = ?;
-			`,
-			[
-				firstName,
-				lastName,
-				commonName,
-				species,
-				genus,
-				birthDate,
-				deathDate,
-				importedFrom,
-				importDate,
-				sex,
-				behavior,
-				animalId,
-			]
-		);
-
-		const updatedAnimal = result[0];
-
-		return sendJSON(res, 201, { updatedAnimal });
-	} catch (err) {
-		//what error code does an invalid query show?
-		return sendJSON(res, 404, {
-			error: 'Attempted to update an animal not found',
-		});
-	}
 }
 
 async function getOneById(req, res) {
-	//you can get an animal many ways, but in the frontend, it queries based on some "filter", ie; only show me animals living in X habitat. Clicking on them returns the animalId.
-	const findAnimal = req.body; //findAnimal only has the animalId
+	const findAnimal = req.body; 
 
-	if (!findAnimal || typeof findAnimal !== 'object') {
-		return sendJSON(res, 400, { error: 'Invalid request body' });
-	}
 	const findAnimalId = findAnimal.animalId;
-	try {
-		const [result] = await db.query(
-			`
+		const [result] = await db.query(`
 			SELECT *
 			FROM Animal
 			WHERE AnimalId = ?
+			WHERE AnimalID = ? AND deletedAt IS NULL
 			`,
 			[findAnimalId]
 		);
 
-		if (result.length === 0) {
-			throw new Error('Animal is not found');
-		}
-
 		const foundAnimal = result[0];
 		return sendJSON(res, 201, { foundAnimal });
-	} catch (err) {
-		return sendJSON(res, 404, {
-			error: 'Could not find animal',
-		});
-	}
 }
-
-async function getOneByHabitatId(req, res) {
+async function getManyByHabitat(req, res){
 	const requestedHabitat = req.body;
-	if (!requestedHabitat || typeof requestedHabitat !== 'object') {
-		return sendJSON(res, 400, { error: 'Invalid request body' });
-	}
 	const habitatId = requestedHabitat.habitatId;
-	try {
-		const [result] = await db.query(
+	const [result] = await db.query(
 			`
 				SELECT *
 				FROM Animal
-				WHERE habitatId = ?
+				WHERE habitatId = ? AND deletedAt IS NULL
 			`,
 			[habitatId]
 		);
-		//don't have to seperate checking for a valid habitat and checking for if there are any animals in said habitat.
-		if (result.length === 0) {
-			//no animals in habitat
-			return sendJSON(res, 404, 'No animals found in habitat.');
-		}
-	} catch (_err) {
-		//uh what error do i throw?
-	}
+	return sendJSON(res,
+		201,
+		{result}
+	);
 }
 
-async function getOneByEmployeeId(req, res) {
-	//by employeeid
-	//TO-DO: Make sure to add security to this, cant think of the cases atm
+async function getManyByHandler(req, res){ //by employeeid
 	const handlerInfo = req.body;
-	if (!handlerInfo || typeof handlerInfo !== 'object') {
-		return sendJSON(res, 400, { error: 'Invalid request body' });
-	}
-	//first check if it is a valid employee.
+
 	const [AnimalsTakenCareBy] = await db.query(
 		`
 		SELECT Animal.*
 		FROM Animal, TakesCareOf
 		WHERE TakesCareOf.employeeId = ?
+		WHERE TakesCareOf.employeeID = ? AND TakesCareOf.animalID = Animal.animalID AND Animal.deletedAt IS NULL;       
 		`,
 		[handlerInfo.EmployeeId]
 	);
@@ -244,10 +121,5 @@ async function getOneByEmployeeId(req, res) {
 	});
 }
 
-export default {
-	createOne,
-	updateOne,
-	getOneById,
-	getOneByHabitatId,
-	getOneByEmployeeId,
-};
+
+export default {createOne, updateOne, getOneById, getManyByHabitat, getManyByHandler};
