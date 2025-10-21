@@ -27,3 +27,8 @@ export const db = await mysql.createConnection({
 	multipleStatements: true, // allow executing multiple SQL statements in one query
 	rowsAsArray: false, // return rows as objects instead of arrays
 });
+
+export async function query(sql, params) {
+	const [rows] = await db.query(sql, params);
+	return rows;
+}

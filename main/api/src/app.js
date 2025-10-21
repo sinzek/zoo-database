@@ -1,3 +1,5 @@
+import { handlerWrapper } from './utils/endpoint-utils.js';
+
 /**
  * a simple express-like framework for handling HTTP requests.
  * supports GET, POST, PUT, DELETE methods.
@@ -115,25 +117,11 @@ export class App {
 		}
 
 		console.log('Available routes for method:', this.routes[method]);
+		console.log('Invoking handler function...');
 
-		console.log('Invoking handler functon...');
-		// call the handler
-		try {
-			const responseBody = await handler(req, res);
-
-			// if the handler sends a response body, end the response
-			if (responseBody) {
-				res.end(responseBody);
-			} else if (!res.writableEnded) {
-				// if the handler didn't send a response, and the response isn't already ended, end it with no content
-				res.statusCode = res.statusCode || 204; // default to 204 No Content
-				res.end();
-			}
-		} catch (err) {
-			console.log('Error in handler function:', err);
-			res.statusCode = 500;
-			return res.end(JSON.stringify({ error: 'Internal Server Error' }));
-		}
+		await handlerWrapper(handler, req, res, {
+			logError: true,
+		});
 
 		console.log('Handler function completed.');
 	}

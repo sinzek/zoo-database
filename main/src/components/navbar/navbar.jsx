@@ -1,3 +1,4 @@
+import { api } from '../../utils/client-api-utils';
 import { Link } from '../link';
 import './navbar.css';
 
@@ -8,6 +9,20 @@ export function Navbar() {
 		{ href: '/attractions', label: 'Attractions' },
 		{ href: '/memberships', label: 'Memberships' },
 	];
+
+	const testApi = async () => {
+		const res = await api('/api/auth/login', 'POST', {
+			email: 'egg',
+			password: 'egg',
+		});
+
+		if (!res.success) {
+			alert('API Test Error: ' + res.error);
+			return;
+		}
+
+		alert('API Test Success: ' + JSON.stringify(res.data));
+	};
 
 	return (
 		<nav className='navbar'>
@@ -42,6 +57,12 @@ export function Navbar() {
 							<div className='navbar-underline' />
 						</li>
 					))}
+					<li
+						className='navbar-item-special'
+						onClick={testApi}
+					>
+						Test the API
+					</li>
 				</ul>
 			</div>
 			<div className='buttons'>
