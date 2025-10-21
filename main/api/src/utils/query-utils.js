@@ -9,6 +9,10 @@ import { query } from '../db/mysql.js';
  * @throws If the insert fails
  */
 export async function createOneQuery(tableName, data) {
+	if (!data || Object.keys(data).length === 0) {
+		throw new Error('Data object must have at least one field to insert');
+	}
+
 	const columns = Object.keys(data);
 	const values = Object.values(data);
 	const placeholders = columns.map(() => '?').join(', ');
@@ -64,7 +68,7 @@ export async function getNByKeyQuery(
  * Updates a record in the specified table with the provided data, identified by the key column. Please ensure that the data object keys match the table column names, and that all required fields are included.
  * (order of fields does not matter here i'm pretty sure)
  * @param {string} tableName The name of the table to update (e.g., 'User', 'Employee', 'Customer', etc.)
- * @param {any} data Object containing the data to update. Must include the field of the provided keyColumn.
+ * @param {object} data Object containing the data to update. Must include the field of the provided keyColumn. keyColumn field will not be updated.
  * @param {string} keyColumn Column name to identify the record (e.g., 'userId', 'employeeId', etc.)
  * @param {boolean} excludeDeleted Whether to exclude rows with deletedAt IS NOT NULL (default: true)
  * @throws If the update fails
@@ -75,8 +79,20 @@ export async function updateOneQuery(
 	keyColumn,
 	excludeDeleted = true
 ) {
-	const columns = Object.keys(data);
-	const values = Object.values(data);
+	let columns = Object.keys(data);
+	let values = Object.values(data);
+
+	if (columns[keyColumn] === undefined) {
+		throw new Error(
+			`Data object must include the key column: ${keyColumn}`
+		);
+	}
+
+	// remove keyColumn from columns and values to avoid updating it
+	columns = columns.filter((col) => col !== keyColumn);
+	values = Object.values(data).filter(
+		(_x, idx) => columns[idx] !== keyColumn
+	);
 	const setClause = columns.map((col) => `${col} = ?`).join(', ');
 
 	const [result] = await query(

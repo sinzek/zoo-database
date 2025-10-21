@@ -58,7 +58,7 @@ async function getOneById(req, _res) {
 
 	const rows = await getNByKeyQuery('Employee', 'employeeId', employeeId);
 
-	return [rows[0]];
+	return [rows[0]]; // array with single employee object
 }
 
 async function getNByBusinessId(req, _res) {
@@ -79,13 +79,12 @@ async function updateOne(req, _res) {
 	}
 
 	const newEmpData = { ...updatedEmployee };
-	delete newEmpData.employeeId; // remove employeeId from data to update
 	delete newEmpData.userId; // cannot update userId
 	delete newEmpData.ssn; // cannot update ssn
 
 	await updateOneQuery('Employee', newEmpData, 'employeeId');
 
-	return [updatedEmployee];
+	return [updatedEmployee]; // updated employee data
 }
 
 //Create Employee
