@@ -8,7 +8,6 @@ import { cn } from '../../utils/cn';
 import { Loader } from '../../components/loader/loader';
 
 export default function SignupPage() {
-	//const { navigate } = useRouter();
 
 	const [formData, setFormData] = useState({
 		firstName: '',
