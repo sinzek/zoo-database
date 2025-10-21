@@ -1,4 +1,4 @@
-import { verifyJWT } from './auth-utils';
+import { verifyJWT } from './auth-utils.js';
 
 export function sendJSON(res, statusCode, payload, ...cookies) {
 	res.statusCode = statusCode;

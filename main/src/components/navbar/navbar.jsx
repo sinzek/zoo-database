@@ -11,10 +11,7 @@ export function Navbar() {
 	];
 
 	const testApi = async () => {
-		const res = await api('/api/auth/login', 'POST', {
-			email: 'egg',
-			password: 'egg',
-		});
+		const res = await api('/api/dummy-data/gen-customers', 'POST');
 
 		if (!res.success) {
 			alert('API Test Error: ' + res.error);

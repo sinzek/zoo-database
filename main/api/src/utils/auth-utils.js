@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import { query } from '../db/mysql.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -28,4 +29,25 @@ export function signJWT(data) {
 
 export function verifyJWT(token) {
 	return jwt.verify(token, JWT_SECRET);
+}
+
+export async function getCustomerOrEmployeeById(userId) {
+	// first try to find a customer with this userId
+	const [customer] = await query(`SELECT * FROM Customer WHERE userId = ?`, [
+		userId,
+	]);
+
+	if (customer) {
+		return { type: 'customer', data: customer };
+	}
+
+	const [employee] = await query(`SELECT * FROM Employee WHERE userId = ?`, [
+		userId,
+	]);
+
+	if (employee) {
+		return { type: 'employee', data: employee };
+	}
+
+	return null;
 }

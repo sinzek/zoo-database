@@ -1,4 +1,5 @@
 import { App } from './src/app.js';
+import { registerDummyDataRoutes } from './src/routes/dummyData.js';
 import { registerAuthRoutes } from './src/routes/index.js';
 
 /**
@@ -13,6 +14,7 @@ export default async function handler(req, res) {
 
 	// !--- start route registration ---!
 	registerAuthRoutes(requestApp);
+	registerDummyDataRoutes(requestApp);
 	// !--- end route registration ---!
 
 	return await requestApp.handleVercel(req, res);

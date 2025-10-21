@@ -2,7 +2,7 @@ import { Navbar } from './components/navbar/navbar';
 import { useRouter } from './context/routerContext';
 import NotFoundPage from './pages/404/404';
 import HomePage from './pages/home/home';
-import SignupPage from './pages/signup/signup';
+import LoginPage from './pages/login/login';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -14,7 +14,7 @@ export default function Router() {
 
 	let content = null;
 	if (path === '/') content = <HomePage />;
-	else if (path === '/signup') content = <SignupPage />;
+	else if (path === '/login') content = <LoginPage />;
 	else if (animalsMatch) content = <div>Animal ID: {animalsMatch.id}</div>;
 	else content = <NotFoundPage />;
 
