@@ -4,6 +4,7 @@ import NotFoundPage from "./pages/404/404";
 import HomePage from "./pages/home/home";
 import HabitatsPage from "./pages/habitats/habitats";
 import LoginPage from './pages/login/login';
+import AttractionsPage from "./pages/attractions/attractions";
 import { PortalPage } from './pages/portal/portal';
 
 export default function Router() {
@@ -18,6 +19,7 @@ export default function Router() {
 	if (path === '/') content = <HomePage />;
 	else if (path === '/login') content = <LoginPage />;
   else if (path === '/habitats') content = <HabitatsPage />;
+  else if (path === "/attractions") content = <AttractionsPage />;
 	else if (animalsMatch) content = <div>Animal ID: {animalsMatch.id}</div>;
 	else if (path === '/portal') content = <PortalPage />;
 	else content = <NotFoundPage />;
