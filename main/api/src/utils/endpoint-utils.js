@@ -16,9 +16,15 @@ export function sendJSON(res, statusCode, payload, ...cookies) {
 		res.setHeader('Set-Cookie', cookieStrings);
 	}
 
-	const body = payload.error
-		? { success: false, error: payload.error }
-		: { success: true, data: payload };
+	let body = null;
+
+	if (!payload) {
+		body = { success: true, data: null };
+	} else {
+		body = payload.error
+			? { success: false, error: payload.error }
+			: { success: true, data: payload };
+	}
 
 	res.end(JSON.stringify(body));
 }

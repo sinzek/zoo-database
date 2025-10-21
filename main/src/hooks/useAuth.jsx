@@ -68,10 +68,8 @@ export function useAuth() {
 	) => {
 		const result = await api('/api/auth/me', 'GET');
 
-		if (!result.success) {
-			console.error('Get user data error:', result.error);
-			showToast(`ERROR: ${result.error || 'Failed to get user data'}`);
-			return result; // { success: false, error: '...'}
+		if (!result.success && result.error === 'Unauthorized') {
+			return; // not logged in, no action needed
 		}
 
 		const { user, relatedInfo } = result.data;

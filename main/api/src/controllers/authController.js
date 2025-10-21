@@ -59,7 +59,7 @@ async function logout(_req, _res) {
 		},
 	};
 
-	return [null, [expiredCookie], 204]; // no content status
+	return [undefined, [expiredCookie], 204]; // no content status
 }
 
 async function getUserData(req, _res) {

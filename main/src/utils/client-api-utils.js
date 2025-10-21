@@ -14,21 +14,18 @@ export async function api(path, method = 'GET', data) {
 		credentials: 'include',
 	};
 
-	if (data !== undefined) {
+	if (data) {
 		options.body = JSON.stringify(data);
 	}
 
 	try {
 		const res = await fetch(path, options);
 
-		let resData;
-
-		try {
-			resData = await res.json();
-		} catch {
-			const text = await res.text();
-			throw new Error(text || 'Invalid server response');
+		if (res.status === 204) {
+			return { success: true, data: null };
 		}
+
+		const resData = await res.json();
 
 		if (!res.ok) {
 			const message =

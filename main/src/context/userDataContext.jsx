@@ -30,8 +30,8 @@ export function UserDataProvider({ children }) {
 				setUserEntityType
 			);
 
-			if (!result.success) {
-				console.error('Error fetching user data:', result.error);
+			if (!result || !result.success) {
+				// failed to get user data, not logged in
 				return;
 			}
 		}
