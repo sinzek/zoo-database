@@ -4,11 +4,14 @@ import './index.css';
 import Router from './router';
 import { RouterProvider } from './context/routerContext';
 import { Toast } from './components/toast/toast';
+import { UserDataProvider } from './context/userDataContext';
 
 createRoot(document.getElementById('root')).render(
 	<StrictMode>
 		<RouterProvider>
-			<Router />
+			<UserDataProvider>
+				<Router />
+			</UserDataProvider>
 			<Toast />
 		</RouterProvider>
 	</StrictMode>

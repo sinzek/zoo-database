@@ -27,7 +27,7 @@ h1 {
 	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
-.signup-subtext {
+.login-subtext {
 	font-size: 1.5em;
 	color: var(--color-lbrown);
 	margin-top: 0px;
@@ -36,13 +36,7 @@ h1 {
 	text-align: center;
 }
 
-.login-redirect {
-	font-size: 1em;
-	color: var(--color-lbrown);
-	margin-top: 15px;
-}
-
-.signup-form {
+.login-form {
 	display: flex;
 	flex-direction: column;
 	gap: 15px;
@@ -89,4 +83,11 @@ h1 {
 .show-pwd-btn:focus,
 .show-pwd-btn:focus-visible {
 	outline: none;
+}
+
+.error-message {
+	color: red;
+	font-weight: 600;
+	margin-top: 10px;
+	font-style: italic;
 }

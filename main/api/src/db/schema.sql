@@ -61,6 +61,7 @@ CREATE TABLE Transaction (
     description VARCHAR(1000) NULL,
     businessId CHAR(36) NOT NULL, -- uuid, foreign key to Business(id)
     amount DECIMAL(24, 2) NOT NULL CHECK (amount >= 0),
+    purchaseDate DATETIME NOT NULL DEFAULT (CURDATE()), -- defaults to current date
     deletedAt DATETIME NULL, -- soft delete (null if not deleted)
 
     FOREIGN KEY (businessId) REFERENCES Business(businessId) ON DELETE RESTRICT ON UPDATE CASCADE
@@ -104,7 +105,7 @@ CREATE TABLE PurchasedItem (
 );
 
 CREATE TABLE BusinessHoursDay (
-    businessHoursDayId CHAR(36) PRIMARY KEY, -- uuid
+    --weak entity
     businessId CHAR(36) NOT NULL, -- uuid, foreign key to Business(id)
     dayOfWeek ENUM('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NOT NULL,
     openTime TIME NOT NULL, -- time only (no date)
@@ -127,7 +128,7 @@ CREATE TABLE Attraction (
 );
 
 CREATE TABLE AttractionHoursDay (
-    attractionHoursDayId CHAR(36) PRIMARY KEY, -- uuid
+    -- weak entity 
     attractionId CHAR(36) NOT NULL, -- uuid, foreign key to Attraction(id)
     dayOfWeek ENUM('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NOT NULL,
     openTime TIME NOT NULL, -- time only (no date)
