@@ -71,6 +71,15 @@
 	text-transform: uppercase;
 }
 
+.navbar-item-special {
+	color: var(--color-white);
+	font-size: 1.1em;
+	text-decoration: none;
+	transition: color 0.15s;
+	font-weight: 600;
+	cursor: pointer;
+}
+
 .navbar-link {
 	color: var(--color-dbrown);
 	font-size: 1.1em;
