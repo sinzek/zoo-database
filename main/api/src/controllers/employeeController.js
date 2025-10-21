@@ -1,92 +1,92 @@
-import { sendJSON } from '../utils/endpoint-utils.js';
-import { db } from '../db/mysql.js';
 import crypto from 'crypto';
+import { createUser } from '../utils/auth-utils.js';
+import {
+	createOneQuery,
+	getNByKeyQuery,
+	updateOneQuery,
+} from '../utils/query-utils.js';
 
-async function createOne(req, res){ //careful of creating employees.
-	const createdEmployee = req.body;
-	const {accessLevel, jobTitle, fName, lName, MI, sex, ssn, hourlyWage, jobDesc, addPostalCode, addSt, addCity, addState, payInfoAccNum, payInfoRouteNum, paymentMethod, businessId, hireDate, birthDate, phone, email} = createdEmployee;
+async function createOne(req, _res) {
+	//careful of creating employees. <<--// wym? -chase
+	const newEmp = req.body;
+	if (!newEmp) throw new Error('Missing employee data');
 
-	const employeeID = crypto.randomUUID();
-	await db.query(`
-		INSERT INTO Employee (employeeId, accessLevel, jobTitle, firstName, lastName, middleInitial, sex, ssn, hourlywage, jobDescription, addressPostalCode, addressStreet, addressCity, addressState, payInfoAccountNum, payInfoRoutingNum, payInfoPaymentMethod, businessId, hireDate, phone, email)
-		VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-		`,
-	[
-		employeeID, jobTitle, accessLevel, fName, lName, MI, sex, ssn, hourlyWage, jobDesc, addPostalCode, addSt, addCity, addState, payInfoAccNum, payInfoRouteNum, paymentMethod, businessId, hireDate, birthDate, phone, email
-	]);
-	return sendJSON(res,
-		201,
-		{message: 'Employee successfully created'}
-	);
-}
-
-async function getOneByID(req, res){
-	const findEmployee = req.body; //findAnimal only has the animalID
-
-	const findEmployeeID = findEmployee.animalID;
-	const [result] = await db.query(`
-		SELECT *
-		FROM Employee
-		WHERE employeeId = ?
-		`,
-	[
-		findEmployeeID
-	]);
-
-	if(result.length === 0){
-		throw new Error('Employee is not found');
+	if (!newEmp.email || !newEmp.password) {
+		throw new Error('Missing employee account email or password');
 	}
-	
-	const findEmployees = result[0];
-	return sendJSON(res,
-		201,
-		{findEmployees}
-	);
+
+	const { userId } = await createUser(newEmp.email, newEmp.password);
+
+	const employeeId = crypto.randomUUID();
+
+	const employeeData = {
+		employeeId,
+		accessLevel: newEmp.accessLevel,
+		jobTitle: newEmp.jobTitle,
+		firstName: newEmp.firstName,
+		lastName: newEmp.lastName,
+		middleInitial: newEmp.middleInitial,
+		sex: newEmp.sex,
+		ssn: newEmp.ssn,
+		hourlyWage: newEmp.hourlyWage,
+		jobDescription: newEmp.jobDescription,
+		addressPostalCode: newEmp.addressPostalCode,
+		addressStreet: newEmp.addressStreet,
+		addressCity: newEmp.addressCity,
+		addressState: newEmp.addressState,
+		payInfoAccountNum: newEmp.payInfoAccountNum,
+		payInfoRoutingNum: newEmp.payInfoRoutingNum,
+		payInfoPaymentMethod: newEmp.payInfoPaymentMethod,
+		businessId: newEmp.businessId,
+		hireDate: newEmp.hireDate || new Date(),
+		terminationDate: null,
+		birthDate: newEmp.birthDate,
+		phone: newEmp.phone,
+		supervisorId: newEmp.supervisorId || null,
+		userId: userId,
+	};
+
+	await createOneQuery('Employee', employeeData);
+
+	return [{ employeeId, ...newEmp }];
 }
 
-async function GetManyByBusiness(req, res){
-	const findEmployees = req.body; //findAnimal only has the animalID
+async function getOneById(req, _res) {
+	const { employeeId } = req.body;
 
-	const findEmployeeBusiness = findEmployees.businessId;
-		const [result] = await db.query(`
-			SELECT *
-			FROM Employee
-			WHERE businessId = ? AND deletedAt IS NULL
-			`,
-		[
-			findEmployeeBusiness
-		]);
+	if (!employeeId) throw new Error('Missing employeeId');
 
-		if(result.length === 0){
-			throw new Error('Employees not found');
-		}
-		
-		return sendJSON(res,
-			201,
-			{result}
-		);
+	const rows = await getNByKeyQuery('Employee', 'employeeId', employeeId);
+
+	return [rows[0]];
 }
 
-async function updateOne(req, res){
-	const findEmployee = req.body;
-	const {accessLevel, jobTitle, firstName, lastName, middleInitial, sex, ssn, hourlyWage, jobDescription, addressPostalCode, addressCity, addressState, payInfoAccountNum, payInfoPaymentMethod, businessId, terminationDate, birthDate, phone, email, supervisorId} = findEmployee;
-	await db.query(
-		`
-			UPDATE Employee
-			SET accessLevel = ?, jobTitle = ?, firstName = ?, lastName = ?, middleInitial = ?, sex = ?, ssn = ?, hourlyWage = ?, jobDescription = ?, addressPostalCode = ?, addressCity = ?, addressState = ?, payInfoAccountNum = ?, payInfoPaymentMethod = ?, businessId = ?, terminationDate = ?, birthDate = ?, phone = ?, email = ?, supervisorId = ?
-			WHERE employeeId = ? AND deletedAt IS NULL;
+async function getNByBusinessId(req, _res) {
+	const { businessId } = req.body;
 
-		`,
-		[
-			accessLevel, jobTitle, firstName, lastName, middleInitial, sex, ssn, hourlyWage, jobDescription, addressPostalCode, addressCity, addressState, payInfoAccountNum, payInfoPaymentMethod, businessId, terminationDate, birthDate, phone, email, supervisorId
-		]
-	);
-	return sendJSON(res,
-		201,
-		{message: 'Employee successfully updated'}
-	);
+	if (!businessId) throw new Error('Missing businessId');
+
+	const rows = await getNByKeyQuery('Employee', 'businessId', businessId);
+
+	return rows; // array of employees with given businessId
 }
 
+async function updateOne(req, _res) {
+	const updatedEmployee = req.body;
+
+	if (!updatedEmployee || !updatedEmployee.employeeId) {
+		throw new Error('Missing employee data or employeeId');
+	}
+
+	const newEmpData = { ...updatedEmployee };
+	delete newEmpData.employeeId; // remove employeeId from data to update
+	delete newEmpData.userId; // cannot update userId
+	delete newEmpData.ssn; // cannot update ssn
+
+	await updateOneQuery('Employee', newEmpData, 'employeeId');
+
+	return [updatedEmployee];
+}
 
 //Create Employee
 //Get Employee by ID
@@ -94,6 +94,4 @@ async function updateOne(req, res){
 //Get Access Level
 //Update Employee
 
-
-
-export default {createOne, getOneByID, GetManyByBusiness, updateOne};
+export default { createOne, getOneById, getNByBusinessId, updateOne };

@@ -51,3 +51,16 @@ export async function getCustomerOrEmployeeById(userId) {
 
 	return null;
 }
+
+export async function createUser(email, password) {
+	const userId = crypto.randomUUID();
+
+	const passwordHash = sha256Hash(password);
+
+	await query(
+		`INSERT INTO User (userId, email, passwordHash) VALUES (?, ?, ?)`,
+		[userId, email, passwordHash]
+	);
+
+	return { userId, email };
+}
