@@ -167,10 +167,14 @@
     height: 160px;
   }
 }
+
 .details-wrap {
+  position: relative;
+  isolation: isolate;
   max-width: 1100px;
   margin: 0 auto;
   padding: 2rem 1.25rem 4rem;
+  z-index: 2;
 }
 
 .details-grid {
@@ -186,11 +190,14 @@
 }
 
 .details-card {
-  background: rgba(255, 255, 255, 0.03);
+  position: relative;
+  z-index: 2;
+  background-color: #3a2f2a !important;
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
-  padding: 1.25rem 1.5rem;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  padding: 1rem;
+  color: #f4ecd1;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
 .details-card h2 {
@@ -209,6 +216,7 @@
   display: flex;
   justify-content: center;
 }
+
 .details-bottom-wrap {
   position: relative;
   overflow: hidden;
@@ -216,65 +224,36 @@
   padding-bottom: 4rem;
 }
 
-.details-wrap {
-  position: relative;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 2rem 1.25rem;
-  z-index: 2;
-}
-
-.details-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.25rem;
-}
-
-@media (min-width: 900px) {
-  .details-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.details-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
-  padding: 1.25rem 1.5rem;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-}
-
-.details-card h2 {
-  margin-bottom: 0.5rem;
-  font-size: 1.6rem;
-  line-height: 1.2;
-}
-
-.details-card p,
-.details-card li {
-  font-size: 1.05rem;
-}
-
-.details-footer {
-  margin-top: 2.5rem;
-  display: flex;
-  justify-content: center;
-}
-
-.bottom-dots {
+.details-bottom-wrap .bottom-dots {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 50%;
-  z-index: 1;
-  opacity: 0.15;
+  width: 50vw;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  opacity: 0.6;
+  z-index: 0;
 }
 
-.left-dots {
+.details-bottom-wrap .bottom-dots svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.details-bottom-wrap .bottom-dots svg * {
+  stroke: rgba(255, 255, 255, 0.7);
+  fill: rgba(255, 255, 255, 0.25);
+}
+
+.details-bottom-wrap .left-dots {
   left: 0;
+  justify-content: flex-start;
 }
 
-.right-dots {
+.details-bottom-wrap .right-dots {
   right: 0;
+  justify-content: flex-end;
   transform: scaleX(-1);
 }
