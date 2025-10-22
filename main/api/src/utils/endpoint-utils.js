@@ -1,4 +1,3 @@
-import { verifyJWT } from './auth-utils.js';
 
 export function sendJSON(res, statusCode, payload, ...cookies) {
 	console.log('Sending response:', { statusCode, payload, cookies });
@@ -78,17 +77,3 @@ export async function handlerWrapper(handler, req, res, options = {}) {
 	}
 }
 
-export const withAuth = (handler) => async (req, res) => {
-	try {
-		const cookie = req.headers.cookie || '';
-		const token = cookie
-			.split('; ')
-			.find((c) => c.startsWith('session='))
-			?.split('=')[1];
-		const decoded = verifyJWT(token);
-		req.session = decoded; // userId now available in req object
-		return handler(req, res);
-	} catch {
-		return ['Unauthorized', [], 401];
-	}
-};

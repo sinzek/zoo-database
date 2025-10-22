@@ -7,7 +7,6 @@ import {
 } from '../utils/query-utils.js';
 
 async function createOne(req, _res) {
-	//careful of creating employees. <<--// wym? -chase
 	const newEmp = req.body;
 	if (!newEmp) throw new Error('Missing employee data');
 
@@ -15,6 +14,7 @@ async function createOne(req, _res) {
 		throw new Error('Missing employee account email or password');
 	}
 
+	// create user account first
 	const { userId } = await createUser(newEmp.email, newEmp.password);
 
 	const employeeId = crypto.randomUUID();
@@ -46,9 +46,11 @@ async function createOne(req, _res) {
 		userId: userId,
 	};
 
+	// now create employee record
 	await createOneQuery('Employee', employeeData);
 
-	return [{ employeeId, ...newEmp }];
+	// return created employee data
+	return [employeeData];
 }
 
 async function getOneById(req, _res) {
