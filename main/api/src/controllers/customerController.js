@@ -1,14 +1,19 @@
-import { sendJSON } from '../utils/endpoint-utils.js';
 import { db } from '../db/mysql.js';
 import crypto from 'crypto';
+import {
+	getNByKeyQuery,
+} from '../utils/query-utils.js';
 
-async function createOne(req, res){
+async function createOne(req, _res){
 	const newCustomer = req.body;
+
+	if (!newCustomer) throw new Error('Missing customer data');
 	
 	const {firstName, lastName, middleInitial} = newCustomer;
 
 	const customerID = crypto.randomUUID();
 
+	// using db.query because we need CURRENT_DATE() function
 	await db.query(
 		`
 		INSERT INTO Customer (customerId, firstName, lastName, middleInitial, joinDate, email)
@@ -17,49 +22,37 @@ async function createOne(req, res){
 		[customerID, firstName, lastName, middleInitial]
 	);
 
-	return sendJSON(res,
-		201,
-		{message: 'Customer successfully created'}
-	);
+	return [{ customerID, ...newCustomer }];
 }
 
-async function getOne(req, res){
+async function getOne(req, _res){
 	const getCustomer = req.body; 
 	const getCustomerID = getCustomer.customerID;
-	const [result] = await db.query(`
-		SELECT *
-		FROM Customer
-		WHERE customerId = ? AND deletedAt IS NULL
-		`,
-	[
-		getCustomerID
-	]);
-	//check if customer exists maybe here.
 
-	return sendJSON(res,
-		201,
-		{customer: result[0]}
-	);
+	if (!getCustomerID) throw new Error('Missing customerID');
+
+	const rows = await getNByKeyQuery('Customer', 'customerId', getCustomerID);
+
+	return [rows[0]];
 }
 
-async function deleteOne(req, res){
+async function deleteOne(req, _res){
 	const deleteCustomer = req.body;
 	const deleteCustomerID = deleteCustomer.customerID;
+
+	if (!deleteCustomerID) throw new Error('Missing customerID');
 	
-	await db.query(`
+	// using db.query for soft delete
+	await db.query(
+		`
 		UPDATE Customer
 		SET deletedAt = CURRENT_DATE()
 		WHERE customerId = ? AND deletedAt IS NULL
 		`,
-	[
-		deleteCustomerID
-	]);
-
-	return sendJSON(res,
-		201,
-		{message: 'Customer successfully deleted'}
+		[deleteCustomerID]
 	);
-}
 
+	return [{ message: 'Customer successfully deleted' }];
+}
 
 export default {createOne, getOne, deleteOne};

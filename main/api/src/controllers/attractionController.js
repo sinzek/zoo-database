@@ -1,21 +1,27 @@
-import { sendJSON } from '../utils/endpoint-utils.js';
 import { db } from '../db/mysql.js';
 import crypto from 'crypto';
+import {
+	createOneQuery,
+	getNByKeyQuery,
+	updateOneQuery,
+} from '../utils/query-utils.js';
 
-async function createOne(req, res){
+async function createOne(req, _res){
 	//assuming req body has the attraction times as well.
 	const newAttraction = req.body;
 	const newAttractionID = crypto.randomUUID();
 
 	const {name, description, location, uiImage, startingDay, endingDay} = newAttraction;
 
-	await db.query(
-		`
-		INSERT INTO Attraction (attractionId, name, description, location, uiImage, startingDay, endingDay)
-		VALUES(?, ?, ?, ?, ?, ?, ?);
-		`,
-		[newAttractionID, name, description, location, uiImage, startingDay, endingDay]
-	);
+	await createOneQuery('Attraction', { //NOTE, UI-IMAGE IS NOT AN ATTRIBUTE YET. PLEASE ADD LATER --- JOSEPH
+		attractionId: newAttractionID,
+		name,
+		uiDescription: description,
+		location,
+		uiImage,
+		startDate: startingDay,
+		endDate: endingDay
+	});
 
 	//create the hours tuple
 	const {mondayOpen, mondayClose,	tuesdayOpen, tuesdayClose,	wednesdayOpen,	wednesdayClose,	thursdayOpen,	thursdayClose,
@@ -32,43 +38,46 @@ async function createOne(req, res){
 		];
 
 		for (const [dayOfWeek, openTime, closeTime] of hours){
-			await db.query(
-				`
-				INSERT INTO AttractionHoursDay (attractionId, dayOfWeek, openTime, closeTime)
-				VALUES(?, ?, ?, ?);
-				`,
-				[newAttractionID, dayOfWeek, openTime, closeTime]
-			);
+			await createOneQuery('AttractionHoursDay', {
+				attractionId: newAttractionID,
+				dayOfWeek,
+				openTime,
+				closeTime
+			});
 		}
-	return sendJSON(res,
-		201,
-		{message: 'Attraction successfully created'}
-	);
 }
 
-async function updateOneInfo(req, res){
+async function updateOneInfo(req, _res){
 	const updatedAttraction = req.body;
-	const {name, description, location, uiImage, startingDay, endingDay} = updatedAttraction;
 
-	await db.query(`
-		UPDATE Attraction
-		SET name = ?, description = ?, location = ?, uiImage = ?, startingDay = ?, endingDay = ?
-		WHERE attractionId = ? AND deletedAt IS NULL
-		`,
-	[
-		name, description, location, uiImage, startingDay, endingDay, updatedAttraction.attractionId
-	]);
+	if (!updatedAttraction || !updatedAttraction.attractionId) {
+		throw new Error('Missing attraction data or attractionId');
+	}
 
-	return sendJSON(res,
-		201,
-		{message: 'Attraction successfully updated'}
-	);
+	const {attractionId, name, description, location, uiImage, startingDay, endingDay} = updatedAttraction;
+
+	await updateOneQuery('Attraction', {
+		attractionId,
+		name,
+		uiDescription: description,
+		location,
+		uiImage,
+		startDate: startingDay,
+		endDate: endingDay
+	}, 'attractionId');
+
+	return [updatedAttraction];
 }
 
-async function updateOneHours(req, res){
+async function updateOneHours(req, _res){
 	const updatedAttractionHours = req.body;
-	const {mondayOpen, mondayClose,	tuesdayOpen, tuesdayClose,	wednesdayOpen,	wednesdayClose,	thursdayOpen,	thursdayClose,
-		fridayOpen,	fridayClose,	saturdayOpen,	saturdayClose,	sundayOpen,	sundayClose} = updatedAttractionHours;
+
+	if (!updatedAttractionHours || !updatedAttractionHours.attractionId) {
+		throw new Error('Missing attraction data or attractionId');
+	}
+
+	const {attractionId, mondayOpen, mondayClose, tuesdayOpen, tuesdayClose, wednesdayOpen, wednesdayClose, thursdayOpen, thursdayClose,
+		fridayOpen,	fridayClose, saturdayOpen, saturdayClose, sundayOpen, sundayClose} = updatedAttractionHours;
 
 	const hours = [
 		['Sunday', sundayOpen, sundayClose],
@@ -80,75 +89,60 @@ async function updateOneHours(req, res){
 		['Saturday', saturdayOpen, saturdayClose]
 	];
 
+	// using db.query for composite key update
 	for (const [dayOfWeek, openTime, closeTime] of hours){
-		await db.query(`
+		await db.query(
+			`
 			UPDATE AttractionHoursDay
 			SET openTime = ?, closeTime = ?
-			WHERE attractionId = ? AND dayOfWeek = ?;
+			WHERE attractionId = ? AND dayOfWeek = ?
 			`,
-		[
-			openTime, closeTime, updatedAttractionHours.attractionId, dayOfWeek
-		]);
+			[openTime, closeTime, attractionId, dayOfWeek]
+		);
 	}
-	return sendJSON(res,
-		201,
-		{message: 'Attraction hours successfully updated'}
-	);
+
+	return [updatedAttractionHours];
 }
 
-async function deleteOne(req, res){
+async function deleteOne(req, _res){
 	const deleteAttraction = req.body;
 	const deleteAttractionID = deleteAttraction.attractionID;
 
-	await db.query(`
+	if (!deleteAttractionID) throw new Error('Missing attractionID');
+
+	// using db.query for soft delete
+	await db.query(
+		`
 		UPDATE Attraction
 		SET deletedAt = CURRENT_DATE()
 		WHERE attractionId = ? AND deletedAt IS NULL
 		`,
-	[
-		deleteAttractionID
-	]);
-	
-	return sendJSON(res,
-		201,
-		{message: 'Attraction successfully deleted'}
+		[deleteAttractionID]
 	);
+
+	return [{ message: 'Attraction successfully deleted' }];
 }
 
-async function getOne(req, res){
+async function getOne(req, _res){
 	const findAttraction = req.body;
 	const findAttractionID = findAttraction.attractionID;
-	const [result] = await db.query(`
-		SELECT *
-		FROM Attraction
-		WHERE attractionId = ? AND deletedAt IS NULL
-		`,
-	[
-		findAttractionID
-	]);
 
-	return sendJSON(res,
-		201,
-		{attraction: result[0]}
-	);
+	if (!findAttractionID) throw new Error('Missing attractionID');
+
+	const rows = await getNByKeyQuery('Attraction', 'attractionId', findAttractionID);
+
+	return [rows[0]];
 }
 
-async function getOneHours(req, res){
+async function getOneHours(req, _res){
 	const findAttraction = req.body;
 	const findAttractionID = findAttraction.attractionID;
-	const [result] = await db.query(`
-		SELECT *
-		FROM AttractionHoursDay
-		WHERE attractionId = ?
-		`,
-	[
-		findAttractionID
-	]);
+
+	if (!findAttractionID) throw new Error('Missing attractionID');
+
+	const rows = await getNByKeyQuery('AttractionHoursDay', 'attractionId', findAttractionID, false);
 	
-	return sendJSON(res,
-		201,
-		{result}
-	);
+	return rows;
 }
 
 export default {createOne, updateOneInfo, updateOneHours, deleteOne, getOne, getOneHours};

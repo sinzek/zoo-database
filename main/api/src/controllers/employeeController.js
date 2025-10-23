@@ -7,6 +7,7 @@ import {
 } from '../utils/query-utils.js';
 
 async function createOne(req, _res) {
+	//careful of creating employees. <<--// wym? -chase <<--// I think this was a comment from a lot earlier, -joseph
 	const newEmp = req.body;
 	if (!newEmp) throw new Error('Missing employee data');
 
