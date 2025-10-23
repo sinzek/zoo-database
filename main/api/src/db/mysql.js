@@ -27,3 +27,13 @@ export const db = await mysql.createConnection({
 	multipleStatements: true, // allow executing multiple SQL statements in one query
 	rowsAsArray: false, // return rows as objects instead of arrays
 });
+
+export async function query(sql, params) {
+	const [result] = await db.query(sql, params);
+
+	if (result.affectedRows === 0) {
+		throw new Error('[DB ERROR] No rows affected');
+	}
+
+	return result;
+}

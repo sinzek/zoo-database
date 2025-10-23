@@ -1,5 +1,10 @@
 import crypto from 'crypto';
-import { db } from '../db/mysql';
+import jwt from 'jsonwebtoken';
+import { query } from '../db/mysql.js';
+import { getNByKeyQuery } from './query-utils.js';
+import { ACCESS_LEVELS } from '../constants/accessLevels.js';
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 /**
  * For hashing passwords using SHA-256 (this is pretty insecure, but it's good enough for this project lol)
@@ -14,70 +19,92 @@ export function sha256Hash(password) {
 	return crypto.createHash('sha256').update(password).digest('hex');
 }
 
-/**
- * Attempts to validate that all provided strings are non-empty and do not contain potentially dangerous characters.
- * @param  {...string} strings Array of strings to validate
- * @returns {boolean} false if one is not valid, true if all valid
- */
-export function validateStrings(...strings) {
-	for (const str of strings) {
-		if (typeof str !== 'string' || str.trim() === '') {
-			return false;
-		}
-
-		if (
-			str.includes("'") ||
-			str.includes('"') ||
-			str.includes('<') ||
-			str.includes('>') ||
-			str.includes(';') ||
-			str.includes('--')
-		) {
-			return false; // basic check to prevent SQL injection
-		}
-	}
-
-	return true;
+export function signJWT(data) {
+	return jwt.sign(
+		{
+			expiresAt: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60, // 30 days
+			data,
+		},
+		JWT_SECRET
+	);
 }
 
-export function determineEmptyFields(obj) {
-	const affected = [];
-	for (const [key, value] of Object.entries(obj)) {
-		if (!value || (typeof value === 'string' && value.trim() === '')) {
-			affected.push(key);
-		}
-	}
-
-	return affected;
+export function verifyJWT(token) {
+	return jwt.verify(token, JWT_SECRET);
 }
 
-/**
- * Creates a new authentication session for either a customer or an employee. Only one of customerId or employeeId should be provided.
- * @param {string} customerId Optional ID of customer
- * @param {string} employeeId Optional ID of employee
- * @returns {Promise<string>} ID of newly created session
- */
-export async function createSession(customerId, employeeId) {
-	if (!customerId && !employeeId) {
-		throw new Error(
-			'Must provide either customerId or employeeId to create a session'
-		);
+export async function getCustomerOrEmployeeById(userId) {
+	// first try to find a customer with this userId
+	const [customer] = await query(`SELECT * FROM Customer WHERE userId = ?`, [
+		userId,
+	]);
+
+	if (customer) {
+		return { type: 'customer', data: customer };
 	}
 
-	if (customerId && employeeId) {
-		throw new Error(
-			'Cannot provide both customerId and employeeId to create a session'
-		);
+	const [employee] = await query(`SELECT * FROM Employee WHERE userId = ?`, [
+		userId,
+	]);
+
+	if (employee) {
+		return { type: 'employee', data: employee };
 	}
 
-	const uuid = crypto.randomUUID();
+	return null;
+}
 
-	// add session to db, return session id to be stored in cookie
-	await db.query(
-		`INSERT INTO AuthSession (id, customerId, employeeId) VALUES (?, ?, ?)`,
-		[uuid, customerId || null, employeeId || null]
+export async function createUser(email, password) {
+	const userId = crypto.randomUUID();
+
+	const passwordHash = sha256Hash(password);
+
+	await query(
+		`INSERT INTO User (userId, email, passwordHash) VALUES (?, ?, ?)`,
+		[userId, email, passwordHash]
 	);
 
-	// successful, return session id
-	return uuid;
+	return { userId, email };
+}
+
+/**
+ * Middleware to protect routes that require authentication (user must be logged in).
+ * Provides `req.user` with decoded JWT data if valid. This means the `userId` is available at `req.user.data.id` from a controller function wrapped by this.
+ * @param {Function} handler 
+ * @returns {Function}
+ */
+export const withAuth = (handler) => async (req, res) => {
+	try {
+		const cookie = req.headers.cookie || '';
+		const token = cookie
+			.split('; ')
+			.find((c) => c.startsWith('session='))
+			?.split('=')[1];
+		const decoded = verifyJWT(token);
+		req.user = decoded; // userId now available in req object
+		return handler(req, res);
+	} catch {
+		return ['Unauthorized', [], 401];
+	}
+};
+
+/**
+ * Middleware to protect routes that require a specific access level (on employee-only routes). Provides `req.user.employeeData` for use within controller functions wrapped by this.
+ * @param {'worker' | 'zookeeper' | 'veterinarian' | 'manager' | 'executive' | 'db_admin'} requiredLevel 
+ * @param {Function} handler 
+ * @returns {Function}
+ */
+export async function withAccessLevel(requiredLevel, handler) {
+	return withAuth(async (req, res) => {
+		const userId = req.user.data.id;
+
+		const [employee] = await getNByKeyQuery('Employee', 'userId', userId);
+
+		if(!employee || ACCESS_LEVELS[employee.accessLevel] < ACCESS_LEVELS[requiredLevel]) {
+			return ['Forbidden', [], 403];
+		}
+
+		req.user.employeeData = employee;
+		return handler(req, res);
+	});
 }

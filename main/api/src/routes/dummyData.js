@@ -1,0 +1,8 @@
+import dummyDataController from '../controllers/dummyDataController.js';
+
+export function registerDummyDataRoutes(app) {
+	app.post(
+		'/api/dummy-data/gen-customers',
+		dummyDataController.generateDummyCustomers
+	);
+}

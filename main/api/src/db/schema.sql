@@ -195,11 +195,8 @@ CREATE TABLE HabitatPhoto(
 
 CREATE TABLE Diet (
     dietId CHAR(36) PRIMARY KEY, -- uuid
-    animalId CHAR(36) NOT NULL,
     specialNotes VARCHAR(200) NULL CHECK (specialNotes IS NULL OR LENGTH(specialNotes) >= 1),
     deletedAt DATETIME NULL
-
-    FOREIGN KEY (animalId) REFERENCES Animal(animalId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE DietScheduleDay (
@@ -226,6 +223,7 @@ CREATE TABLE Animal (
     sex ENUM('male', 'female') NOT NULL,
     behavior VARCHAR(200) NULL,
     habitatId CHAR(36) NOT NULL,
+    dietId CHAR(36) NOT NULL,
     deletedAt DATETIME NULL,
 
     FOREIGN KEY (habitatId) REFERENCES Habitat(habitatId) ON DELETE RESTRICT ON UPDATE CASCADE,

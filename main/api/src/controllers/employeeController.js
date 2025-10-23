@@ -1,151 +1,94 @@
-import { sendJSON } from '../utils/endpoint-utils.js';
-import { db } from '../db/mysql.js';
-import { validateStrings, determineEmptyFields} from '../utils/auth-utils.js';
 import crypto from 'crypto';
+import { createUser } from '../utils/auth-utils.js';
+import {
+	createOneQuery,
+	getNByKeyQuery,
+	updateOneQuery,
+} from '../utils/query-utils.js';
 
-async function createEmployee(req, res){ //careful of creating employees.
-	const createdEmployee = req.body;
-	const {accessLevel, jobTitle, fName, lName, MI, sex, ssn, hourlyWage, jobDesc, addPostalCode, addSt, addCity, addState, payInfoAccNum, payInfoRouteNum, paymentMethod, businessId, hireDate, birthDate, phone, email} = createdEmployee;
-	if(!createdEmployee || typeof createdEmployee !== 'object'){
-		return sendJSON(res, 400, { error: 'Invalid request body' });
+async function createOne(req, _res) {
+	//careful of creating employees. <<--// wym? -chase <<--// I think this was a comment from a lot earlier, -joseph
+	const newEmp = req.body;
+	if (!newEmp) throw new Error('Missing employee data');
+
+	if (!newEmp.email || !newEmp.password) {
+		throw new Error('Missing employee account email or password');
 	}
 
-	if (
-		!validateStrings(jobTitle, fName, lName, jobDesc, addSt, addCity, addState, payInfoRouteNum, payInfoRouteNum)
-	) {
-		return sendJSON(res, 400, {
-			error: 'Missing required fields',
-			affectedFields: determineEmptyFields(createdEmployee),
-		});
-	}
+	// create user account first
+	const { userId } = await createUser(newEmp.email, newEmp.password);
 
-	try{
-		const employeeID = crypto.randomUUID();
-		await db.query(`
-			INSERT INTO Employee (employeeId, accessLevel, jobTitle, firstName, lastName, middleInitial, sex, ssn, hourlywage, jobDescription, addressPostalCode, addressStreet, addressCity, addressState, payInfoAccountNum, payInfoRoutingNum, payInfoPaymentMethod, businessId, hireDate, phone, email)
-			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-			`,
-		[
-			employeeID, jobTitle, accessLevel, fName, lName, MI, sex, ssn, hourlyWage, jobDesc, addPostalCode, addSt, addCity, addState, payInfoAccNum, payInfoRouteNum, paymentMethod, businessId, hireDate, birthDate, phone, email
-		]);
+	const employeeId = crypto.randomUUID();
 
-	}
-	catch(err){
-		if (err.code === 'ER_DUP_ENTRY') {
-			return sendJSON(res, 409, {
-				error: 'Employee with provided SSN already exists',
-			});
-		}
-		return sendJSON(res,
-			404,
-			{
-				error: "Could not create Employee"
-			}
-		);	
-	}
+	const employeeData = {
+		employeeId,
+		accessLevel: newEmp.accessLevel,
+		jobTitle: newEmp.jobTitle,
+		firstName: newEmp.firstName,
+		lastName: newEmp.lastName,
+		middleInitial: newEmp.middleInitial,
+		sex: newEmp.sex,
+		ssn: newEmp.ssn,
+		hourlyWage: newEmp.hourlyWage,
+		jobDescription: newEmp.jobDescription,
+		addressPostalCode: newEmp.addressPostalCode,
+		addressStreet: newEmp.addressStreet,
+		addressCity: newEmp.addressCity,
+		addressState: newEmp.addressState,
+		payInfoAccountNum: newEmp.payInfoAccountNum,
+		payInfoRoutingNum: newEmp.payInfoRoutingNum,
+		payInfoPaymentMethod: newEmp.payInfoPaymentMethod,
+		businessId: newEmp.businessId,
+		hireDate: newEmp.hireDate || new Date(),
+		terminationDate: null,
+		birthDate: newEmp.birthDate,
+		phone: newEmp.phone,
+		supervisorId: newEmp.supervisorId || null,
+		userId: userId,
+	};
+
+	// now create employee record
+	await createOneQuery('Employee', employeeData);
+
+	// return created employee data
+	return [employeeData];
 }
 
-async function getEmployeeByID(req, res){
-	const findEmployee = req.body; //findAnimal only has the animalID
+async function getOneById(req, _res) {
+	const { employeeId } = req.body;
 
-	if (!findEmployee || typeof findEmployee !== 'object') {
-		return sendJSON(res, 400, { error: 'Invalid request body' });
-	}
-	const findEmployeeID = findEmployee.animalID;
-	try{
-		const [result] = await db.query(`
-			SELECT *
-			FROM Employee
-			WHERE employeeId = ?
-			`,
-		[
-			findEmployeeID
-		]);
+	if (!employeeId) throw new Error('Missing employeeId');
 
-		if(result.length === 0){
-			throw new Error('Employee is not found');
-		}
-		
-		const findEmployee = result[0];
-		return sendJSON(res,
-			201,
-			{findEmployee}
-		);
+	const rows = await getNByKeyQuery('Employee', 'employeeId', employeeId);
 
-	}catch(err){
-		return sendJSON(res,
-			404,
-			{
-				error: "Could not find Employee"
-			}
-		);
-	}
+	return [rows[0]]; // array with single employee object
 }
 
-async function getEmployeeByBusiness(req, res){
-	const findEmployees = req.body; //findAnimal only has the animalID
+async function getNByBusinessId(req, _res) {
+	const { businessId } = req.body;
 
-	if (!findEmployees || typeof findEmployees !== 'object') {
-		return sendJSON(res, 400, { error: 'Invalid request body' });
-	}
-	const findEmployeeBusiness = findEmployees.businessId;
-	try{
-		const [result] = await db.query(`
-			SELECT *
-			FROM Employee
-			WHERE businessId = ?
-			`,
-		[
-			findEmployeeBusiness
-		]);
+	if (!businessId) throw new Error('Missing businessId');
 
-		if(result.length === 0){
-			throw new Error('Employees not found');
-		}
-		
-		return sendJSON(res,
-			201,
-			{result}
-		);
+	const rows = await getNByKeyQuery('Employee', 'businessId', businessId);
 
-	}catch(err){
-		return sendJSON(res,
-			404,
-			{
-				error: "Could not find Employee"
-			}
-		);
-	}
+	return rows; // array of employees with given businessId
 }
 
-async function updateEmployee(req, res){
-	const findEmployee = req.body;
-	const {accessLevel, jobTitle, firstName, lastName, middleInitial, sex, ssn, hourlyWage, jobDescription, addressPostalCode, addressCity, addressState, payInfoAccountNum, payInfoPaymentMethod, businessId, terminationDate, birthDate, phone, email, supervisorId} = findEmployee;
-	if(findEmployee || typeof findEmployee !== 'object'){
-		return sendJSON(res, 400, { error: 'Invalid request body' });
-	}
-  try{
-		const [result] = await db.query(
-			`
-				UPDATE Employee
-				SET accessLevel = ?, jobTitle = ?, firstName = ?, lastName = ?, middleInitial = ?, sex = ?, ssn = ?, hourlyWage = ?, jobDescription = ?, addressPostalCode = ?, addressCity = ?, addressState = ?, payInfoAccountNum = ?, payInfoPaymentMethod = ?, businessId = ?, terminationDate = ?, birthDate = ?, phone = ?, email = ?, supervisorId = ?
+async function updateOne(req, _res) {
+	const updatedEmployee = req.body;
 
-			`,
-			[
-				accessLevel, jobTitle, firstName, lastName, middleInitial, sex, ssn, hourlyWage, jobDescription, addressPostalCode, addressCity, addressState, payInfoAccountNum, payInfoPaymentMethod, businessId, terminationDate, birthDate, phone, email, supervisorId
-			]
-		);
+	if (!updatedEmployee || !updatedEmployee.employeeId) {
+		throw new Error('Missing employee data or employeeId');
 	}
-	catch(err){
-		return sendJSON(res,
-			404,
-			{
-				error: "Could not update Employee"
-			}
-		);
-	}
+
+	const newEmpData = { ...updatedEmployee };
+	delete newEmpData.userId; // cannot update userId
+	delete newEmpData.ssn; // cannot update ssn
+
+	await updateOneQuery('Employee', newEmpData, 'employeeId');
+
+	return [updatedEmployee]; // updated employee data
 }
-
 
 //Create Employee
 //Get Employee by ID
@@ -153,6 +96,4 @@ async function updateEmployee(req, res){
 //Get Access Level
 //Update Employee
 
-
-
-export default {createEmployee, getEmployeeByID, getEmployeeByBusiness, updateEmployee};
+export default { createOne, getOneById, getNByBusinessId, updateOne };
