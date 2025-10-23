@@ -6,6 +6,31 @@ import {
 	updateOneQuery,
 } from '../utils/query-utils.js';
 
+/**
+ * Creates a new attraction with operating hours for each day of the week.
+ * @param {Object} req.body - Request body containing attraction data and hours
+ * @param {string} req.body.name - Attraction name
+ * @param {string} [req.body.description] - Attraction description
+ * @param {string} req.body.location - Location of the attraction
+ * @param {string} [req.body.uiImage] - Image URL for UI
+ * @param {string} [req.body.startingDay] - Start date of the attraction
+ * @param {string} [req.body.endingDay] - End date of the attraction
+ * @param {string} req.body.mondayOpen - Monday opening time
+ * @param {string} req.body.mondayClose - Monday closing time
+ * @param {string} req.body.tuesdayOpen - Tuesday opening time
+ * @param {string} req.body.tuesdayClose - Tuesday closing time
+ * @param {string} req.body.wednesdayOpen - Wednesday opening time
+ * @param {string} req.body.wednesdayClose - Wednesday closing time
+ * @param {string} req.body.thursdayOpen - Thursday opening time
+ * @param {string} req.body.thursdayClose - Thursday closing time
+ * @param {string} req.body.fridayOpen - Friday opening time
+ * @param {string} req.body.fridayClose - Friday closing time
+ * @param {string} req.body.saturdayOpen - Saturday opening time
+ * @param {string} req.body.saturdayClose - Saturday closing time
+ * @param {string} req.body.sundayOpen - Sunday opening time
+ * @param {string} req.body.sundayClose - Sunday closing time
+ * @returns {Promise<void>}
+ */
 async function createOne(req, _res){
 	//assuming req body has the attraction times as well.
 	const newAttraction = req.body;
@@ -47,6 +72,18 @@ async function createOne(req, _res){
 		}
 }
 
+/**
+ * Updates an attraction's basic information (not hours).
+ * @param {string} req.body.attractionId - UUID of the attraction to update
+ * @param {string} [req.body.name] - Updated name
+ * @param {string} [req.body.description] - Updated description
+ * @param {string} [req.body.location] - Updated location
+ * @param {string} [req.body.uiImage] - Updated image URL
+ * @param {string} [req.body.startingDay] - Updated start date
+ * @param {string} [req.body.endingDay] - Updated end date
+ * @returns {Promise<Array>} Array containing the updated attraction object
+ * @throws {Error} If attraction data or attractionId is missing
+ */
 async function updateOneInfo(req, _res){
 	const updatedAttraction = req.body;
 
@@ -69,6 +106,26 @@ async function updateOneInfo(req, _res){
 	return [updatedAttraction];
 }
 
+/**
+ * Updates an attraction's operating hours for all days of the week.
+ * @param {string} req.body.attractionId - UUID of the attraction
+ * @param {string} req.body.mondayOpen - Monday opening time
+ * @param {string} req.body.mondayClose - Monday closing time
+ * @param {string} req.body.tuesdayOpen - Tuesday opening time
+ * @param {string} req.body.tuesdayClose - Tuesday closing time
+ * @param {string} req.body.wednesdayOpen - Wednesday opening time
+ * @param {string} req.body.wednesdayClose - Wednesday closing time
+ * @param {string} req.body.thursdayOpen - Thursday opening time
+ * @param {string} req.body.thursdayClose - Thursday closing time
+ * @param {string} req.body.fridayOpen - Friday opening time
+ * @param {string} req.body.fridayClose - Friday closing time
+ * @param {string} req.body.saturdayOpen - Saturday opening time
+ * @param {string} req.body.saturdayClose - Saturday closing time
+ * @param {string} req.body.sundayOpen - Sunday opening time
+ * @param {string} req.body.sundayClose - Sunday closing time
+ * @returns {Promise<Array>} Array containing the updated hours object
+ * @throws {Error} If attraction data or attractionId is missing
+ */
 async function updateOneHours(req, _res){
 	const updatedAttractionHours = req.body;
 
@@ -104,6 +161,12 @@ async function updateOneHours(req, _res){
 	return [updatedAttractionHours];
 }
 
+/**
+ * Soft deletes an attraction by setting its deletedAt timestamp.
+ * @param {string} req.body.attractionID - UUID of the attraction to delete
+ * @returns {Promise<Array>} Array containing success message
+ * @throws {Error} If attractionID is missing
+ */
 async function deleteOne(req, _res){
 	const deleteAttraction = req.body;
 	const deleteAttractionID = deleteAttraction.attractionID;
@@ -123,6 +186,12 @@ async function deleteOne(req, _res){
 	return [{ message: 'Attraction successfully deleted' }];
 }
 
+/**
+ * Retrieves a single attraction by its ID.
+ * @param {string} req.body.attractionID - UUID of the attraction to retrieve
+ * @returns {Promise<Array>} Array containing the attraction object
+ * @throws {Error} If attractionID is missing or no attraction is found
+ */
 async function getOne(req, _res){
 	const findAttraction = req.body;
 	const findAttractionID = findAttraction.attractionID;
@@ -134,6 +203,12 @@ async function getOne(req, _res){
 	return [rows[0]];
 }
 
+/**
+ * Retrieves the operating hours for a specific attraction.
+ * @param {string} req.body.attractionID - UUID of the attraction
+ * @returns {Promise<Array>} Array of hours objects for each day of the week
+ * @throws {Error} If attractionID is missing or no hours are found
+ */
 async function getOneHours(req, _res){
 	const findAttraction = req.body;
 	const findAttractionID = findAttraction.attractionID;
