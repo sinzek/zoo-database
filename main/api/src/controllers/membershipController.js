@@ -1,78 +1,73 @@
-import { sendJSON } from '../utils/endpoint-utils.js';
-import { db } from '../db/mysql.js';
 import crypto from 'crypto';
+import {
+	createOneQuery,
+	getNByKeyQuery,
+	updateOneQuery,
+} from '../utils/query-utils.js';
 
-async function createOne(req, res){
+async function createOne(req, _res){
 	const newMembership = req.body;
+
+	if (!newMembership) throw new Error('Missing membership data');
+
 	const {purchaser, membershipType, price, startDate, expireDate, autoRenew} = newMembership;
 	const newMembershipID = crypto.randomUUID();
 
-	await db.query(
-		`
-		INSERT INTO Membership (membershipId, purchaser, membershipType, amount, startDate, expireDate, autoRenew)
-		VALUES(?, ?, ?, ?, ?, ?, ?);
-		`,
-		[newMembershipID, purchaser, membershipType, price, startDate, expireDate, autoRenew]
-	);
-	return sendJSON(res,
-		201,
-		{message: 'Membership successfully created'}
-	);
+	await createOneQuery('Membership', {
+		membershipId: newMembershipID,
+		purchaser,
+		membershipType,
+		amount: price,
+		startDate,
+		expireDate,
+		autoRenew
+	});
+
+	return [{ membershipId: newMembershipID, ...newMembership }];
 }
 
-async function updateOne(req, res){
+async function updateOne(req, _res){
 	const updatedMembership = req.body;
-	const {purchaser, membershipType, price, startDate, expireDate, autoRenew} = updatedMembership; 
-	
-	await db.query(`
-		UPDATE Membership
-		SET purchaser = ?, membershipType = ?, amount = ?, startDate = ?, expireDate = ?, autoRenew = ?
-		WHERE membershipId = ? AND deletedAt IS NULL
-		`,
-	[
-		purchaser, membershipType, price, startDate, expireDate, autoRenew, updatedMembership.membershipId
-	]);
 
-	return sendJSON(res,
-		201,
-		{message: 'Membership successfully updated'}
-	);
+	if (!updatedMembership || !updatedMembership.membershipId) {
+		throw new Error('Missing membership data or membershipId');
+	}
+
+	const {membershipId, purchaser, membershipType, price, startDate, expireDate, autoRenew} = updatedMembership; 
+	
+	await updateOneQuery('Membership', {
+		membershipId,
+		purchaser,
+		membershipType,
+		amount: price,
+		startDate,
+		expireDate,
+		autoRenew
+	}, 'membershipId');
+
+	return [updatedMembership];
 }
 
-async function getOneByID(req, res){
+async function getOneByID(req, _res){
 	const getMembership = req.body; 
 	const getMembershipID = getMembership.membershipID;
-	const [result] = await db.query(`
-		SELECT *
-		FROM Membership
-		WHERE membershipId = ? AND deletedAt IS NULL
-		`,
-	[
-		getMembershipID
-	]);
 
-	return sendJSON(res,
-		201,
-		{membership: result[0]}
-	);
+	if (!getMembershipID) throw new Error('Missing membershipID');
+
+	const rows = await getNByKeyQuery('Membership', 'membershipId', getMembershipID);
+
+	return [rows[0]];
 }
 
-async function getManyByPurchaser(req, res){
+async function getManyByPurchaser(req, _res){
 	const getMemberships = req.body; 
 	const getPurchaserID = getMemberships.purchaserID;
-	const [result] = await db.query(`
-		SELECT *
-		FROM Membership
-		WHERE purchaser = ? AND deletedAt IS NULL
-		`,
-	[
-		getPurchaserID
-	]);
 
-	return sendJSON(res,
-		201,
-		{memberships: result}
-	);
+	if (!getPurchaserID) throw new Error('Missing purchaserID');
+
+	const rows = await getNByKeyQuery('Membership', 'purchaser', getPurchaserID);
+
+	return rows;
 }
 
 export default {createOne, updateOne, getOneByID, getManyByPurchaser};

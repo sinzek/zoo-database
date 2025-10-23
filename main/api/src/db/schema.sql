@@ -61,7 +61,6 @@ CREATE TABLE Transaction (
     description VARCHAR(1000) NULL,
     businessId CHAR(36) NOT NULL, -- uuid, foreign key to Business(id)
     amount DECIMAL(24, 2) NOT NULL CHECK (amount >= 0),
-    purchaseDate DATETIME NOT NULL DEFAULT (CURDATE()), -- defaults to current date
     deletedAt DATETIME NULL, -- soft delete (null if not deleted)
 
     FOREIGN KEY (businessId) REFERENCES Business(businessId) ON DELETE RESTRICT ON UPDATE CASCADE
@@ -105,7 +104,7 @@ CREATE TABLE PurchasedItem (
 );
 
 CREATE TABLE BusinessHoursDay (
-    --weak entity
+    businessHoursDayId CHAR(36) PRIMARY KEY, -- uuid
     businessId CHAR(36) NOT NULL, -- uuid, foreign key to Business(id)
     dayOfWeek ENUM('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NOT NULL,
     openTime TIME NOT NULL, -- time only (no date)
@@ -128,7 +127,7 @@ CREATE TABLE Attraction (
 );
 
 CREATE TABLE AttractionHoursDay (
-    -- weak entity 
+    attractionHoursDayId CHAR(36) PRIMARY KEY, -- uuid
     attractionId CHAR(36) NOT NULL, -- uuid, foreign key to Attraction(id)
     dayOfWeek ENUM('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NOT NULL,
     openTime TIME NOT NULL, -- time only (no date)
@@ -196,11 +195,8 @@ CREATE TABLE HabitatPhoto(
 
 CREATE TABLE Diet (
     dietId CHAR(36) PRIMARY KEY, -- uuid
-    animalId CHAR(36) NOT NULL,
     specialNotes VARCHAR(200) NULL CHECK (specialNotes IS NULL OR LENGTH(specialNotes) >= 1),
     deletedAt DATETIME NULL
-
-    FOREIGN KEY (animalId) REFERENCES Animal(animalId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE DietScheduleDay (
@@ -227,6 +223,7 @@ CREATE TABLE Animal (
     sex ENUM('male', 'female') NOT NULL,
     behavior VARCHAR(200) NULL,
     habitatId CHAR(36) NOT NULL,
+    dietId CHAR(36) NOT NULL,
     deletedAt DATETIME NULL,
 
     FOREIGN KEY (habitatId) REFERENCES Habitat(habitatId) ON DELETE RESTRICT ON UPDATE CASCADE,

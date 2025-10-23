@@ -1,60 +1,64 @@
-import { sendJSON } from '../utils/endpoint-utils.js';
 import { db } from '../db/mysql.js';
 import crypto from 'crypto';
+import {
+	createOneQuery,
+	updateOneQuery,
+} from '../utils/query-utils.js';
 
-
-async function createOne(req, res){
+async function createOne(req, _res){
 	const newTransaction = req.body;
+
+	if (!newTransaction) throw new Error('Missing transaction data');
+
 	const newTransactionID = crypto.randomUUID();
 	const {businessId, price, purchaseDate} = newTransaction;
 
-	await db.query(
-		`
-		INSERT INTO Transaction (transactionId, businessId, amount, purchaseDate)
-		VALUES(?, ?, ?, ?);
-		`,
-		[newTransactionID, businessId, price, purchaseDate]
-	);
-	return sendJSON(res,
-		201,
-		{message: 'Transaction successfully created'}
-	);
+	await createOneQuery('Transaction', {
+		transactionId: newTransactionID,
+		businessId,
+		amount: price,
+		purchaseDate
+	});
+
+	return [{ transactionId: newTransactionID, ...newTransaction }];
 }
 
-async function deleteOneByID(req, res){
+async function deleteOneByID(req, _res){
 	const deleteTransaction = req.body;
 	const deleteTransactionID = deleteTransaction.transactionID;
+
+	if (!deleteTransactionID) throw new Error('Missing transactionID');
 	
-	await db.query(`
+	// using db.query for soft delete
+	await db.query(
+		`
 		UPDATE Transaction
 		SET deletedAt = CURRENT_DATE()
 		WHERE transactionId = ? AND deletedAt IS NULL
 		`,
-	[
-		deleteTransactionID
-	]);
-	//may have to handle PurchasedItem deletion here too.
-	return sendJSON(res,
-		201,
-		{message: 'Transaction successfully deleted'}
+		[deleteTransactionID]
 	);
+	//may have to handle PurchasedItem deletion here too.
+	return [{ message: 'Transaction successfully deleted' }];
 }
 
-async function updateOneByID(req, res){
+async function updateOneByID(req, _res){
 	const updatedTransaction = req.body;
-	const {businessId, price, purchaseDate} = updatedTransaction
-	await db.query(`
-		UPDATE Transaction
-		SET businessId = ?, amount = ?, purchaseDate = ?
-		WHERE transactionId = ? AND deletedAt IS NULL
-		`,
-	[
-		businessId, price, purchaseDate, updatedTransaction.transactionId
-	]);
-	return sendJSON(res,
-		201,
-		{message: 'Transaction successfully updated'}
-	);
+
+	if (!updatedTransaction || !updatedTransaction.transactionId) {
+		throw new Error('Missing transaction data or transactionId');
+	}
+
+	const {transactionId, businessId, price, purchaseDate} = updatedTransaction;
+
+	await updateOneQuery('Transaction', {
+		transactionId,
+		businessId,
+		amount: price,
+		purchaseDate
+	}, 'transactionId');
+
+	return [updatedTransaction];
 }
 
 export default {createOne, deleteOneByID,	updateOneByID};

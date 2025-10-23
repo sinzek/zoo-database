@@ -1,124 +1,85 @@
-import { sendJSON } from '../utils/endpoint-utils.js';
 import { db } from '../db/mysql.js';
 import crypto from 'crypto';
+import {
+	createOneQuery,
+	getNByKeyQuery,
+	updateOneQuery,
+} from '../utils/query-utils.js';
 
-async function createOne(req, res){
+async function createOne(req, _res){
 	const newAnimal = req.body;
+	const animalId = crypto.randomUUID();
 
-	const {
-		firstName,
-		lastName,
-		commonName,
-		species,
-		genus,
-		birthDate,
-		importedFrom,
-		importDate,
-		sex,
-		behavior,
-		habitatId,
-	} = newAnimal;
-
-		const newAnimalUUID = crypto.randomUUID();
-
-		const [result] = await db.query(
-			`
-			INSERT INTO Animal (animalID, firstName, lastName, commonName, species, genus, birthDate, importedFrom, importDate, sex, behavior, habitatId)
-			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);	
-			`,
-			[newAnimalUUID, firstName, lastName, commonName, species, genus, birthDate, importedFrom, importDate, sex, behavior, habitatId]
-		);
-
-		return sendJSON(
-			res,
-			201,
-			{animal: result[0]}
-		);
-}
-
-async function updateOne(req, res){
-	const updatedAnimal = req.body;
-	const {
+	const animalData = {
 		animalId,
-		firstName,
-		lastName,
-		commonName,
-		species,
-		genus,
-		birthDate,
-		deathDate,
-		importedFrom,
-		importDate,
-		sex,
-		behavior,
-	} = updatedAnimal;
+		firstName: newAnimal.firstName,
+		lastName: newAnimal.lastName,
+		commonName: newAnimal.commonName,
+		species: newAnimal.species,
+		genus: newAnimal.genus,
+		birthDate: newAnimal.birthDate,
+		importedFrom: newAnimal.importedFrom,
+		importDate: newAnimal.importDate,
+		sex: newAnimal.sex,
+		behavior: newAnimal.behavior,
+		habitatId: newAnimal.habitatId
+	};
 
-	const [result] = await db.query(
-		`
-			UPDATE Animal
-			SET firstName = ?, lastName = ?, commonName = ?, species = ?, genus = ?, birthDate = ?, deathDate = ?, importedFrom = ?, importDate = ?, sex = ?, behavior = ?
-			WHERE animalID = ? AND deletedAt IS NULL;
-		`,
-		[firstName, lastName, commonName, species, genus, birthDate, deathDate, importedFrom, importDate, sex, behavior, animalId]
-	);
 
-		const animal = result[0];
-		return sendJSON(
-			res,
-			201,
-			{animal}
-		)
+	await createOneQuery('Animal', animalData);
+	return [{animalId, ...animalData}];
 }
 
-async function getOneById(req, res) {
-	const findAnimal = req.body; 
+async function updateOne(req, _res){
+	const updatedAnimal = req.body;
 
-	const findAnimalId = findAnimal.animalId;
-		const [result] = await db.query(`
-			SELECT *
-			FROM Animal
-			WHERE AnimalId = ?
-			WHERE AnimalID = ? AND deletedAt IS NULL
-			`,
-			[findAnimalId]
-		);
+	if (!updatedAnimal || !updatedAnimal.animalId) {
+		throw new Error('Missing animal data or animalId');
+	}
 
-		const foundAnimal = result[0];
-		return sendJSON(res, 201, { foundAnimal });
+	const newAnimalData = {...updatedAnimal};
+	await updateOneQuery('Animal', newAnimalData, 'animalId');
+
+	return [updatedAnimal];
 }
-async function getManyByHabitat(req, res){
+
+async function getOneById(req, _res) {
+	const {findAnimalId} = req.body; 
+	if(!findAnimalId) {
+		throw new Error('Missing animal ID');
+	}
+	const rows = await getNByKeyQuery('Animal', 'animalId', findAnimalId);
+
+	return [rows[0]];
+}
+
+async function getManyByHabitat(req, _res){
 	const requestedHabitat = req.body;
 	const habitatId = requestedHabitat.habitatId;
-	const [result] = await db.query(
-			`
-				SELECT *
-				FROM Animal
-				WHERE habitatId = ? AND deletedAt IS NULL
-			`,
-			[habitatId]
-		);
-	return sendJSON(res,
-		201,
-		{result}
-	);
+
+	if (!habitatId) throw new Error('Missing habitatId');
+
+	const rows = await getNByKeyQuery('Animal', 'habitatId', habitatId);
+	
+	return rows;
 }
 
-async function getManyByHandler(req, res){ //by employeeid
+async function getManyByHandler(req, _res){ //by employeeid
 	const handlerInfo = req.body;
 
-	const [AnimalsTakenCareBy] = await db.query(
+	if (!handlerInfo.EmployeeId) throw new Error('Missing EmployeeId');
+
+	// using db.query for complex join query
+	const rows = await db.query(
 		`
 		SELECT Animal.*
 		FROM Animal, TakesCareOf
-		WHERE TakesCareOf.employeeId = ?
 		WHERE TakesCareOf.employeeID = ? AND TakesCareOf.animalID = Animal.animalID AND Animal.deletedAt IS NULL;       
 		`,
 		[handlerInfo.EmployeeId]
 	);
 
-	return sendJSON(res, 400, {
-		AnimalsTakenCareBy,
-	});
+	return rows;
 }
 
 

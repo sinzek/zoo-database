@@ -1,80 +1,79 @@
-import { sendJSON } from '../utils/endpoint-utils.js';
 import { db } from '../db/mysql.js';
 import crypto from 'crypto';
+import {
+	createOneQuery,
+	getNByKeyQuery,
+	updateOneQuery,
+} from '../utils/query-utils.js';
 
-async function createOne(req, res){
+async function createOne(req, _res){
 	const newItem = req.body;
+
+	if (!newItem) throw new Error('Missing item data');
+
 	const newItemID = crypto.randomUUID();
 	const {name, description, price, uiImage, businessId} = newItem;
 
-	await db.query(
-		`
-		INSERT INTO Item (itemId, name, description, price, uiImage, businessId)
-		VALUES(?, ?, ?, ?, ?, ?);
-		`,
-		[newItemID, name, description, price, uiImage, businessId]
-	);
-	return sendJSON(res,
-		201,
-		{message: 'Item successfully created'}
-	);
+	await createOneQuery('Item', { //NOTE ITEM SHOULD HAVE UI IMAGE
+		itemId: newItemID,
+		name,
+		description,
+		price,
+		uiImage,
+		businessId
+	});
+
+	return [{ itemId: newItemID, ...newItem }];
 }
 
-async function deleteOne(req, res){
+async function deleteOne(req, _res){
 	const deleteItem = req.body;
 	const deleteItemID = deleteItem.itemID;
+
+	if (!deleteItemID) throw new Error('Missing itemID');
 	
-	await db.query(`
+	// using db.query for soft delete
+	await db.query(
+		`
 		UPDATE Item
 		SET deletedAt = CURRENT_DATE()
 		WHERE itemId = ? AND deletedAt IS NULL
 		`,
-	[
-		deleteItemID
-	]);
-	
-	return sendJSON(res,
-		201,
-		{message: 'Item successfully deleted'}
+		[deleteItemID]
 	);
+	
+	return [{ message: 'Item successfully deleted' }];
 }
 
-async function updateOne(req, res){
+async function updateOne(req, _res){
 	const updatedItem = req.body;
-	const {name, description, price, uiImage} = updatedItem; 
-	
-	await db.query(`
-		UPDATE Item
-		SET name = ?, description = ?, price = ?, uiImage = ?
-		WHERE itemId = ? AND deletedAt IS NULL
-		`,
-	[
-		name, description, price, uiImage, updatedItem.itemId
-	]);
 
-	return sendJSON(res,
-		201,
-		{message: 'Item successfully updated'}
-	);
+	if (!updatedItem || !updatedItem.itemId) {
+		throw new Error('Missing item data or itemId');
+	}
+
+	const {itemId, name, description, price, uiImage} = updatedItem; 
+	
+	await updateOneQuery('Item', {
+		itemId,
+		name,
+		description,
+		price,
+		uiImage
+	}, 'itemId');
+
+	return [updatedItem];
 }
 
-async function getOneByID(req, res){
+async function getOneByID(req, _res){
 	const findItem = req.body; 
 	const findItemID = findItem.itemID;
-	const [result] = await db.query(`
-		SELECT *
-		FROM Item
-		WHERE itemId = ? AND deletedAt IS NULL
-		`,
-	[
-		findItemID
-	]);
+
+	if (!findItemID) throw new Error('Missing itemID');
+
+	const rows = await getNByKeyQuery('Item', 'itemId', findItemID);
 	
-	const findItems = result[0];
-	return sendJSON(res,
-		201,
-		{findItems}
-	);
+	return [rows[0]];
 }
 
 export default {createOne, deleteOne, updateOne , getOneByID};
