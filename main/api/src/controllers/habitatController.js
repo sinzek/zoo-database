@@ -4,6 +4,7 @@ import {
 	getNByKeyQuery,
 	updateOneQuery,
 } from '../utils/query-utils.js';
+import { db } from '../db/mysql.js';
 
 /**
  * Creates a new habitat record in the database.
@@ -100,7 +101,6 @@ async function deleteOne(req, _res) {
 	if (!habitatId) throw new Error('Missing habitatId');
 
 	// using db.query for soft delete
-	const { db } = await import('../db/mysql.js');
 
 	await db.query(
 		`
