@@ -63,7 +63,7 @@ async function logout(_req, _res) {
 }
 
 async function getUserData(req, _res) {
-	const userId = req.session.data.id;
+	const userId = req.user.data.id;
 	console.log('GET USER DATA CALLED FOR USER ID:', userId);
 
 	const [user] = await query(
