@@ -6,6 +6,16 @@ import {
 	updateOneQuery,
 } from '../utils/query-utils.js';
 
+/**
+ * Creates a new item record.
+ * @param {string} req.body.name - Item name
+ * @param {string} [req.body.description] - Item description
+ * @param {number} req.body.price - Item price
+ * @param {string} [req.body.uiImage] - Image URL for UI
+ * @param {string} req.body.businessId - UUID of the associated business
+ * @returns {Promise<Array>} Array containing the created item object with generated itemId
+ * @throws {Error} If item data is missing
+ */
 async function createOne(req, _res){
 	const newItem = req.body;
 
@@ -26,6 +36,12 @@ async function createOne(req, _res){
 	return [{ itemId: newItemID, ...newItem }];
 }
 
+/**
+ * Soft deletes an item by setting its deletedAt timestamp.
+ * @param {string} req.body.itemID - UUID of the item to delete
+ * @returns {Promise<Array>} Array containing success message
+ * @throws {Error} If itemID is missing
+ */
 async function deleteOne(req, _res){
 	const deleteItem = req.body;
 	const deleteItemID = deleteItem.itemID;
@@ -45,6 +61,16 @@ async function deleteOne(req, _res){
 	return [{ message: 'Item successfully deleted' }];
 }
 
+/**
+ * Updates an existing item record.
+ * @param {string} req.body.itemId - UUID of the item to update
+ * @param {string} [req.body.name] - Updated name
+ * @param {string} [req.body.description] - Updated description
+ * @param {number} [req.body.price] - Updated price
+ * @param {string} [req.body.uiImage] - Updated image URL
+ * @returns {Promise<Array>} Array containing the updated item object
+ * @throws {Error} If item data or itemId is missing
+ */
 async function updateOne(req, _res){
 	const updatedItem = req.body;
 
@@ -65,6 +91,12 @@ async function updateOne(req, _res){
 	return [updatedItem];
 }
 
+/**
+ * Retrieves a single item by its ID.
+ * @param {string} req.body.itemID - UUID of the item to retrieve
+ * @returns {Promise<Array>} Array containing the item object
+ * @throws {Error} If itemID is missing or no item is found
+ */
 async function getOneByID(req, _res){
 	const findItem = req.body; 
 	const findItemID = findItem.itemID;
