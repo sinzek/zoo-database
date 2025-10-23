@@ -6,6 +6,33 @@ import {
 	updateOneQuery,
 } from '../utils/query-utils.js';
 
+/**
+ * Creates a new business with operating hours for each day of the week.
+ * @param {string} req.body.name - Business name
+ * @param {string} req.body.address - Business address
+ * @param {string} req.body.phone - Phone number (10 digits)
+ * @param {string} req.body.email - Email address
+ * @param {string} [req.body.uiDesc] - Description for UI purposes
+ * @param {string} req.body.businessType - Type ('zoo', 'retail', 'food', 'vet_clinic')
+ * @param {string} req.body.createdAt - Creation date
+ * @param {string} [req.body.ownerID] - UUID of owner employee
+ * @param {string} req.body.mondayOpen - Monday opening time
+ * @param {string} req.body.mondayClose - Monday closing time
+ * @param {string} req.body.tuesdayOpen - Tuesday opening time
+ * @param {string} req.body.tuesdayClose - Tuesday closing time
+ * @param {string} req.body.wednesdayOpen - Wednesday opening time
+ * @param {string} req.body.wednesdayClose - Wednesday closing time
+ * @param {string} req.body.thursdayOpen - Thursday opening time
+ * @param {string} req.body.thursdayClose - Thursday closing time
+ * @param {string} req.body.fridayOpen - Friday opening time
+ * @param {string} req.body.fridayClose - Friday closing time
+ * @param {string} req.body.saturdayOpen - Saturday opening time
+ * @param {string} req.body.saturdayClose - Saturday closing time
+ * @param {string} req.body.sundayOpen - Sunday opening time
+ * @param {string} req.body.sundayClose - Sunday closing time
+ * @returns {Promise<Array>} Array containing the created business object with generated businessId
+ * @throws {Error} If business data is missing
+ */
 async function createOne(req, _res){
 	const newBusiness = req.body;
 
@@ -53,6 +80,12 @@ async function createOne(req, _res){
 	return [{ businessId: newBusinessID, ...newBusiness }];
 }
 
+/**
+ * Soft deletes a business by setting its deletedAt timestamp.
+ * @param {string} req.body.businessID - UUID of the business to delete
+ * @returns {Promise<Array>} Array containing success message
+ * @throws {Error} If businessID is missing
+ */
 async function deleteOne(req, _res){
 	const deleteBusiness = req.body;
 	const deleteBusinessID = deleteBusiness.businessID;
@@ -74,6 +107,18 @@ async function deleteOne(req, _res){
 	return [{ message: 'Business successfully deleted' }];
 }
 
+/**
+ * Updates a business's basic information (not hours).
+ * Note: businessId and type cannot be updated.
+ * @param {string} req.body.businessId - UUID of the business to update
+ * @param {string} [req.body.name] - Updated name
+ * @param {string} [req.body.address] - Updated address
+ * @param {string} [req.body.phone] - Updated phone
+ * @param {string} [req.body.email] - Updated email
+ * @param {string} [req.body.uiDesc] - Updated description
+ * @returns {Promise<Array>} Array containing the updated business object
+ * @throws {Error} If business data or businessId is missing
+ */
 async function updateOneInfo(req, _res){
 	const updatedBusiness = req.body;
 
@@ -95,6 +140,26 @@ async function updateOneInfo(req, _res){
 	return [updatedBusiness];
 }
 
+/**
+ * Updates a business's operating hours for all days of the week.
+ * @param {string} req.body.businessId - UUID of the business
+ * @param {string} req.body.mondayOpen - Monday opening time
+ * @param {string} req.body.mondayClose - Monday closing time
+ * @param {string} req.body.tuesdayOpen - Tuesday opening time
+ * @param {string} req.body.tuesdayClose - Tuesday closing time
+ * @param {string} req.body.wednesdayOpen - Wednesday opening time
+ * @param {string} req.body.wednesdayClose - Wednesday closing time
+ * @param {string} req.body.thursdayOpen - Thursday opening time
+ * @param {string} req.body.thursdayClose - Thursday closing time
+ * @param {string} req.body.fridayOpen - Friday opening time
+ * @param {string} req.body.fridayClose - Friday closing time
+ * @param {string} req.body.saturdayOpen - Saturday opening time
+ * @param {string} req.body.saturdayClose - Saturday closing time
+ * @param {string} req.body.sundayOpen - Sunday opening time
+ * @param {string} req.body.sundayClose - Sunday closing time
+ * @returns {Promise<Array>} Array containing the updated hours object
+ * @throws {Error} If business data or businessId is missing
+ */
 async function updateOneHours(req, _res){
 	const updatedBusinessHours = req.body;
 
@@ -130,6 +195,12 @@ async function updateOneHours(req, _res){
 	return [updatedBusinessHours];
 }
 
+/**
+ * Retrieves all employees for a specific business.
+ * @param {string} req.body.businessID - UUID of the business
+ * @returns {Promise<Array>} Array of employee objects
+ * @throws {Error} If businessID is missing or no employees are found
+ */
 async function getEmployees(req, _res){
 	const findBusiness = req.body;
 	const findBusinessID = findBusiness.businessID;

@@ -50,6 +50,12 @@ async function updateOne(req, _res){
 	return [updatedMembership];
 }
 
+/**
+ * Retrieves a single membership by its ID.
+ * @param {string} req.body.membershipID - UUID of the membership to retrieve
+ * @returns {Promise<Array>} Array containing the membership object
+ * @throws {Error} If membershipID is missing or no membership is found
+ */
 async function getOneByID(req, _res){
 	const { membershipId } = req.body;
 

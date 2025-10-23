@@ -28,6 +28,12 @@ import {
 // 	return [{ customerID, ...newCustomer }];
 // }
 
+/**
+ * Retrieves a single customer by their ID.
+ * @param {string} req.body.customerID - UUID of the customer to retrieve
+ * @returns {Promise<Array>} Array containing the customer object
+ * @throws {Error} If customerID is missing or no customer is found
+ */
 async function getOne(req, _res){
 	const { customerId } = req.body;
 
@@ -38,6 +44,12 @@ async function getOne(req, _res){
 	return [customer];
 }
 
+/**
+ * Soft deletes a customer by setting their deletedAt timestamp.
+ * @param {string} req.body.customerID - UUID of the customer to delete
+ * @returns {Promise<Array>} Array containing success message
+ * @throws {Error} If customerID is missing
+ */
 async function deleteOne(req, _res){
 	const { customerId } = req.body;
 

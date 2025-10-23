@@ -9,7 +9,6 @@ import { ACCESS_LEVELS } from '../constants/accessLevels.js';
 import { query } from '../db/mysql.js';
 
 async function createOne(req, _res) {
-	//careful of creating employees. <<--// wym? -chase <<--// I think this was a comment from a lot earlier, -joseph
 	const newEmp = req.body;
 	if (!newEmp) throw new Error('Missing employee data');
 
@@ -56,6 +55,12 @@ async function createOne(req, _res) {
 	return [employeeData];
 }
 
+/**
+ * Retrieves a single employee by their ID.
+ * @param {string} req.body.employeeId - UUID of the employee to retrieve
+ * @returns {Promise<Array>} Array containing the employee object
+ * @throws {Error} If employeeId is missing or no employee is found
+ */
 async function getOneById(req, _res) {
 	const { employeeId } = req.body;
 
@@ -76,6 +81,21 @@ async function getNByBusiness(req, _res) {
 	return employees; // array of employees with given businessId
 }
 
+/**
+ * Updates an existing employee record.
+ * Note: userId and ssn cannot be updated through this function.
+ * @param {string} req.body.employeeId - UUID of the employee to update
+ * @param {string} [req.body.accessLevel] - Updated access level
+ * @param {string} [req.body.jobTitle] - Updated job title
+ * @param {string} [req.body.firstName] - Updated first name
+ * @param {string} [req.body.lastName] - Updated last name
+ * @param {number} [req.body.hourlyWage] - Updated hourly wage
+ * @param {string} [req.body.phone] - Updated phone number
+ * @param {string} [req.body.addressStreet] - Updated street address
+ * @param {string} [req.body.supervisorId] - Updated supervisor ID
+ * @returns {Promise<Array>} Array containing the updated employee object
+ * @throws {Error} If employee data or employeeId is missing
+ */
 async function updateOne(req, _res) {
 	const updatedEmployee = req.body;
 

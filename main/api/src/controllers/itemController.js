@@ -7,6 +7,16 @@ import {
 	updateOneQuery,
 } from '../utils/query-utils.js';
 
+/**
+ * Creates a new item record.
+ * @param {string} req.body.name - Item name
+ * @param {string} [req.body.description] - Item description
+ * @param {number} req.body.price - Item price
+ * @param {string} [req.body.uiImage] - Image URL for UI
+ * @param {string} req.body.businessId - UUID of the associated business
+ * @returns {Promise<Array>} Array containing the created item object with generated itemId
+ * @throws {Error} If item data is missing
+ */
 async function createOne(req, _res){
 	const newItem = req.body;
 
