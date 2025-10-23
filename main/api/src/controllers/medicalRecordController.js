@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { db } from '../db/mysql.js';
+import { query } from '../db/mysql.js';
 import {
 	createOneQuery,
 	getNByKeyQuery,
@@ -35,7 +35,7 @@ async function createOne(req, _res) {
 
 	await createOneQuery('MedicalRecord', recordData);
 
-	return [{ medicalRecordId, ...newRecord }];
+	return [recordData];
 }
 
 /**
@@ -49,13 +49,13 @@ async function getOneById(req, _res) {
 
 	if (!medicalRecordId) throw new Error('Missing medicalRecordId');
 
-	const rows = await getNByKeyQuery(
+	const [medicalRecord] = await getNByKeyQuery(
 		'MedicalRecord',
 		'medicalRecordId',
 		medicalRecordId
 	);
 
-	return [rows[0]];
+	return [medicalRecord];
 }
 
 /**
@@ -64,23 +64,16 @@ async function getOneById(req, _res) {
  * @returns {Promise<Array>} Array of medical record objects ordered by visit date (descending)
  * @throws {Error} If animalId is missing
  */
-async function getManyByAnimal(req, _res) {
+async function getNyByAnimal(req, _res) {
 	const { animalId } = req.body;
 
 	if (!animalId) throw new Error('Missing animalId');
 
-	// using db.query to order by date
-	const rows = await db.query(
-		`
-		SELECT *
-		FROM MedicalRecord
-		WHERE animalId = ? AND deletedAt IS NULL
-		ORDER BY visitDate DESC
-		`,
-		[animalId]
-	);
+	let medicalRecords = await getNByKeyQuery('MedicalRecord', 'animalId', animalId);
 
-	return rows;
+	medicalRecords = medicalRecords.sort((a, b) => new Date(b.visitDate) - new Date(a.visitDate));
+
+	return [medicalRecords];
 }
 
 /**
@@ -91,13 +84,12 @@ async function getManyByAnimal(req, _res) {
  * @returns {Promise<Array>} Array of medical record objects ordered by visit date (descending)
  * @throws {Error} If startDate or endDate is missing
  */
-async function getManyByDateRange(req, _res) {
+async function getNByDateRange(req, _res) {
 	const { startDate, endDate, animalId } = req.body;
 
 	if (!startDate || !endDate) throw new Error('Missing startDate or endDate');
 
-	// using db.query for date range query
-	let query = `
+	let q = `
 		SELECT *
 		FROM MedicalRecord
 		WHERE visitDate >= ? AND visitDate <= ? AND deletedAt IS NULL
@@ -106,15 +98,19 @@ async function getManyByDateRange(req, _res) {
 
 	// Optional filter by animal
 	if (animalId) {
-		query += ` AND animalId = ?`;
+		q += ` AND animalId = ?`;
 		params.push(animalId);
 	}
 
-	query += ` ORDER BY visitDate DESC`;
+	q += ` ORDER BY visitDate DESC`;
 
-	const rows = await db.query(query, params);
+	const medicalRecords = await query(q, params);
 
-	return rows;
+	if(!medicalRecords || medicalRecords.length === 0) {
+		return [[]]; // return empty array if no records found
+	}
+
+	return [medicalRecords];
 }
 
 /**
@@ -124,7 +120,7 @@ async function getManyByDateRange(req, _res) {
 async function getActiveRecords(_req, _res) {
 	// Get records where checkoutDate is NULL (animal still in care)
 	// using db.query for NULL check
-	const rows = await db.query(
+	const medicalRecords = await query(
 		`
 		SELECT *
 		FROM MedicalRecord
@@ -133,7 +129,11 @@ async function getActiveRecords(_req, _res) {
 		`
 	);
 
-	return rows;
+	if (!medicalRecords || medicalRecords.length === 0) {
+		return [[]]; // return empty array if no records found
+	}
+
+	return [medicalRecords];
 }
 
 /**
@@ -170,8 +170,7 @@ async function deleteOne(req, _res) {
 
 	if (!medicalRecordId) throw new Error('Missing medicalRecordId');
 
-	// using db.query for soft delete
-	await db.query(
+	const result = await query(
 		`
 		UPDATE MedicalRecord
 		SET deletedAt = CURRENT_TIMESTAMP()
@@ -180,7 +179,11 @@ async function deleteOne(req, _res) {
 		[medicalRecordId]
 	);
 
-	return [{ message: 'Medical record successfully deleted' }];
+	if(result.affectedRows === 0) {
+		throw new Error('No medical record found to delete or it is already deleted');
+	}
+
+	return [{ message: `Medical record deleted with ID ${medicalRecordId}` }];
 }
 
 /**
@@ -219,14 +222,14 @@ async function getMedicationsByRecord(req, _res) {
 
 	if (!medicalRecordId) throw new Error('Missing medicalRecordId');
 
-	const rows = await getNByKeyQuery(
+	const prescribedMedications = await getNByKeyQuery(
 		'PrescribedMedication',
 		'medicalRecordId',
 		medicalRecordId,
 		false
 	);
 
-	return rows;
+	return [prescribedMedications];
 }
 
 /**
@@ -240,8 +243,8 @@ async function removePrescribedMedication(req, _res) {
 
 	if (!prescribedMedicationId) throw new Error('Missing prescribedMedicationId');
 
-	// using db.query for hard delete
-	await db.query(
+	// using query for hard delete
+	await query(
 		`
 		DELETE FROM PrescribedMedication
 		WHERE prescribedMedicationId = ?
@@ -249,7 +252,7 @@ async function removePrescribedMedication(req, _res) {
 		[prescribedMedicationId]
 	);
 
-	return [{ message: 'Prescribed medication removed successfully' }];
+	return [{ message: `Prescribed medication removed with ID ${prescribedMedicationId}` }];
 }
 
 /**
@@ -270,15 +273,17 @@ async function assignVeterinarian(req, _res) {
 
 	const veterinarianId = crypto.randomUUID();
 
-	await createOneQuery('AssignedVeterinarian', {
+	const assignedVet = {
 		veterinarianId,
 		medicalRecordId,
 		vetName,
 		vetEmail,
 		vetOffice,
-	});
+	}
 
-	return [{ veterinarianId, medicalRecordId, vetName, vetEmail, vetOffice }];
+	await createOneQuery('AssignedVeterinarian', assignedVet);
+
+	return [assignedVet];
 }
 
 /**
@@ -292,21 +297,21 @@ async function getVeterinarianByRecord(req, _res) {
 
 	if (!medicalRecordId) throw new Error('Missing medicalRecordId');
 
-	const rows = await getNByKeyQuery(
+	const [assignedVet] = await getNByKeyQuery(
 		'AssignedVeterinarian',
 		'medicalRecordId',
 		medicalRecordId,
 		false
 	);
 
-	return [rows[0]];
+	return [assignedVet];
 }
 
 export default {
 	createOne,
 	getOneById,
-	getManyByAnimal,
-	getManyByDateRange,
+	getNyByAnimal,
+	getNByDateRange,
 	getActiveRecords,
 	updateOne,
 	deleteOne,
