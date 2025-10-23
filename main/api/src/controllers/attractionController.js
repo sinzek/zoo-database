@@ -6,6 +6,8 @@ import {
 	updateOneQuery,
 } from '../utils/query-utils.js';
 
+// we need to clean this up later, too much repetition
+
 /**
  * Creates a new attraction with operating hours for each day of the week.
  * @param {Object} req.body - Request body containing attraction data and hours
