@@ -1,7 +1,8 @@
-import { db } from '../db/mysql.js';
+
 import crypto from 'crypto';
 import {
 	createOneQuery,
+	deleteOneQuery,
 	getNByKeyQuery,
 	updateOneQuery,
 } from '../utils/query-utils.js';
@@ -11,38 +12,28 @@ async function createOne(req, _res){
 
 	if (!newItem) throw new Error('Missing item data');
 
-	const newItemID = crypto.randomUUID();
-	const {name, description, price, uiImage, businessId} = newItem;
+	const newItemData = {
+		itemId: crypto.randomUUID(),
+		name: newItem.name,
+		description: newItem.description || null,
+		price: newItem.price,
+		uiImage: newItem.uiImage, // ! CHANGE UIPHOTOURL TO UIIMAGE BLOB TYPE
+		businessId: newItem.businessId
+	}
 
-	await createOneQuery('Item', { //NOTE ITEM SHOULD HAVE UI IMAGE
-		itemId: newItemID,
-		name,
-		description,
-		price,
-		uiImage,
-		businessId
-	});
+	await createOneQuery('Item', newItemData);
 
-	return [{ itemId: newItemID, ...newItem }];
+	return [newItemData];
 }
 
 async function deleteOne(req, _res){
-	const deleteItem = req.body;
-	const deleteItemID = deleteItem.itemID;
+	const { itemId } = req.body;
 
-	if (!deleteItemID) throw new Error('Missing itemID');
-	
-	// using db.query for soft delete
-	await db.query(
-		`
-		UPDATE Item
-		SET deletedAt = CURRENT_DATE()
-		WHERE itemId = ? AND deletedAt IS NULL
-		`,
-		[deleteItemID]
-	);
-	
-	return [{ message: 'Item successfully deleted' }];
+	if (!itemId) throw new Error('Missing itemId');
+
+	await deleteOneQuery('Item', 'itemId', itemId);
+
+	return [{ message: `Successfully deleted item with ID: ${itemId}` }];
 }
 
 async function updateOne(req, _res){
@@ -52,28 +43,29 @@ async function updateOne(req, _res){
 		throw new Error('Missing item data or itemId');
 	}
 
-	const {itemId, name, description, price, uiImage} = updatedItem; 
-	
-	await updateOneQuery('Item', {
-		itemId,
-		name,
-		description,
-		price,
-		uiImage
-	}, 'itemId');
+	await updateOneQuery('Item', updatedItem, 'itemId');
 
 	return [updatedItem];
 }
 
-async function getOneByID(req, _res){
-	const findItem = req.body; 
-	const findItemID = findItem.itemID;
+async function getOneById(req, _res){
+	const { itemId } = req.body;
 
-	if (!findItemID) throw new Error('Missing itemID');
+	if (!itemId) throw new Error('Missing itemId');
 
-	const rows = await getNByKeyQuery('Item', 'itemId', findItemID);
-	
-	return [rows[0]];
+	const [item] = await getNByKeyQuery('Item', 'itemId', itemId);
+
+	return [item];
 }
 
-export default {createOne, deleteOne, updateOne , getOneByID};
+async function getNByBusiness(req, _res){
+	const { businessId } = req.body;
+
+	if (!businessId) throw new Error('Missing businessId');
+
+	const items = await getNByKeyQuery('Item', 'businessId', businessId);
+
+	return items;
+}
+
+export default {createOne, deleteOne, updateOne , getOneById, getNByBusiness};

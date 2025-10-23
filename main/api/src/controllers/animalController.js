@@ -1,10 +1,11 @@
-import { db } from '../db/mysql.js';
+
 import crypto from 'crypto';
 import {
 	createOneQuery,
 	getNByKeyQuery,
 	updateOneQuery,
 } from '../utils/query-utils.js';
+import { query } from '../db/mysql.js';
 
 async function createOne(req, _res){
 	const newAnimal = req.body;
@@ -27,60 +28,65 @@ async function createOne(req, _res){
 
 
 	await createOneQuery('Animal', animalData);
-	return [{animalId, ...animalData}];
+
+	return [animalData];
 }
 
 async function updateOne(req, _res){
 	const updatedAnimal = req.body;
 
-	if (!updatedAnimal || !updatedAnimal.animalId) {
-		throw new Error('Missing animal data or animalId');
+	if (!updatedAnimal) {
+		throw new Error('Missing animal data');
 	}
 
-	const newAnimalData = {...updatedAnimal};
-	await updateOneQuery('Animal', newAnimalData, 'animalId');
+	await updateOneQuery('Animal', updatedAnimal, 'animalId');
 
 	return [updatedAnimal];
 }
 
 async function getOneById(req, _res) {
-	const {findAnimalId} = req.body; 
-	if(!findAnimalId) {
-		throw new Error('Missing animal ID');
-	}
-	const rows = await getNByKeyQuery('Animal', 'animalId', findAnimalId);
+	const { animalId } = req.body; 
 
-	return [rows[0]];
+	if(!animalId) {
+		throw new Error('Missing animalId');
+	}
+
+	const [animal] = await getNByKeyQuery('Animal', 'animalId', animalId);
+
+	return [animal];
 }
 
-async function getManyByHabitat(req, _res){
-	const requestedHabitat = req.body;
-	const habitatId = requestedHabitat.habitatId;
+async function getNByHabitat(req, _res){
+	const { habitatId } = req.body;
 
 	if (!habitatId) throw new Error('Missing habitatId');
 
-	const rows = await getNByKeyQuery('Animal', 'habitatId', habitatId);
+	const animals = await getNByKeyQuery('Animal', 'habitatId', habitatId);
 	
-	return rows;
+	return animals;
 }
 
-async function getManyByHandler(req, _res){ //by employeeid
-	const handlerInfo = req.body;
+async function getNByHandler(req, _res){ //by employeeid
+	const { employeeId } = req.body;
 
-	if (!handlerInfo.EmployeeId) throw new Error('Missing EmployeeId');
+	if (!employeeId) throw new Error('Missing employeeId');
 
-	// using db.query for complex join query
-	const rows = await db.query(
+	// using query for complex join
+	const animals = await query(
 		`
 		SELECT Animal.*
 		FROM Animal, TakesCareOf
-		WHERE TakesCareOf.employeeID = ? AND TakesCareOf.animalID = Animal.animalID AND Animal.deletedAt IS NULL;       
+		WHERE TakesCareOf.employeeId = ? AND TakesCareOf.animalId = Animal.animalId AND Animal.deletedAt IS NULL;       
 		`,
-		[handlerInfo.EmployeeId]
+		[employeeId]
 	);
 
-	return rows;
+	if(!animals || animals.length === 0) {
+		throw new Error('No animals found for the given handler');
+	}
+
+	return animals;
 }
 
 
-export default {createOne, updateOne, getOneById, getManyByHabitat, getManyByHandler};
+export default { createOne, updateOne, getOneById, getNByHabitat, getNByHandler };

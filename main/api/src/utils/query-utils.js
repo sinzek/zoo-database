@@ -65,6 +65,30 @@ export async function getNByKeyQuery(
 }
 
 /**
+ * Retrieves all records from the specified table.
+ * @param {string} tableName The name of the table to query (e.g., 'User', 'Employee', 'Customer', etc.)
+ * @param {boolean} excludeDeleted Whether to exclude rows with deletedAt IS NOT NULL (default: true)
+ * @returns {Promise<Array>} Promise<Array of records>
+ * @throws If no records are found
+ */
+export async function getAllQuery(tableName, excludeDeleted = true) {
+	const rows = await query(
+		`
+		SELECT *
+		FROM ${tableName}
+		WHERE 1=1${excludeDeleted ? ` AND deletedAt IS NULL` : ''};
+		`
+	);
+
+	// no rows found
+	if (!rows || rows.length === 0 || !rows[0]) {
+		throw new Error(`No records found in ${tableName}`);
+	}
+
+	return rows;
+}
+
+/**
  * Updates a record in the specified table with the provided data, identified by the key column. Please ensure that the data object keys match the table column names, and that all required fields are included.
  * (order of fields does not matter here i'm pretty sure)
  * @param {string} tableName The name of the table to update (e.g., 'User', 'Employee', 'Customer', etc.)
@@ -106,6 +130,34 @@ export async function updateOneQuery(
 	if (result.affectedRows === 0) {
 		throw new Error(
 			`Failed to update record in ${tableName} where ${keyColumn} = ${data[keyColumn]}`
+		);
+	}
+}
+
+/**
+ * SOFT deletes a record from the specified table by a given key column and value. Table must support soft deletes (i.e., have a deletedAt column).
+ * @param {string} tableName The name of the table to delete from (e.g., 'User', 'Employee', 'Customer', etc.)
+ * @param {string} keyColumn Column name to identify the record (e.g., 'userId', 'employeeId', etc.)
+ * @param {any} keyValue Value to identify the record in the keyColumn
+ * @throws If the delete fails
+ */
+export async function deleteOneQuery(
+	tableName,
+	keyColumn,
+	keyValue,
+) {
+	const [result] = await query(
+		`
+		UPDATE ${tableName}
+		SET deletedAt = CURRENT_DATE()
+		WHERE ${keyColumn} = ? AND deletedAt IS NULL
+		`,
+		[keyValue]
+	);
+
+	if (result.affectedRows === 0) {
+		throw new Error(
+			`Failed to delete record in ${tableName} where ${keyColumn} = ${keyValue}`
 		);
 	}
 }
