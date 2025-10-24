@@ -141,11 +141,7 @@ export async function updateOneQuery(
  * @param {any} keyValue Value to identify the record in the keyColumn
  * @throws If the delete fails
  */
-export async function deleteOneQuery(
-	tableName,
-	keyColumn,
-	keyValue,
-) {
+export async function deleteOneQuery(tableName, keyColumn, keyValue) {
 	const [result] = await query(
 		`
 		UPDATE ${tableName}
