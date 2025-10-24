@@ -195,21 +195,4 @@ async function updateOneHours(req, _res){
 	return [updatedBusinessHours];
 }
 
-/**
- * Retrieves all employees for a specific business.
- * @param {string} req.body.businessID - UUID of the business
- * @returns {Promise<Array>} Array of employee objects
- * @throws {Error} If businessID is missing or no employees are found
- */
-async function getEmployees(req, _res){
-	const findBusiness = req.body;
-	const findBusinessID = findBusiness.businessID;
-
-	if (!findBusinessID) throw new Error('Missing businessID');
-	
-	const rows = await getNByKeyQuery('Employee', 'businessId', findBusinessID);
-
-	return rows;
-}
-
-export default {createOne, updateOneInfo, updateOneHours, deleteOne, getEmployees};
+export default {createOne, updateOneInfo, updateOneHours, deleteOne };

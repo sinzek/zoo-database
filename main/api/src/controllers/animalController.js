@@ -1,25 +1,17 @@
-import { db } from '../db/mysql.js';
+
 import crypto from 'crypto';
 import {
 	createOneQuery,
 	getNByKeyQuery,
 	updateOneQuery,
 } from '../utils/query-utils.js';
+import { query } from '../db/mysql.js';
 
 /**
  * Creates a new animal record.
- * @param {string} req.body.firstName - First name of the animal
- * @param {string} [req.body.lastName] - Last name of the animal
- * @param {string} req.body.commonName - Common name of the animal
- * @param {string} req.body.species - Species of the animal
- * @param {string} req.body.genus - Genus of the animal
- * @param {string} req.body.birthDate - Birth date of the animal
- * @param {string} [req.body.importedFrom] - Location imported from
- * @param {string} [req.body.importDate] - Date imported
- * @param {string} req.body.sex - Sex of the animal ('male' or 'female')
- * @param {string} [req.body.behavior] - Behavioral notes
- * @param {string} req.body.habitatId - UUID of the habitat
- * @returns {Promise<Array>} Array containing the created animal object with generated animalId
+ * @param {*} req - The request object containing the animal data in req.body
+ * @param {*} _res - The response object (not used).
+ * @returns {Promise<Array>} - An array containing the newly created animal object.
  */
 async function createOne(req, _res){
 	const newAnimal = req.body;
@@ -42,29 +34,24 @@ async function createOne(req, _res){
 
 
 	await createOneQuery('Animal', animalData);
-	return [{animalId, ...animalData}];
+
+	return [animalData];
 }
 
 /**
  * Updates an existing animal record.
- * @param {string} req.body.animalId - UUID of the animal to update
- * @param {string} [req.body.firstName] - Updated first name
- * @param {string} [req.body.lastName] - Updated last name
- * @param {string} [req.body.commonName] - Updated common name
- * @param {string} [req.body.behavior] - Updated behavior notes
- * @param {string} [req.body.habitatId] - Updated habitat ID
- * @returns {Promise<Array>} Array containing the updated animal object
- * @throws {Error} If animal data or animalId is missing
+ * @param {*} req - The request object containing the updated animal data in req.body
+ * @param {*} _res - The response object (not used).
+ * @returns {Promise<Array>} - An array containing the updated animal object.
  */
 async function updateOne(req, _res){
 	const updatedAnimal = req.body;
 
-	if (!updatedAnimal || !updatedAnimal.animalId) {
-		throw new Error('Missing animal data or animalId');
+	if (!updatedAnimal) {
+		throw new Error('Missing animal data');
 	}
 
-	const newAnimalData = {...updatedAnimal};
-	await updateOneQuery('Animal', newAnimalData, 'animalId');
+	await updateOneQuery('Animal', updatedAnimal, 'animalId');
 
 	return [updatedAnimal];
 }
@@ -73,58 +60,51 @@ async function updateOne(req, _res){
  * Retrieves a single animal by its ID.
  * @param {string} req.body.findAnimalId - UUID of the animal to retrieve
  * @returns {Promise<Array>} Array containing the animal object
- * @throws {Error} If findAnimalId is missing or no animal is found
+ * @throws If findAnimalId is missing or no animal is found
  */
 async function getOneById(req, _res) {
-	const {findAnimalId} = req.body; 
-	if(!findAnimalId) {
-		throw new Error('Missing animal ID');
-	}
-	const rows = await getNByKeyQuery('Animal', 'animalId', findAnimalId);
+	const { animalId } = req.body; 
 
-	return [rows[0]];
+	if (!animalId) {
+		throw new Error('Missing animalId');
+	}
+
+	const [animal] = await getNByKeyQuery('Animal', 'animalId', animalId);
+
+	return [animal];
 }
 
-/**
- * Retrieves all animals in a specific habitat.
- * @param {string} req.body.habitatId - UUID of the habitat
- * @returns {Promise<Array>} Array of animal objects
- * @throws {Error} If habitatId is missing or no animals are found
- */
-async function getManyByHabitat(req, _res){
-	const requestedHabitat = req.body;
-	const habitatId = requestedHabitat.habitatId;
+async function getNByHabitat(req, _res){
+	const { habitatId } = req.body;
 
 	if (!habitatId) throw new Error('Missing habitatId');
 
-	const rows = await getNByKeyQuery('Animal', 'habitatId', habitatId);
+	const animals = await getNByKeyQuery('Animal', 'habitatId', habitatId);
 	
-	return rows;
+	return [animals];
 }
 
-/**
- * Retrieves all animals assigned to a specific handler/employee.
- * @param {string} req.body.EmployeeId - UUID of the employee/handler
- * @returns {Promise<Array>} Array of animal objects with handler information
- * @throws {Error} If EmployeeId is missing
- */
-async function getManyByHandler(req, _res){ //by employeeid
-	const handlerInfo = req.body;
+async function getNByHandler(req, _res){ //by employeeid
+	const { employeeId } = req.body;
 
-	if (!handlerInfo.EmployeeId) throw new Error('Missing EmployeeId');
+	if (!employeeId) throw new Error('Missing employeeId');
 
-	// using db.query for complex join query
-	const rows = await db.query(
+	// using query for complex join
+	const animals = await query(
 		`
 		SELECT Animal.*
 		FROM Animal, TakesCareOf
-		WHERE TakesCareOf.employeeID = ? AND TakesCareOf.animalID = Animal.animalID AND Animal.deletedAt IS NULL;       
+		WHERE TakesCareOf.employeeId = ? AND TakesCareOf.animalId = Animal.animalId AND Animal.deletedAt IS NULL;       
 		`,
-		[handlerInfo.EmployeeId]
+		[employeeId]
 	);
 
-	return rows;
+	if(!animals || animals.length === 0) {
+		throw new Error('No animals found for the given handler');
+	}
+
+	return [animals];
 }
 
 
-export default {createOne, updateOne, getOneById, getManyByHabitat, getManyByHandler};
+export default { createOne, updateOne, getOneById, getNByHabitat, getNByHandler };

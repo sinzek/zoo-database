@@ -5,36 +5,9 @@ import {
 	getNByKeyQuery,
 	updateOneQuery,
 } from '../utils/query-utils.js';
+import { ACCESS_LEVELS } from '../constants/accessLevels.js';
+import { query } from '../db/mysql.js';
 
-/**
- * Creates a new employee record with user account.
- * Creates both a User account and Employee record in a single operation.
- * @param {string} req.body.email - Employee email address
- * @param {string} req.body.password - Employee password
- * @param {string} req.body.accessLevel - Access level (worker, zookeeper, veterinarian, manager, executive, db_admin)
- * @param {string} req.body.jobTitle - Job title
- * @param {string} req.body.firstName - First name
- * @param {string} req.body.lastName - Last name
- * @param {string} [req.body.middleInitial] - Middle initial
- * @param {string} req.body.sex - Sex ('male' or 'female')
- * @param {string} req.body.ssn - Social security number
- * @param {number} req.body.hourlyWage - Hourly wage
- * @param {string} [req.body.jobDescription] - Job description
- * @param {string} req.body.addressPostalCode - Postal code
- * @param {string} req.body.addressStreet - Street address
- * @param {string} req.body.addressCity - City
- * @param {string} [req.body.addressState] - State
- * @param {string} [req.body.payInfoAccountNum] - Bank account number
- * @param {string} [req.body.payInfoRoutingNum] - Bank routing number
- * @param {string} req.body.payInfoPaymentMethod - Payment method ('check' or 'direct_deposit')
- * @param {string} req.body.businessId - UUID of the business
- * @param {string} [req.body.hireDate] - Hire date (defaults to current date)
- * @param {string} req.body.birthDate - Birth date
- * @param {string} req.body.phone - Phone number
- * @param {string} [req.body.supervisorId] - UUID of supervisor employee
- * @returns {Promise<Array>} Array containing the created employee object
- * @throws {Error} If employee data, email, or password is missing
- */
 async function createOne(req, _res) {
 	const newEmp = req.body;
 	if (!newEmp) throw new Error('Missing employee data');
@@ -93,25 +66,19 @@ async function getOneById(req, _res) {
 
 	if (!employeeId) throw new Error('Missing employeeId');
 
-	const rows = await getNByKeyQuery('Employee', 'employeeId', employeeId);
+	const [employee] = await getNByKeyQuery('Employee', 'employeeId', employeeId);
 
-	return [rows[0]]; // array with single employee object
+	return [employee];
 }
 
-/**
- * Retrieves all employees for a specific business.
- * @param {string} req.body.businessId - UUID of the business
- * @returns {Promise<Array>} Array of employee objects
- * @throws {Error} If businessId is missing or no employees are found
- */
-async function getNByBusinessId(req, _res) {
+async function getNByBusiness(req, _res) {
 	const { businessId } = req.body;
 
 	if (!businessId) throw new Error('Missing businessId');
 
-	const rows = await getNByKeyQuery('Employee', 'businessId', businessId);
+	const employees = await getNByKeyQuery('Employee', 'businessId', businessId);
 
-	return rows; // array of employees with given businessId
+	return employees; // array of employees with given businessId
 }
 
 /**
@@ -145,10 +112,52 @@ async function updateOne(req, _res) {
 	return [updatedEmployee]; // updated employee data
 }
 
+async function getNByAnimal(req, _res) {
+	const { animalId } = req.body;
+
+	if (!animalId) throw new Error('Missing animalId');
+
+	const takesCareOfRecords = await getNByKeyQuery('TakesCareOf', 'animalId', animalId);
+
+	const employeeIds = takesCareOfRecords.map(record => record.employeeId);
+
+	const employees = [];
+
+	for (const empId of employeeIds) {
+		const employees = await getNByKeyQuery('Employee', 'employeeId', empId);
+		if(employees.length > 1) {
+			employees = employees.concat(employees);
+		} else if(employees.length === 1) {
+			employees.push(employees[0]);
+		}
+		// otherwise skip, no employee found
+	}
+
+	return [employees]; // array of employees who take care of the given animal
+}
+
+async function getNByBusinessAndAccessLevel(req, _res) {
+	const { businessId, accessLevel } = req.body;
+
+	if (!businessId) throw new Error('Missing businessId');
+	if(!accessLevel) throw new Error('Missing accessLevel');
+
+	if(!ACCESS_LEVELS[accessLevel]) {
+		throw new Error('Invalid access level');
+	}
+
+	const employees = await query(
+		`SELECT * FROM Employee WHERE businessId = ? AND accessLevel = ?`,
+		[businessId, accessLevel]
+	);
+
+	return [employees];
+}
+
 //Create Employee
 //Get Employee by ID
 //Get Employees by Business
 //Get Access Level
 //Update Employee
 
-export default { createOne, getOneById, getNByBusinessId, updateOne };
+export default { createOne, getOneById, getNByBusiness, updateOne, getNByAnimal, getNByBusinessAndAccessLevel };
