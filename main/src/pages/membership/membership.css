@@ -52,6 +52,8 @@
 
 .membership-card-link:hover .membership-card {
   transform: translateY(-5px);
+  background-color: #f0f0f0;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
 
 
@@ -80,6 +82,8 @@
   font-size: 1.1em;
   font-weight: 500;
   margin: 0 0 5px 0;
+  color: #55886c; 
+  transition: color 0.3s ease;
 }
 
 .card-price {
