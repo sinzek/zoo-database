@@ -2,6 +2,7 @@ import { App } from "./src/app.js";
 import { registerDummyDataRoutes } from "./src/routes/dummyData.js";
 import { registerEmployeeRoutes } from "./src/routes/employee.js";
 import { registerAuthRoutes } from "./src/routes/auth.js";
+import { registerRevenueReportRoutes } from "./src/routes/revenueReport.js";
 
 /**
  * Main entry point for the API
@@ -17,6 +18,7 @@ export default async function handler(req, res) {
   registerAuthRoutes(app);
   registerDummyDataRoutes(app);
   registerEmployeeRoutes(app);
+  registerRevenueReportRoutes(app);
   // !--- end route registration ---!
 
   return await app.handleVercel(req, res);

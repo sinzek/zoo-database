@@ -1,5 +1,6 @@
 import { createOneQuery } from "../utils/query-utils";
 import { MEMBERSHIP_LEVELS } from "../constants/membershipLevels";
+import crypto from "crypto";
 
 // takes in customerId and array of items to purchase
 async function purchaseItems(req, _res) {

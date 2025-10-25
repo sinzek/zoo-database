@@ -64,7 +64,7 @@ async function getAll(_req, _res) {
 		`
 	);
 
-	return rows;
+	return [rows];
 }
 
 /**
