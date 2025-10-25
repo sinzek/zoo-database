@@ -63,7 +63,7 @@ async function getManyByAttraction(req, _res) {
 
 	const rows = await getNByKeyQuery('Shift', 'attractionId', attractionId);
 
-	return rows;
+	return [rows];
 }
 
 /**
@@ -89,7 +89,7 @@ async function getManyByDateRange(req, _res) {
 		[startDate, endDate]
 	);
 
-	return rows;
+	return [rows];
 }
 
 /**
@@ -214,7 +214,7 @@ async function getShiftsByEmployee(req, _res) {
 		[employeeId]
 	);
 
-	return rows;
+	return [rows];
 }
 
 /**
