@@ -10,6 +10,9 @@ import HabitatDetailsPage from './pages/habitats/habitatDetails';
 import { TestingPage } from './pages/testing/testing';
 import AnimalsPage from './pages/animals/animals';
 
+import MembershipPage from './pages/membership/membership'; 
+import MembershipDetailPage from './pages/membership/membershipDetails';
+
 export default function Router() {
 	const { path, match } = useRouter();
 
@@ -18,6 +21,8 @@ export default function Router() {
 
 	const animalsMatch = match('/animals/:id');
 	const habitatMatch = match('/habitats/:id');
+
+  const membershipMatch = match('/membership/:id');
 
 	let content = null;
 	if (path === '/') content = <HomePage />;
@@ -30,6 +35,10 @@ export default function Router() {
 	else if (animalsMatch) content = <div>Animal ID: {animalsMatch.id}</div>;
 	else if (path === '/portal') content = <PortalPage />;
 	else if (path === '/testing') content = <TestingPage />;
+
+	else if (membershipMatch) content = <MembershipDetailPage id={membershipMatch.id} />; 
+	else if (path === '/membership') content = <MembershipPage />;   
+
 	else content = <NotFoundPage />;
 
 	return (
