@@ -139,8 +139,6 @@ button:focus-visible {
 
 .btn {
 	border-radius: 100px;
-	padding: 0.6em 1.8em;
-	font-size: 1rem;
 	font-weight: 600;
 	font-family: inherit;
 	cursor: pointer;
@@ -153,10 +151,21 @@ button:focus-visible {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 8px;
 	user-select: none;
 	white-space: nowrap;
 	flex-direction: row;
+}
+
+.btn-lg {
+	padding: 0.6em 1.8em;
+	font-size: 1rem;
+	gap: 8px;
+}
+
+.btn-sm {
+	padding: 0.4em 1.2em;
+	font-size: 0.875rem;
+	gap: 6px;
 }
 
 .btn:hover {

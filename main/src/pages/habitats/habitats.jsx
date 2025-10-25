@@ -45,14 +45,14 @@ export default function HabitatsPage() {
 				<div className='hero-btn-list'>
 					<Link
 						to='/animals'
-						className='btn btn-green'
+						className='btn btn-green btn-lg'
 						href='/animals'
 					>
 						Animals
 					</Link>
 					<Link
 						to='/'
-						className='btn btn-outline'
+						className='btn btn-outline btn-lg'
 						href='/'
 					>
 						← Home

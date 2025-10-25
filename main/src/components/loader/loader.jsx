@@ -2,7 +2,7 @@ import { cn } from '../../utils/cn';
 import './loader.css';
 import PropTypes from 'prop-types';
 
-export function Loader({ className }) {
+export function Loader({ className, style }) {
 	return (
 		<svg
 			xmlns='http://www.w3.org/2000/svg'
@@ -15,6 +15,7 @@ export function Loader({ className }) {
 			strokeLinecap='round'
 			strokeLinejoin='round'
 			className={cn('loader', className)}
+			style={style}
 		>
 			<path d='M21 12a9 9 0 1 1-6.219-8.56' />
 		</svg>
@@ -23,4 +24,5 @@ export function Loader({ className }) {
 
 Loader.propTypes = {
 	className: PropTypes.string,
+	style: PropTypes.object,
 };

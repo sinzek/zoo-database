@@ -41,8 +41,10 @@ export function useAuth() {
 		setUserInfo,
 		setUserEntityData,
 		setUserEntityType,
-		navigate
+		navigate,
+		setAuthLoading
 	) => {
+		setAuthLoading(true);
 		const result = await api('/api/auth/logout', 'POST');
 
 		if (!result.success) {
@@ -58,14 +60,17 @@ export function useAuth() {
 		console.log('Logout successful');
 		navigate('/login', { replace: true });
 		showToast('You have been logged out.');
+		setAuthLoading(false);
 		return { success: true };
 	};
 
 	const getUserData = async (
 		setUserInfo,
 		setUserEntityData,
-		setUserEntityType
+		setUserEntityType,
+		setAuthLoading
 	) => {
+		setAuthLoading(true);
 		const result = await api('/api/auth/me', 'GET');
 
 		if (!result.success && result.error === 'Unauthorized') {
@@ -77,7 +82,7 @@ export function useAuth() {
 		setUserInfo(user);
 		setUserEntityData(relatedInfo.data);
 		setUserEntityType(relatedInfo.type);
-
+		setAuthLoading(false);
 		return { success: true, data: result.data };
 	};
 

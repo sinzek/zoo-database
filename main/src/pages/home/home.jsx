@@ -21,14 +21,14 @@ export default function HomePage() {
 				<div className='hero-btn-list'>
 					<Link
 						to='/animals'
-						className='btn btn-green'
+						className='btn btn-green btn-lg'
 						href='/animals'
 					>
 						Animals
 					</Link>
 					<Link
 						to='/habitats'
-						className='btn btn-outline'
+						className='btn btn-outline btn-lg'
 						href='/habitats'
 					>
 						Habitats
