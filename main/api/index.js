@@ -3,6 +3,8 @@ import { registerDummyDataRoutes } from "./src/routes/dummyData.js";
 import { registerEmployeeRoutes } from "./src/routes/employee.js";
 import { registerAuthRoutes } from "./src/routes/auth.js";
 import { registerRevenueReportRoutes } from "./src/routes/revenueReport.js";
+import { registerHabitatRoutes } from './src/routes/habitat.js';
+import { registerAnimalRoutes } from './src/routes/animal.js';
 
 /**
  * Main entry point for the API
@@ -12,14 +14,16 @@ import { registerRevenueReportRoutes } from "./src/routes/revenueReport.js";
  * and delegates the request handling to the App instance
  */
 export default async function handler(req, res) {
-  const app = new App();
+	const app = new App();
 
   // !--- start route registration ---!
   registerAuthRoutes(app);
   registerDummyDataRoutes(app);
   registerEmployeeRoutes(app);
   registerRevenueReportRoutes(app);
-  // !--- end route registration ---!
+	registerHabitatRoutes(app);
+	registerAnimalRoutes(app);
+	// !--- end route registration ---!
 
-  return await app.handleVercel(req, res);
+	return await app.handleVercel(req, res);
 }

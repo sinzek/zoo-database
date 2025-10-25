@@ -23,7 +23,6 @@ export default function LoginPage() {
 		await login(formData.email, formData.password);
 
 		setIsSubmitting(false);
-		//router.navigateTo('/portal'); --- IGNORE ---
 	}
 
 	return (
