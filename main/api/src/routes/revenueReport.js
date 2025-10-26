@@ -21,7 +21,7 @@ export function registerRevenueReportRoutes(app) {
   // Get aggregated revenue report (grand totals across all selected businesses)
   app.post(
     "/api/revenue-report/aggregated", 
-    withAccessLevel('executive', revenueReportController.getAggregatedRevenueReport)
+    withAccessLevel('executive', revenueReportController.getAllBusinessesRevenueReport)
   );
 }
 

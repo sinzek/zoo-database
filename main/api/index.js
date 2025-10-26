@@ -2,6 +2,7 @@ import { App } from './src/app.js';
 import { registerEmployeeRoutes } from './src/routes/employee.js';
 import { registerAuthRoutes } from './src/routes/auth.js';
 import { registerRevenueReportRoutes } from './src/routes/revenueReport.js';
+import { registerShiftReportRoutes } from './src/routes/shiftReport.js';
 import { registerHabitatRoutes } from './src/routes/habitat.js';
 import { registerAnimalRoutes } from './src/routes/animal.js';
 import { registerShiftRoutes } from './src/routes/shift.js';
@@ -21,6 +22,7 @@ export default async function handler(req, res) {
 	registerAuthRoutes(app);
 	registerEmployeeRoutes(app);
 	registerRevenueReportRoutes(app);
+	registerShiftReportRoutes(app);
 	registerHabitatRoutes(app);
 	registerAnimalRoutes(app);
 	registerShiftRoutes(app);
