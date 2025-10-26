@@ -74,6 +74,7 @@ export function useAuth() {
 		const result = await api('/api/auth/me', 'GET');
 
 		if (!result.success && result.error === 'Unauthorized') {
+			setAuthLoading(false);
 			return; // not logged in, no action needed
 		}
 

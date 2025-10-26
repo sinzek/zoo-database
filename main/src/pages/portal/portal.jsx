@@ -1,7 +1,8 @@
 import { useUserData } from '../../context/userDataContext';
-import { hasMinAccessLvl } from '../../utils/access';
 import { Sidebar } from './sidebar/sidebar';
 import { PortalCustomerPageContent } from './customerPageContent/customerPageContent';
+import { UserMenu } from '../../components/userMenu/userMenu';
+import './portal.css';
 
 export function PortalPage() {
 	const { userEntityData, userEntityType } = useUserData();
@@ -9,15 +10,21 @@ export function PortalPage() {
 	const isCustomer = userEntityType === 'customer';
 
 	if (isCustomer) {
-		return <PortalCustomerPageContent />;
+		return (
+			<div className='portal-page-container'>
+				<UserMenu />
+				<PortalCustomerPageContent />
+			</div>
+		)
 	}
 
 	return (
-		<div>
+		<div className='portal-page-container'>
 			<Sidebar
 				ueType={userEntityType}
 				uedata={userEntityData}
 			/>
+			<UserMenu />
 			<div className='portal-main-content'>
 				Welcome to the Portal Page,{' '}
 				{userEntityData?.firstName || 'User'}! You are a{' '}

@@ -1,0 +1,123 @@
+.user-menu {
+ 	position: absolute;
+    top: 2rem;
+    right: 2rem;
+    z-index: 10;
+    font-family: inherit;
+}
+
+.user-menu-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: transparent;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--color-lgreen);
+    cursor: pointer;
+}
+
+.user-menu-button:hover {
+    color: var(--color-green);
+}
+
+.user-menu-button:focus {
+    outline: none;
+}
+
+.user-menu ul {
+ 	position: absolute;
+    width: 100%;
+ 	top: 120%;
+ 	left: 0;
+ 	background-color: var(--color-brown);
+ 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+ 	list-style: none;
+ 	padding: 0;
+ 	margin: 0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.user-menu a {
+ 	padding: 0.5rem 1rem;
+ 	cursor: pointer;
+    color: var(--color-lgreen);
+    transition: all 0.15s ease;
+    will-change: background-color, color;
+    font-size: 1rem;
+    font-weight: 400;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+}
+
+.user-menu a:first-child {
+    border-radius: 10px 10px 0 0;
+}
+
+.user-menu a:last-child {
+    border-radius: 0 0 10px 10px;
+}
+
+.user-menu a:hover {
+ 	background-color: var(--color-dbrown);
+    color: var(--color-lgreen);
+    text-decoration: none;
+}
+
+.user-menu a {
+ 	text-decoration: none;
+ 	color: inherit;
+ 	display: block;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-dgreen);
+    color: var(--color-lgreen);
+    font-weight: bolder;
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+.user-menu.open ul {
+    animation: fadeIn 0.2s ease forwards;
+}
+
+.user-menu.closed ul {
+    animation: fadeOut 0.2s ease forwards;
+}
+
+.user-menu-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
