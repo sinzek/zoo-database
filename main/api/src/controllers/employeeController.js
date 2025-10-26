@@ -78,7 +78,7 @@ async function getNByBusiness(req, _res) {
 
 	const employees = await getNByKeyQuery('Employee', 'businessId', businessId);
 
-	return employees; // array of employees with given businessId
+	return [employees]; // array of employees with given businessId
 }
 
 /**
