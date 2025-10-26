@@ -1,16 +1,10 @@
 import { db } from '../db/mysql.js';
 
-/**
- * Fetch animal report
- * Accepts optional filters:
- * - animalIds: array of animal UUIDs
- * - habitatId: string
- * - handlerId: string
- */
+
 async function getAnimalReport(req, _res) {
     const { animalIds, habitatId, handlerId } = req.body;
 
-    // Build WHERE clause dynamically
+    
     let whereClause = 'WHERE a.deletedAt IS NULL';
     let params = [];
 
@@ -28,7 +22,7 @@ async function getAnimalReport(req, _res) {
         params.push(handlerId);
     }
 
-    // Main animal query with handler join
+    
     const query = `
         SELECT a.*, h.name AS habitatName, d.dietId
         FROM Animal a
@@ -41,10 +35,10 @@ async function getAnimalReport(req, _res) {
 
     const animals = await db.query(query, params);
 
-    // Fetch medical records and diet schedule for each animal
+    
     const reports = await Promise.all(animals.map(async animal => {
-        // Medical records
-        const medicalRecordsQuery = `
+        
+        const medicalRecordsQuery = ` // Medical records
             SELECT mr.*, pm.medication, av.vetName, av.vetEmail, av.vetOffice
             FROM MedicalRecord mr
             LEFT JOIN PrescribedMedication pm ON mr.medicalRecordId = pm.medicalRecordId
@@ -54,7 +48,7 @@ async function getAnimalReport(req, _res) {
         `;
         const medicalRecords = await db.query(medicalRecordsQuery, [animal.animalId]);
 
-        // Diet schedule
+        
         const dietQuery = `
             SELECT dayOfWeek, feedTime, food
             FROM DietScheduleDay
@@ -63,7 +57,7 @@ async function getAnimalReport(req, _res) {
         `;
         const dietSchedule = await db.query(dietQuery, [animal.dietId]);
 
-        // Handlers
+       
         const handlersQuery = `
             SELECT e.employeeId, e.firstName, e.lastName
             FROM Employee e
@@ -86,3 +80,4 @@ async function getAnimalReport(req, _res) {
 export default {
     getAnimalReport
 };
+
