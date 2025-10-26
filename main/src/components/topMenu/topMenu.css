@@ -1,9 +1,51 @@
-.user-menu {
- 	position: absolute;
+
+.user-menu-container {
+    position: absolute;
     top: 2rem;
     right: 2rem;
     z-index: 10;
     font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: max-content;
+}
+
+.logo-container {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    z-index: 10;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: max-content;
+}
+
+.topmenu-logo-text {
+    color: var(--color-green);
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0;
+    background-color: var(--color-brown);
+    padding: 0.2rem 0.5rem;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+}
+
+.topmenu-logo-text:hover {
+    color: var(--color-lgreen);
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.5);
+}
+
+.topmenu-logo:hover {
+    text-decoration: none;
+}
+
+.user-menu {
+    position: relative;
+    display: inline-block;
 }
 
 .user-menu-button {
@@ -15,6 +57,7 @@
     font-size: 1.2rem;
     color: var(--color-lgreen);
     cursor: pointer;
+    width: max-content;
 }
 
 .user-menu-button:hover {
@@ -23,6 +66,7 @@
 
 .user-menu-button:focus {
     outline: none;
+    white-space: nowrap;
 }
 
 .user-menu ul {
@@ -39,7 +83,7 @@
     overflow: hidden;
 }
 
-.user-menu a {
+.user-menu ul a {
  	padding: 0.5rem 1rem;
  	cursor: pointer;
     color: var(--color-lgreen);
@@ -50,21 +94,21 @@
     font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
 }
 
-.user-menu a:first-child {
+.user-menu ul a:first-child {
     border-radius: 10px 10px 0 0;
 }
 
-.user-menu a:last-child {
+.user-menu ul a:last-child {
     border-radius: 0 0 10px 10px;
 }
 
-.user-menu a:hover {
+.user-menu ul a:hover {
  	background-color: var(--color-dbrown);
     color: var(--color-lgreen);
     text-decoration: none;
 }
 
-.user-menu a {
+.user-menu ul a {
  	text-decoration: none;
  	color: inherit;
  	display: block;
@@ -120,4 +164,12 @@
     display: block;
     width: 100%;
     height: 100%;
+}
+
+.shopping-cart-btn {
+    font-family: inherit;
+}
+
+.shopping-cart-btn:hover {
+    text-decoration: none;
 }
