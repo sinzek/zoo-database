@@ -1,7 +1,7 @@
 import { useUserData } from '../../context/userDataContext';
 import { Sidebar } from './sidebar/sidebar';
 import { PortalCustomerPageContent } from './customerPageContent/customerPageContent';
-import { UserMenu } from '../../components/userMenu/userMenu';
+import { TopMenu } from '../../components/topMenu/topMenu';
 import './portal.css';
 
 export function PortalPage() {
@@ -12,7 +12,6 @@ export function PortalPage() {
 	if (isCustomer) {
 		return (
 			<div className='portal-page-container'>
-				<UserMenu />
 				<PortalCustomerPageContent />
 			</div>
 		)
@@ -24,7 +23,6 @@ export function PortalPage() {
 				ueType={userEntityType}
 				uedata={userEntityData}
 			/>
-			<UserMenu />
 			<div className='portal-main-content'>
 				Welcome to the Portal Page,{' '}
 				{userEntityData?.firstName || 'User'}! You are a{' '}

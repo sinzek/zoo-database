@@ -79,9 +79,11 @@ export default function AnimalsPage() {
 				</div>
 
 				<div className='section'>
-					<div className='habitat-rows'>
+					<div className='habitat-row'>
 						{loading ? (
-							<Skeleton className='habitat-row-skeleton' />
+							Array(3).fill(0).map((_, idx) => (
+								<Skeleton key={`skeleton-${idx}`} className='animal-loader' />
+							))
 						) : (
 							animalsByHabitat.map(
 								({ habitatId, habitatName, animals }) => (

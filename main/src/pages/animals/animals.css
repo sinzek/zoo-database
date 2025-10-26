@@ -296,3 +296,8 @@
 	color: var(--color-lbrown);
 	margin-bottom: 0.5rem;
 }
+
+.animal-loader {
+	margin-top: 5rem;
+	min-height: 300px;
+}

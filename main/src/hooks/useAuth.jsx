@@ -33,7 +33,7 @@ export function useAuth() {
 
 		console.log('Login successful:', result.data);
 		navigate('/portal', { replace: true });
-		showToast(`Welcome back, ${user.firstName || 'User'}!`);
+		showToast(`Welcome back, ${relatedInfo.data.firstName || 'User'}!`);
 		return { success: true };
 	};
 

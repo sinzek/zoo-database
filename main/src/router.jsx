@@ -9,6 +9,8 @@ import HabitatDetailsPage from './pages/habitats/habitatDetails';
 import { TestingPage } from './pages/testing/testing';
 import AnimalsPage from './pages/animals/animals';
 import { PortalPage } from './pages/portal/portal';
+import { AccountPage } from './pages/portal/account/account';
+import { TopMenu } from './components/topMenu/topMenu';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -16,25 +18,37 @@ export default function Router() {
 	const isAuthProtectedPage = path.startsWith('/portal');
 	const isLoginOrSignupPage = path === '/login' || path === '/signup';
 
-	const animalsMatch = match('/animals/:id');
 	const habitatMatch = match('/habitats/:id');
 
 	let content = null;
-	if (path === '/') content = <HomePage />;
-	else if (path === '/login') content = <LoginPage />;
-	else if (path === '/habitats') content = <HabitatsPage />;
-	else if (path === '/animals') content = <AnimalsPage />;
-	else if (habitatMatch)
+
+	const pathMap = {
+		'/': HomePage,
+		'/login': LoginPage,
+
+		'/habitats': HabitatsPage,
+		'/attractions': AttractionsPage,
+		'/animals': AnimalsPage,
+
+		'/portal': PortalPage,
+		'/portal/account': AccountPage,
+
+		'/testing': TestingPage,
+	};
+
+	if (habitatMatch) {
 		content = <HabitatDetailsPage id={habitatMatch.id} />;
-	else if (path === '/attractions') content = <AttractionsPage />;
-	else if (animalsMatch) content = <div>Animal ID: {animalsMatch.id}</div>;
-	else if (path === '/portal') content = <PortalPage />;
-	else if (path === '/testing') content = <TestingPage />;
-	else content = <NotFoundPage />;
+	} else if(pathMap[path]) {
+		const Component = pathMap[path];
+		content = <Component />;
+	} else {
+		content = <NotFoundPage />;
+	}
 
 	return (
 		<div className='router-container'>
 			{!isAuthProtectedPage && !isLoginOrSignupPage && <Navbar />}
+			<TopMenu />
 			{content}
 		</div>
 	);
