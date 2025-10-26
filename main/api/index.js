@@ -1,7 +1,8 @@
-import { App } from './src/app.js';
-import { registerDummyDataRoutes } from './src/routes/dummyData.js';
-import { registerEmployeeRoutes } from './src/routes/employee.js';
-import { registerAuthRoutes } from './src/routes/auth.js';
+import { App } from "./src/app.js";
+import { registerDummyDataRoutes } from "./src/routes/dummyData.js";
+import { registerEmployeeRoutes } from "./src/routes/employee.js";
+import { registerAuthRoutes } from "./src/routes/auth.js";
+import { registerRevenueReportRoutes } from "./src/routes/revenueReport.js";
 import { registerHabitatRoutes } from './src/routes/habitat.js';
 import { registerAnimalRoutes } from './src/routes/animal.js';
 
@@ -15,10 +16,11 @@ import { registerAnimalRoutes } from './src/routes/animal.js';
 export default async function handler(req, res) {
 	const app = new App();
 
-	// !--- start route registration ---!
-	registerAuthRoutes(app);
-	registerDummyDataRoutes(app);
-	registerEmployeeRoutes(app);
+  // !--- start route registration ---!
+  registerAuthRoutes(app);
+  registerDummyDataRoutes(app);
+  registerEmployeeRoutes(app);
+  registerRevenueReportRoutes(app);
 	registerHabitatRoutes(app);
 	registerAnimalRoutes(app);
 	// !--- end route registration ---!
