@@ -1,0 +1,151 @@
+.shift-schedule-page {
+	max-width: 1400px;
+	margin: auto auto;
+	padding: 24px;
+	color: var(--color-foreground);
+}
+
+.schedule-header {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+	margin-bottom: 2rem;
+}
+
+.loader-row {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.schedule-header h1 {
+	color: var(--color-green);
+}
+
+.schedule-nav {
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
+	background-color: var(--color-brown);
+	padding: 0.5rem 0.5rem;
+	border-radius: 999px;
+}
+
+.date-range-display {
+	font-weight: 600;
+	font-size: 1.1rem;
+	color: var(--color-lgreen);
+	min-width: 220px;
+	text-align: center;
+}
+
+.schedule-grid {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 8px;
+}
+
+.day-column {
+	background-color: rgba(37, 31, 26, 0.8);
+	border-radius: 12px;
+	border: 2px solid var(--color-brown);
+	min-height: 200px;
+	display: flex;
+	flex-direction: column;
+}
+
+.day-column.past-day {
+	opacity: 0.5;
+}
+
+.day-header {
+	padding: 0.75rem;
+	text-align: center;
+	border-bottom: 1px solid var(--color-brown);
+	background-color: var(--color-brown);
+	border-radius: 11px 11px 0 0;
+	font-weight: 600;
+}
+
+.day-name {
+	font-size: 0.9rem;
+	color: var(--color-lbrown);
+	margin-right: 0.5rem;
+}
+
+.day-date {
+	color: var(--color-lgreen);
+}
+
+.shifts-list {
+	padding: 8px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	flex-grow: 1;
+}
+
+.shift-card {
+	background-color: var(--color-dbrown);
+	border: 1px solid var(--color-lbrown);
+	border-radius: 6px;
+	padding: 0.75rem;
+	font-size: 0.9rem;
+}
+
+.shift-card.past-shift {
+	opacity: 0.7;
+}
+
+.shift-time {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-weight: 600;
+	color: var(--color-lgreen);
+}
+
+.status-icon {
+	width: 18px;
+	height: 18px;
+	flex-shrink: 0;
+}
+
+.status-icon.completed {
+	color: var(--color-green);
+}
+
+.status-icon.missed {
+	color: #ff6b6b; /* A reddish color for missed shifts */
+}
+
+.status-icon.upcoming {
+	color: var(--color-lbrown);
+}
+
+.clock-times {
+	font-size: 0.8rem;
+	color: var(--color-lbrown);
+	margin-top: 0.5rem;
+	padding-left: 26px; /* Align with text next to icon */
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.no-shifts {
+	text-align: center;
+	color: var(--color-lbrown);
+	font-size: 0.9rem;
+	padding: 1rem 0;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.error-message {
+	color: #ff6b6b;
+	font-weight: 600;
+}

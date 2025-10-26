@@ -8,6 +8,7 @@
 		'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans',
 		Arial, sans-serif;
 	color: var(--color-green);
+	margin-bottom: 5px;
 }
 
 .hero-container {
@@ -47,6 +48,7 @@
 }
 
 .hero-btn-list {
+	margin-top: 24px;
 	display: flex;
 	gap: 15px;
 }

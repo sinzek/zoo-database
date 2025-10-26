@@ -1,8 +1,8 @@
 import { useUserData } from '../../context/userDataContext';
-import { Sidebar } from './sidebar/sidebar';
-import { PortalCustomerPageContent } from './customerPageContent/customerPageContent';
-import { TopMenu } from '../../components/topMenu/topMenu';
+import { PortalCustomerPageContent } from './components/customerPageContent/customerPageContent';
 import './portal.css';
+import { availableLinksForAccessLevel } from './sidebar/utils';
+import { Link } from '../../components/link';
 
 export function PortalPage() {
 	const { userEntityData, userEntityType } = useUserData();
@@ -14,19 +14,31 @@ export function PortalPage() {
 			<div className='portal-page-container'>
 				<PortalCustomerPageContent />
 			</div>
-		)
+		);
 	}
+
+	const links = availableLinksForAccessLevel(userEntityData);
 
 	return (
 		<div className='portal-page-container'>
-			<Sidebar
-				ueType={userEntityType}
-				uedata={userEntityData}
-			/>
-			<div className='portal-main-content'>
-				Welcome to the Portal Page,{' '}
-				{userEntityData?.firstName || 'User'}! You are a{' '}
-				{userEntityType || 'Unknown Type'}
+			<h1 className='portal-main-content'>
+				Welcome to work, {userEntityData?.firstName || 'User'}!
+			</h1>
+			<p>
+				You have been a wagie since{' '}
+				{userEntityData.hireDate.split('T')[0]}.
+			</p>
+			<div className='options-grid'>
+				{links.map((link) => (
+					<Link
+						key={link.label}
+						to={link.to}
+						className='option-card'
+					>
+						<link.icon size={32} />
+						{link.label}
+					</Link>
+				))}
 			</div>
 		</div>
 	);

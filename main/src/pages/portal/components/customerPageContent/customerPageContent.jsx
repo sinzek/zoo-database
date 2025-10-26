@@ -1,8 +1,15 @@
-import { useUserData } from '../../../context/userDataContext';
+import { useUserData } from '../../../../context/userDataContext.jsx';
 import './customerPageContent.css';
-import { Link } from '../../../components/link.jsx';
+import { Link } from '../../../../components/link.jsx';
 import { useEffect, useState } from 'react';
-import { Calendar, FerrisWheel, PawPrint, ShoppingBasket, Ticket, TreePalm, UserCheck } from 'lucide-react';
+import {
+	FerrisWheel,
+	PawPrint,
+	ShoppingBasket,
+	Ticket,
+	TreePalm,
+	UserCheck,
+} from 'lucide-react';
 
 export function PortalCustomerPageContent() {
 	const { userEntityData } = useUserData();
@@ -22,12 +29,11 @@ export function PortalCustomerPageContent() {
 	const options = [
 		{ name: 'Buy Tickets', link: '/portal/buy-tickets', icon: Ticket },
 		{ name: 'Memberships', link: '/memberships', icon: UserCheck },
-		{ name: 'Shop', link: '/shop', icon: ShoppingBasket },
+		{ name: 'Shop', link: '/portal/shop', icon: ShoppingBasket },
 		{ name: 'Attractions', link: '/attractions', icon: FerrisWheel },
 		{ name: 'Habitats', link: '/habitats', icon: TreePalm },
 		{ name: 'Animals', link: '/animals', icon: PawPrint },
 	];
-
 
 	useEffect(() => {
 		const interval = setInterval(() => {
@@ -39,11 +45,20 @@ export function PortalCustomerPageContent() {
 
 	return (
 		<div className='portal-customer-main-content'>
-			<img src={backgrounds[curBg]} alt="Coral Reef Habitat" className="bg-img" />
+			<img
+				src={backgrounds[curBg]}
+				alt='Coral Reef Habitat'
+				className='bg-img'
+			/>
 			<h1>The Zoo awaits, {userEntityData.firstName}!</h1>
-			<div className="options-grid">
+			<div className='options-grid'>
 				{options.map((option) => (
-					<Link key={option.name} to={option.link} href={option.link} className="option-card">
+					<Link
+						key={option.name}
+						to={option.link}
+						href={option.link}
+						className='option-card'
+					>
 						<option.icon size={32} />
 						{option.name}
 					</Link>

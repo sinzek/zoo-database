@@ -1,11 +1,21 @@
-.form {
+.form-builder {
 	display: flex;
 	flex-direction: column;
-	gap: 15px;
-	margin-top: 20px;
-	width: 300px;
+	gap: 1rem;
+	width: 100%;
+	max-width: 500px;
+	min-width: 350px;
+}
+
+.form-display-text {
+	padding: 0rem 0.75rem;
+	border: 1px solid var(--color-gray-light);
+	border-radius: 4px;
+	background-color: var(--color-background-light);
+	min-height: 20px; /* match input height */
+	display: flex;
 	align-items: center;
-	justify-content: center;
+	margin: 0.3rem 0.25rem;
 }
 
 .form-group {

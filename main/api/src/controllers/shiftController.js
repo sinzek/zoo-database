@@ -2,9 +2,11 @@ import crypto from 'crypto';
 import { db } from '../db/mysql.js';
 import {
 	createOneQuery,
+	deleteOneQuery,
 	getNByKeyQuery,
 	updateOneQuery,
 } from '../utils/query-utils.js';
+import { query } from '../db/mysql.js';
 
 /**
  * Creates a new shift record.
@@ -56,7 +58,7 @@ async function getOneById(req, _res) {
  * @returns {Promise<Array>} Array of shift objects
  * @throws {Error} If attractionId is missing or no shifts are found
  */
-async function getManyByAttraction(req, _res) {
+async function getNByAttraction(req, _res) {
 	const { attractionId } = req.body;
 
 	if (!attractionId) throw new Error('Missing attractionId');
@@ -73,7 +75,7 @@ async function getManyByAttraction(req, _res) {
  * @returns {Promise<Array>} Array of shift objects ordered by start time
  * @throws {Error} If startDate or endDate is missing
  */
-async function getManyByDateRange(req, _res) {
+async function getNByDateRange(req, _res) {
 	const { startDate, endDate } = req.body;
 
 	if (!startDate || !endDate) throw new Error('Missing startDate or endDate');
@@ -126,15 +128,7 @@ async function deleteOne(req, _res) {
 
 	if (!shiftId) throw new Error('Missing shiftId');
 
-	// using db.query for soft delete
-	await db.query(
-		`
-		UPDATE Shift
-		SET deletedAt = CURRENT_TIMESTAMP()
-		WHERE shiftId = ? AND deletedAt IS NULL
-		`,
-		[shiftId]
-	);
+	await deleteOneQuery('Shift', 'shiftId', shiftId);
 
 	return [{ message: 'Shift successfully deleted' }];
 }
@@ -147,7 +141,7 @@ async function deleteOne(req, _res) {
  * @returns {Promise<Array>} Array containing the created assignment with generated shiftTakenId
  * @throws {Error} If shiftId, employeeId, or totalHours is missing
  */
-async function assignEmployeeToShift(req, _res) {
+async function assignOneEmployeeToShift(req, _res) {
 	const { shiftId, employeeId, totalHours } = req.body;
 
 	if (!shiftId || !employeeId || !totalHours) {
@@ -172,13 +166,12 @@ async function assignEmployeeToShift(req, _res) {
  * @returns {Promise<Array>} Array of employee objects with shift assignment details
  * @throws {Error} If shiftId is missing
  */
-async function getEmployeesByShift(req, _res) {
+async function getNEmployeesByShift(req, _res) {
 	const { shiftId } = req.body;
 
 	if (!shiftId) throw new Error('Missing shiftId');
 
-	// using db.query for join query
-	const rows = await db.query(
+	const employees = query(
 		`
 		SELECT e.*, ets.totalHours, ets.shiftTakenId
 		FROM Employee e
@@ -188,7 +181,7 @@ async function getEmployeesByShift(req, _res) {
 		[shiftId]
 	);
 
-	return rows;
+	return [employees];
 }
 
 /**
@@ -197,24 +190,55 @@ async function getEmployeesByShift(req, _res) {
  * @returns {Promise<Array>} Array of shift objects with assignment details, ordered by start time (descending)
  * @throws {Error} If employeeId is missing
  */
-async function getShiftsByEmployee(req, _res) {
+async function getNByEmployee(req, _res) {
 	const { employeeId } = req.body;
 
 	if (!employeeId) throw new Error('Missing employeeId');
 
 	// using db.query for join query
-	const rows = await db.query(
+	const shifts = await query(
 		`
 		SELECT s.*, ets.totalHours, ets.shiftTakenId
-		FROM Shift s
-		JOIN EmployeeTakesShift ets ON s.shiftId = ets.shiftId
-		WHERE ets.employeeId = ? AND s.deletedAt IS NULL
+		FROM Shift s, EmployeeTakesShift ets
+		WHERE s.shiftId = ets.shiftId AND ets.employeeId = ? AND s.deletedAt IS NULL
 		ORDER BY s.start DESC
 		`,
 		[employeeId]
 	);
 
-	return [rows];
+	if (!shifts || shifts.length === 0) {
+		return [[]];
+	}
+
+	const shiftsWithClockTimes = await Promise.all(
+		shifts.map(async (shift) => {
+			// we do not want to throw an error if no clock times are found for a shift
+			try {
+				const clockTimes = await getNByKeyQuery(
+					'EmployeeClockTime',
+					'shiftId',
+					shift.shiftId,
+					false
+				);
+
+				return {
+					...shift,
+					clockTimes,
+				};
+			} catch (err) {
+				if (err.message.includes('No records found')) {
+					return {
+						...shift,
+						clockTimes: [],
+					};
+				}
+			}
+
+			return shift;
+		})
+	);
+
+	return [shiftsWithClockTimes];
 }
 
 /**
@@ -223,19 +247,12 @@ async function getShiftsByEmployee(req, _res) {
  * @returns {Promise<Array>} Array containing success message
  * @throws {Error} If shiftTakenId is missing
  */
-async function removeEmployeeFromShift(req, _res) {
+async function removeOneEmployeeFromShift(req, _res) {
 	const { shiftTakenId } = req.body;
 
 	if (!shiftTakenId) throw new Error('Missing shiftTakenId');
 
-	// using db.query for hard delete (junction table)
-	await db.query(
-		`
-		DELETE FROM EmployeeTakesShift
-		WHERE shiftTakenId = ?
-		`,
-		[shiftTakenId]
-	);
+	deleteOneQuery('EmployeeTakesShift', 'shiftTakenId', shiftTakenId);
 
 	return [{ message: 'Employee removed from shift successfully' }];
 }
@@ -243,13 +260,12 @@ async function removeEmployeeFromShift(req, _res) {
 export default {
 	createOne,
 	getOneById,
-	getManyByAttraction,
-	getManyByDateRange,
+	getNByAttraction,
+	getNByDateRange,
 	updateOne,
 	deleteOne,
-	assignEmployeeToShift,
-	getEmployeesByShift,
-	getShiftsByEmployee,
-	removeEmployeeFromShift,
+	assignOneEmployeeToShift,
+	getNEmployeesByShift,
+	getNByEmployee,
+	removeOneEmployeeFromShift,
 };
-

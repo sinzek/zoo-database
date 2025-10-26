@@ -33,14 +33,23 @@ import {
  * @returns {Promise<Array>} Array containing the created business object with generated businessId
  * @throws {Error} If business data is missing
  */
-async function createOne(req, _res){
+async function createOne(req, _res) {
 	const newBusiness = req.body;
 
 	if (!newBusiness) throw new Error('Missing business data');
 
 	const newBusinessID = crypto.randomUUID();
-	
-	const {name, address, phone, email, uiDesc, businessType, createdAt, ownerID} = newBusiness;
+
+	const {
+		name,
+		address,
+		phone,
+		email,
+		uiDesc,
+		businessType,
+		createdAt,
+		ownerID,
+	} = newBusiness;
 
 	await createOneQuery('Business', {
 		businessId: newBusinessID,
@@ -51,11 +60,25 @@ async function createOne(req, _res){
 		uiDescription: uiDesc,
 		type: businessType,
 		createdAt,
-		ownerId: ownerID
+		ownerId: ownerID,
 	});
 
-	const {mondayOpen, mondayClose,	tuesdayOpen, tuesdayClose,	wednesdayOpen,	wednesdayClose,	thursdayOpen,	thursdayClose,
-		fridayOpen,	fridayClose,	saturdayOpen,	saturdayClose,	sundayOpen,	sundayClose} = newBusiness;
+	const {
+		mondayOpen,
+		mondayClose,
+		tuesdayOpen,
+		tuesdayClose,
+		wednesdayOpen,
+		wednesdayClose,
+		thursdayOpen,
+		thursdayClose,
+		fridayOpen,
+		fridayClose,
+		saturdayOpen,
+		saturdayClose,
+		sundayOpen,
+		sundayClose,
+	} = newBusiness;
 
 	//create business hours
 	const hours = [
@@ -65,15 +88,15 @@ async function createOne(req, _res){
 		['Wednesday', wednesdayOpen, wednesdayClose],
 		['Thursday', thursdayOpen, thursdayClose],
 		['Friday', fridayOpen, fridayClose],
-		['Saturday', saturdayOpen, saturdayClose]
+		['Saturday', saturdayOpen, saturdayClose],
 	];
 
-	for (const [dayOfWeek, openTime, closeTime] of hours){
+	for (const [dayOfWeek, openTime, closeTime] of hours) {
 		await createOneQuery('BusinessHoursDay', {
 			businessId: newBusinessID,
 			dayOfWeek,
 			openTime,
-			closeTime
+			closeTime,
 		});
 	}
 
@@ -86,7 +109,7 @@ async function createOne(req, _res){
  * @returns {Promise<Array>} Array containing success message
  * @throws {Error} If businessID is missing
  */
-async function deleteOne(req, _res){
+async function deleteOne(req, _res) {
 	const deleteBusiness = req.body;
 	const deleteBusinessID = deleteBusiness.businessID;
 
@@ -119,24 +142,28 @@ async function deleteOne(req, _res){
  * @returns {Promise<Array>} Array containing the updated business object
  * @throws {Error} If business data or businessId is missing
  */
-async function updateOneInfo(req, _res){
+async function updateOneInfo(req, _res) {
 	const updatedBusiness = req.body;
 
 	if (!updatedBusiness || !updatedBusiness.businessId) {
 		throw new Error('Missing business data or businessId');
 	}
 
-	const {businessId, name, address, phone, email, uiDesc} = updatedBusiness; //if updating a business, only these fields can be updated. If you try to update the ID it could break things, and a business type shouldnt be changed, just create another and delete the old one.
+	const { businessId, name, address, phone, email, uiDesc } = updatedBusiness; //if updating a business, only these fields can be updated. If you try to update the ID it could break things, and a business type shouldnt be changed, just create another and delete the old one.
 
-	await updateOneQuery('Business', {
-		businessId,
-		name,
-		address,
-		phone,
-		email,
-		uiDescription: uiDesc
-	}, 'businessId');
-	
+	await updateOneQuery(
+		'Business',
+		{
+			businessId,
+			name,
+			address,
+			phone,
+			email,
+			uiDescription: uiDesc,
+		},
+		'businessId'
+	);
+
 	return [updatedBusiness];
 }
 
@@ -160,16 +187,31 @@ async function updateOneInfo(req, _res){
  * @returns {Promise<Array>} Array containing the updated hours object
  * @throws {Error} If business data or businessId is missing
  */
-async function updateOneHours(req, _res){
+async function updateOneHours(req, _res) {
 	const updatedBusinessHours = req.body;
 
 	if (!updatedBusinessHours || !updatedBusinessHours.businessId) {
 		throw new Error('Missing business data or businessId');
 	}
 
-	const {businessId, mondayOpen, mondayClose, tuesdayOpen, tuesdayClose, wednesdayOpen, wednesdayClose, thursdayOpen, thursdayClose,
-		fridayOpen,	fridayClose, saturdayOpen, saturdayClose, sundayOpen, sundayClose} = updatedBusinessHours;
-		
+	const {
+		businessId,
+		mondayOpen,
+		mondayClose,
+		tuesdayOpen,
+		tuesdayClose,
+		wednesdayOpen,
+		wednesdayClose,
+		thursdayOpen,
+		thursdayClose,
+		fridayOpen,
+		fridayClose,
+		saturdayOpen,
+		saturdayClose,
+		sundayOpen,
+		sundayClose,
+	} = updatedBusinessHours;
+
 	//update business hours
 	const hours = [
 		['Sunday', sundayOpen, sundayClose],
@@ -178,11 +220,11 @@ async function updateOneHours(req, _res){
 		['Wednesday', wednesdayOpen, wednesdayClose],
 		['Thursday', thursdayOpen, thursdayClose],
 		['Friday', fridayOpen, fridayClose],
-		['Saturday', saturdayOpen, saturdayClose]
+		['Saturday', saturdayOpen, saturdayClose],
 	];
-	
+
 	// using db.query for composite key update
-	for (const [dayOfWeek, openTime, closeTime] of hours){
+	for (const [dayOfWeek, openTime, closeTime] of hours) {
 		await db.query(
 			`
 			UPDATE BusinessHoursDay
@@ -195,4 +237,24 @@ async function updateOneHours(req, _res){
 	return [updatedBusinessHours];
 }
 
-export default {createOne, updateOneInfo, updateOneHours, deleteOne };
+async function getOneById(req, _res) {
+	const { businessId } = req.body;
+
+	if (!businessId) throw new Error('Missing businessId');
+
+	const [business] = await getNByKeyQuery(
+		'Business',
+		'businessId',
+		businessId
+	);
+
+	return [business];
+}
+
+export default {
+	createOne,
+	updateOneInfo,
+	updateOneHours,
+	deleteOne,
+	getOneById,
+};

@@ -17,7 +17,7 @@ export async function createOneQuery(tableName, data) {
 	const values = Object.values(data);
 	const placeholders = columns.map(() => '?').join(', ');
 
-	const [result] = await query(
+	const result = await query(
 		`
         INSERT INTO ${tableName} (${columns.join(', ')})
         VALUES(${placeholders});

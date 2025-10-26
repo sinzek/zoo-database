@@ -1,4 +1,3 @@
-
 export function sendJSON(res, statusCode, payload, ...cookies) {
 	console.log('Sending response:', { statusCode, payload, cookies });
 
@@ -60,7 +59,12 @@ export async function handlerWrapper(handler, req, res, options = {}) {
 	const { logError = true } = options;
 
 	try {
-		const [payload, cookies, status = 200] = await handler(req, res);
+		const result = await handler(req, res);
+		if (!result) {
+			return sendJSON(res, 200, null);
+		}
+
+		const [payload, cookies, status = 200] = result;
 		return sendJSON(res, status, payload, ...(cookies || []));
 	} catch (err) {
 		const path = req.url.split('?')[0];
@@ -76,4 +80,3 @@ export async function handlerWrapper(handler, req, res, options = {}) {
 		return sendJSON(res, status, { error: message });
 	}
 }
-

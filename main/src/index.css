@@ -74,24 +74,9 @@ p {
 	font-size: 1.1em;
 	line-height: 1.5;
 	font-weight: 500;
+	margin: 0;
 }
 
-button.btn-outline {
-	border-radius: 12px;
-	border: 2px solid #0095ff;
-	padding: 0.6em 1.2em;
-	font-size: 1.2rem;
-	font-weight: 700;
-	font-family: inherit;
-	background-color: transparent;
-	color: #0095ff;
-	cursor: pointer;
-	transition: all 0.25s;
-}
-button.btn-outline:hover {
-	background-color: #0095ff;
-	color: white;
-}
 button:focus,
 button:focus-visible {
 	outline: 6px auto -webkit-focus-ring-color;
@@ -113,9 +98,9 @@ button:focus-visible {
 .router-container {
 	flex: 1;
 	display: flex;
-	flex-direction: column;
-	width: 100%;
-	height: 100%;
+	flex-direction: row;
+	width: 100vw;
+	height: 100vh;
 }
 
 .link {
@@ -236,6 +221,7 @@ button:focus-visible {
 
 .page {
 	margin-top: 78px;
+	width: 100vw;
 }
 
 input {
