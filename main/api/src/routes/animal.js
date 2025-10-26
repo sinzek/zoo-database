@@ -17,4 +17,5 @@ export function registerAnimalRoutes(app) {
 		'/api/animal/get-all-grouped-by-habitat',
 		animalController.getAllGroupedByHabitat
 	);
+   app.post('/api/animal/report', withAccessLevel('zookeeper', animalReportController.getAnimalReport));
 }
