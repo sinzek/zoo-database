@@ -17,7 +17,7 @@ export async function createOneQuery(tableName, data) {
 	const values = Object.values(data);
 	const placeholders = columns.map(() => '?').join(', ');
 
-	const [result] = await query(
+	const result = await query(
 		`
         INSERT INTO ${tableName} (${columns.join(', ')})
         VALUES(${placeholders});
@@ -141,11 +141,7 @@ export async function updateOneQuery(
  * @param {any} keyValue Value to identify the record in the keyColumn
  * @throws If the delete fails
  */
-export async function deleteOneQuery(
-	tableName,
-	keyColumn,
-	keyValue,
-) {
+export async function deleteOneQuery(tableName, keyColumn, keyValue) {
 	const [result] = await query(
 		`
 		UPDATE ${tableName}

@@ -9,6 +9,8 @@ const UserDataContext = createContext({
 	userEntityType: null, // 'customer' | 'employee' | null
 	login: async (_email, _password) => {},
 	logout: async () => {},
+	authLoading: false,
+	businessEmployeeWorksFor: null, // { businessId, name, ... } | null
 });
 
 export function UserDataProvider({ children }) {
@@ -18,29 +20,44 @@ export function UserDataProvider({ children }) {
 	const [userInfo, setUserInfo] = useState(null);
 	const [userEntityData, setUserEntityData] = useState(null);
 	const [userEntityType, setUserEntityType] = useState(null);
+	const [businessEmployeeWorksFor, setBusinessEmployeeWorksFor] =
+		useState(null);
+	const [businessLoading, setBusinessLoading] = useState(false);
+
+	const [authLoading, setAuthLoading] = useState(true);
 
 	// consume some hooks to perform login/logout and set the above states accordingly
-	const { login, logout, getUserData } = useAuth();
+	const { login, logout, getUserData, getBusinessEmployeeWorksFor } =
+		useAuth();
 
 	useEffect(() => {
 		async function fetchUserData() {
 			const result = await getUserData(
 				setUserInfo,
 				setUserEntityData,
-				setUserEntityType
+				setUserEntityType,
+				setAuthLoading
 			);
 
 			if (!result || !result.success) {
 				// failed to get user data, not logged in
 				return;
 			}
+
+			if (result.data.relatedInfo.type === 'employee') {
+				await getBusinessEmployeeWorksFor(
+					result.data.relatedInfo.data.businessId,
+					setBusinessEmployeeWorksFor,
+					setBusinessLoading
+				);
+			}
 		}
 
-		if (userInfo === null && !userDataFetched.current) {
+		if (!userInfo && !userDataFetched.current) {
 			userDataFetched.current = true;
 			fetchUserData();
 		}
-	}, [userInfo, getUserData, logout, navigate]);
+	}, [userInfo, getUserData, logout, navigate, getBusinessEmployeeWorksFor]);
 
 	return (
 		<UserDataContext.Provider
@@ -62,8 +79,11 @@ export function UserDataProvider({ children }) {
 						setUserInfo,
 						setUserEntityData,
 						setUserEntityType,
-						navigate
+						navigate,
+						setAuthLoading
 					),
+				authLoading: authLoading || businessLoading,
+				businessEmployeeWorksFor,
 			}}
 		>
 			{children}

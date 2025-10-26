@@ -5,29 +5,6 @@ import {
 	getNByKeyQuery,
 	updateOneQuery,
 } from '../utils/query-utils.js';
-
-// We don't need this function, creating a new user account already creates a customer record
-// async function createOne(req, _res){
-// 	const newCustomer = req.body;
-
-// 	if (!newCustomer) throw new Error('Missing customer data');
-	
-// 	const {firstName, lastName, middleInitial} = newCustomer;
-
-// 	const customerID = crypto.randomUUID();
-
-// 	// using db.query because we need CURRENT_DATE() function
-// 	await db.query(
-// 		`
-// 		INSERT INTO Customer (customerId, firstName, lastName, middleInitial, joinDate, email)
-// 		VALUES(?, ?, ?, ?, CURRENT_DATE(), NULL);
-// 		`,
-// 		[customerID, firstName, lastName, middleInitial]
-// 	);
-
-// 	return [{ customerID, ...newCustomer }];
-// }
-
 /**
  * Retrieves a single customer by their ID.
  * @param {string} req.body.customerID - UUID of the customer to retrieve
@@ -87,4 +64,10 @@ async function updateOne(req, _res) {
 	return [updatedCustomer];
 }
 
-export default { getOne, deleteOne, updateOne };
+async function getAll(req, _res) {
+	const customers = await getNByKeyQuery('Customer', 'deletedAt', null);
+	
+	return [customers];
+}
+
+export default { getOne, deleteOne, updateOne, getAll};

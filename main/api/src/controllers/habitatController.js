@@ -1,10 +1,11 @@
 import crypto from 'crypto';
 import {
 	createOneQuery,
+	getAllQuery,
 	getNByKeyQuery,
 	updateOneQuery,
 } from '../utils/query-utils.js';
-import { db } from '../db/mysql.js';
+import { query } from '../db/mysql.js';
 
 /**
  * Creates a new habitat record in the database.
@@ -24,12 +25,13 @@ async function createOne(req, _res) {
 		habitatId,
 		name: newHabitat.name,
 		description: newHabitat.description,
+		imageUrl: newHabitat.imageUrl || null,
 		deletedAt: null,
 	};
 
 	await createOneQuery('Habitat', habitatData);
 
-	return [{ habitatId, ...newHabitat }];
+	return [habitatData];
 }
 
 /**
@@ -43,9 +45,14 @@ async function getOneById(req, _res) {
 
 	if (!habitatId) throw new Error('Missing habitatId');
 
-	const rows = await getNByKeyQuery('Habitat', 'habitatId', habitatId);
+	const [habitat] = await getNByKeyQuery('Habitat', 'habitatId', habitatId);
+	const associatedAnimals = await getNByKeyQuery(
+		'Animal',
+		'habitatId',
+		habitatId
+	);
 
-	return [rows[0]];
+	return [{ habitat, associatedAnimals }];
 }
 
 /**
@@ -53,18 +60,9 @@ async function getOneById(req, _res) {
  * @returns {Promise<Array>} Array of all habitat objects
  */
 async function getAll(_req, _res) {
-	// using db.query for getting all habitats
-	const { query } = await import('../db/mysql.js');
-	
-	const rows = await query(
-		`
-		SELECT *
-		FROM Habitat
-		WHERE deletedAt IS NULL
-		`
-	);
+	const habitats = await getAllQuery('Habitat');
 
-	return rows;
+	return [habitats];
 }
 
 /**
@@ -102,7 +100,7 @@ async function deleteOne(req, _res) {
 
 	// using db.query for soft delete
 
-	await db.query(
+	await query(
 		`
 		UPDATE Habitat
 		SET deletedAt = CURRENT_DATE()
@@ -115,4 +113,3 @@ async function deleteOne(req, _res) {
 }
 
 export default { createOne, getOneById, getAll, updateOne, deleteOne };
-

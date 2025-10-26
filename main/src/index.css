@@ -74,24 +74,9 @@ p {
 	font-size: 1.1em;
 	line-height: 1.5;
 	font-weight: 500;
+	margin: 0;
 }
 
-button.btn-outline {
-	border-radius: 12px;
-	border: 2px solid #0095ff;
-	padding: 0.6em 1.2em;
-	font-size: 1.2rem;
-	font-weight: 700;
-	font-family: inherit;
-	background-color: transparent;
-	color: #0095ff;
-	cursor: pointer;
-	transition: all 0.25s;
-}
-button.btn-outline:hover {
-	background-color: #0095ff;
-	color: white;
-}
 button:focus,
 button:focus-visible {
 	outline: 6px auto -webkit-focus-ring-color;
@@ -113,9 +98,9 @@ button:focus-visible {
 .router-container {
 	flex: 1;
 	display: flex;
-	flex-direction: column;
-	width: 100%;
-	height: 100%;
+	flex-direction: row;
+	width: 100vw;
+	height: 100vh;
 }
 
 .link {
@@ -139,8 +124,6 @@ button:focus-visible {
 
 .btn {
 	border-radius: 100px;
-	padding: 0.6em 1.8em;
-	font-size: 1rem;
 	font-weight: 600;
 	font-family: inherit;
 	cursor: pointer;
@@ -153,10 +136,21 @@ button:focus-visible {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 8px;
 	user-select: none;
 	white-space: nowrap;
 	flex-direction: row;
+}
+
+.btn-lg {
+	padding: 0.6em 1.8em;
+	font-size: 1rem;
+	gap: 8px;
+}
+
+.btn-sm {
+	padding: 0.4em 1.2em;
+	font-size: 0.875rem;
+	gap: 6px;
 }
 
 .btn:hover {
@@ -227,6 +221,7 @@ button:focus-visible {
 
 .page {
 	margin-top: 78px;
+	width: 100vw;
 }
 
 input {
@@ -270,4 +265,12 @@ input::placeholder {
 
 input:hover {
 	border-color: var(--color-green);
+}
+
+.centered-page {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 100vh;
 }

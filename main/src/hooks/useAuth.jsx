@@ -33,7 +33,7 @@ export function useAuth() {
 
 		console.log('Login successful:', result.data);
 		navigate('/portal', { replace: true });
-		showToast(`Welcome back, ${user.firstName || 'User'}!`);
+		showToast(`Welcome back, ${relatedInfo.data.firstName || 'User'}!`);
 		return { success: true };
 	};
 
@@ -41,8 +41,10 @@ export function useAuth() {
 		setUserInfo,
 		setUserEntityData,
 		setUserEntityType,
-		navigate
+		navigate,
+		setAuthLoading
 	) => {
+		setAuthLoading(true);
 		const result = await api('/api/auth/logout', 'POST');
 
 		if (!result.success) {
@@ -58,17 +60,21 @@ export function useAuth() {
 		console.log('Logout successful');
 		navigate('/login', { replace: true });
 		showToast('You have been logged out.');
+		setAuthLoading(false);
 		return { success: true };
 	};
 
 	const getUserData = async (
 		setUserInfo,
 		setUserEntityData,
-		setUserEntityType
+		setUserEntityType,
+		setAuthLoading
 	) => {
+		setAuthLoading(true);
 		const result = await api('/api/auth/me', 'GET');
 
 		if (!result.success && result.error === 'Unauthorized') {
+			setAuthLoading(false);
 			return; // not logged in, no action needed
 		}
 
@@ -77,9 +83,35 @@ export function useAuth() {
 		setUserInfo(user);
 		setUserEntityData(relatedInfo.data);
 		setUserEntityType(relatedInfo.type);
-
+		setAuthLoading(false);
 		return { success: true, data: result.data };
 	};
 
-	return { login, logout, getUserData };
+	const getBusinessEmployeeWorksFor = async (
+		businessId,
+		setBusiness,
+		setLoading
+	) => {
+		setLoading(true);
+		const result = await api('/api/business/get-one-by-id', 'POST', {
+			businessId,
+		});
+
+		if (!result.success) {
+			console.error(
+				'Error fetching business for employee:',
+				result.error
+			);
+			showToast(
+				`ERROR: ${result.error || 'Failed to fetch business info'}`
+			);
+			setLoading(false);
+			return;
+		}
+
+		setBusiness(result.data);
+		setLoading(false);
+	};
+
+	return { login, logout, getUserData, getBusinessEmployeeWorksFor };
 }

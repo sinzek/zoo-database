@@ -1,36 +1,70 @@
-import { Navbar } from "./components/navbar/navbar";
-import { useRouter } from "./context/routerContext";
-import NotFoundPage from "./pages/404/404";
-import HomePage from "./pages/home/home";
-import HabitatsPage from "./pages/habitats/habitats";
-import LoginPage from "./pages/login/login";
-import AttractionsPage from "./pages/attractions/attractions";
-import { PortalPage } from "./pages/portal/portal";
-import HabitatDetailsPage from "./pages/habitats/habitatDetails";
+import { Navbar } from './components/navbar/navbar';
+import { useRouter } from './context/routerContext';
+import NotFoundPage from './pages/404/404';
+import HomePage from './pages/home/home';
+import HabitatsPage from './pages/habitats/habitats';
+import LoginPage from './pages/login/login';
+import AttractionsPage from './pages/attractions/attractions';
+import HabitatDetailsPage from './pages/habitats/habitatDetails';
+import { TestingPage } from './pages/testing/testing';
+import AnimalsPage from './pages/animals/animals';
+import { PortalPage } from './pages/portal/portal';
+import { AccountPage } from './pages/portal/account/account';
+import { TopMenu } from './components/topMenu/topMenu';
+import { BuyTicketsPage } from './pages/portal/buyTickets/buyTickets';
+import { CartPage } from './pages/portal/cart/cart';
+import { ShopPage } from './pages/portal/shop/shop';
+import { Sidebar } from './pages/portal/sidebar/sidebar';
+import { useUserData } from './context/userDataContext';
+import { ShiftSchedulePage } from './pages/portal/shiftSchedule/shiftSchedule';
 
 export default function Router() {
-  const { path, match } = useRouter();
+	const { path, match } = useRouter();
+	const { userEntityType, userEntityData } = useUserData();
 
-  const isAuthProtectedPage = path.startsWith("/portal");
-  const isLoginOrSignupPage = path === "/login" || path === "/signup";
+	const isAuthProtectedPage = path.startsWith('/portal');
+	const isLoginOrSignupPage = path === '/login' || path === '/signup';
 
-  const animalsMatch = match("/animals/:id");
-  const habitatMatch = match("/habitats/:id");
+	const habitatMatch = match('/habitats/:id');
 
-  let content = null;
-  if (path === "/") content = <HomePage />;
-  else if (path === "/login") content = <LoginPage />;
-  else if (path === "/habitats") content = <HabitatsPage />;
-  else if (habitatMatch) content = <HabitatDetailsPage id={habitatMatch.id} />;
-  else if (path === "/attractions") content = <AttractionsPage />;
-  else if (animalsMatch) content = <div>Animal ID: {animalsMatch.id}</div>;
-  else if (path === "/portal") content = <PortalPage />;
-  else content = <NotFoundPage />;
+	let content = null;
 
-  return (
-    <div className="router-container">
-      {!isAuthProtectedPage && !isLoginOrSignupPage && <Navbar />}
-      {content}
-    </div>
-  );
+	const pathMap = {
+		'/': HomePage,
+		'/login': LoginPage,
+
+		'/habitats': HabitatsPage,
+		'/attractions': AttractionsPage,
+		'/animals': AnimalsPage,
+
+		'/portal': PortalPage,
+		'/portal/account': AccountPage,
+		'/portal/buy-tickets': BuyTicketsPage,
+		'/portal/cart': CartPage,
+		'/portal/shop': ShopPage,
+		'/portal/shift-schedule': ShiftSchedulePage,
+
+		'/testing': TestingPage,
+	};
+
+	if (habitatMatch) {
+		content = <HabitatDetailsPage id={habitatMatch.id} />;
+	} else if (pathMap[path]) {
+		const Component = pathMap[path];
+		content = <Component />;
+	} else {
+		content = <NotFoundPage />;
+	}
+
+	return (
+		<div className='router-container'>
+			{!isAuthProtectedPage && !isLoginOrSignupPage && <Navbar />}
+			<TopMenu />
+			<Sidebar
+				ueType={userEntityType}
+				uedata={userEntityData}
+			/>
+			{content}
+		</div>
+	);
 }

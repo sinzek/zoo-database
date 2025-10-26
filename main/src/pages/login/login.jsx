@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import './login.css';
-//import { useRouter } from '../../context/routerContext';
-import { Loader } from '../../components/loader/loader';
 import { useUserData } from '../../context/userDataContext';
+import { Button } from '../../components/button';
 
 export default function LoginPage() {
 	const { login } = useUserData();
@@ -23,7 +22,6 @@ export default function LoginPage() {
 		await login(formData.email, formData.password);
 
 		setIsSubmitting(false);
-		//router.navigateTo('/portal'); --- IGNORE ---
 	}
 
 	return (
@@ -80,19 +78,17 @@ export default function LoginPage() {
 						placeholder='Enter your password'
 					/>
 				</div>
-				<button
-					className='btn btn-green'
-					type='button'
+				<Button
+					variant='green'
+					size='lg'
+					loading={isSubmitting}
 					onClick={handleSubmit}
 					disabled={
-						isSubmitting ||
-						!formData.email.trim() ||
-						!formData.password.trim()
+						!formData.email.trim() || !formData.password.trim()
 					}
 				>
-					{isSubmitting && <Loader />}
-					{isSubmitting ? 'Logging in...' : 'Log In'}
-				</button>
+					Log In
+				</Button>
 			</div>
 		</div>
 	);
