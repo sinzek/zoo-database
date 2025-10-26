@@ -87,5 +87,31 @@ export function useAuth() {
 		return { success: true, data: result.data };
 	};
 
-	return { login, logout, getUserData };
+	const getBusinessEmployeeWorksFor = async (
+		businessId,
+		setBusiness,
+		setLoading
+	) => {
+		setLoading(true);
+		const result = await api('/api/business/get-one-by-id', 'POST', {
+			businessId,
+		});
+
+		if (!result.success) {
+			console.error(
+				'Error fetching business for employee:',
+				result.error
+			);
+			showToast(
+				`ERROR: ${result.error || 'Failed to fetch business info'}`
+			);
+			setLoading(false);
+			return;
+		}
+
+		setBusiness(result.data);
+		setLoading(false);
+	};
+
+	return { login, logout, getUserData, getBusinessEmployeeWorksFor };
 }

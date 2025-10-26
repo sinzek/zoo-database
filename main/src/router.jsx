@@ -11,9 +11,16 @@ import AnimalsPage from './pages/animals/animals';
 import { PortalPage } from './pages/portal/portal';
 import { AccountPage } from './pages/portal/account/account';
 import { TopMenu } from './components/topMenu/topMenu';
+import { BuyTicketsPage } from './pages/portal/buyTickets/buyTickets';
+import { CartPage } from './pages/portal/cart/cart';
+import { ShopPage } from './pages/portal/shop/shop';
+import { Sidebar } from './pages/portal/sidebar/sidebar';
+import { useUserData } from './context/userDataContext';
+import { ShiftSchedulePage } from './pages/portal/shiftSchedule/shiftSchedule';
 
 export default function Router() {
 	const { path, match } = useRouter();
+	const { userEntityType, userEntityData } = useUserData();
 
 	const isAuthProtectedPage = path.startsWith('/portal');
 	const isLoginOrSignupPage = path === '/login' || path === '/signup';
@@ -32,13 +39,17 @@ export default function Router() {
 
 		'/portal': PortalPage,
 		'/portal/account': AccountPage,
+		'/portal/buy-tickets': BuyTicketsPage,
+		'/portal/cart': CartPage,
+		'/portal/shop': ShopPage,
+		'/portal/shift-schedule': ShiftSchedulePage,
 
 		'/testing': TestingPage,
 	};
 
 	if (habitatMatch) {
 		content = <HabitatDetailsPage id={habitatMatch.id} />;
-	} else if(pathMap[path]) {
+	} else if (pathMap[path]) {
 		const Component = pathMap[path];
 		content = <Component />;
 	} else {
@@ -49,6 +60,10 @@ export default function Router() {
 		<div className='router-container'>
 			{!isAuthProtectedPage && !isLoginOrSignupPage && <Navbar />}
 			<TopMenu />
+			<Sidebar
+				ueType={userEntityType}
+				uedata={userEntityData}
+			/>
 			{content}
 		</div>
 	);

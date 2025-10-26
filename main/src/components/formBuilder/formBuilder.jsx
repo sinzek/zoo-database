@@ -22,34 +22,51 @@ const loginFields = [
 
 /**
  *
- * @param {{ fields: Array<{ name: string; label: string; type: string; placeholder: string; autoComplete: string; }>; formData: object; setFormData: (formData: object) => void; }} param0
+ * @param {{ fields: Array<{ name: string; label: string; type: string; placeholder: string; autoComplete: string; }>; formData: object; setFormData: (formData: object) => void; isEditing: boolean; }} param0
  * @returns
  */
-export function FormBuilder({ fields, formData, setFormData }) {
+export function FormBuilder({
+	fields,
+	formData,
+	setFormData,
+	isEditing = true,
+	style,
+}) {
+	const handleChange = (e) => {
+		const { name, value, type, checked } = e.target;
+		setFormData((prev) => ({
+			...prev,
+			[name]: type === 'checkbox' ? checked : value,
+		}));
+	};
+
 	return (
-		<div className='form'>
+		<div
+			className='form-builder'
+			style={style}
+		>
 			{fields.map((field) => (
 				<div
 					className='form-group'
-					key={`form-group-${field.name}-${field.placeholder}`}
+					key={field.name}
 				>
-					{field.label && (
-						<label htmlFor={field.name}>{field.label}</label>
+					<label htmlFor={field.name}>{field.label}</label>
+					{isEditing ? (
+						<input
+							id={field.name}
+							name={field.name}
+							type={field.type}
+							placeholder={field.placeholder}
+							value={formData[field.name] || ''}
+							onChange={handleChange}
+							autoComplete={field.autoComplete || 'off'}
+							disabled={field.disabled}
+						/>
+					) : (
+						<p className='form-display-text'>
+							{formData[field.name] || <em>Not set</em>}
+						</p>
 					)}
-
-					<input
-						id={field.name}
-						type={field.type || 'text'}
-						placeholder={field.placeholder}
-						value={formData[field.name]}
-						onChange={(e) =>
-							setFormData({
-								...formData,
-								[field.name]: e.target.value,
-							})
-						}
-						autoComplete={field.autoComplete}
-					/>
 				</div>
 			))}
 		</div>
@@ -68,4 +85,6 @@ FormBuilder.propTypes = {
 	).isRequired,
 	formData: PropTypes.object.isRequired,
 	setFormData: PropTypes.func.isRequired,
+	isEditing: PropTypes.bool,
+	style: PropTypes.object,
 };
