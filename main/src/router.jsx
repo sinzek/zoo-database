@@ -5,10 +5,10 @@ import HomePage from './pages/home/home';
 import HabitatsPage from './pages/habitats/habitats';
 import LoginPage from './pages/login/login';
 import AttractionsPage from './pages/attractions/attractions';
-import { PortalPage } from './pages/portal/portal';
 import HabitatDetailsPage from './pages/habitats/habitatDetails';
 import { TestingPage } from './pages/testing/testing';
 import AnimalsPage from './pages/animals/animals';
+import { PortalPage } from './pages/portal/portal';
 
 export default function Router() {
 	const { path, match } = useRouter();

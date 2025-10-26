@@ -9,6 +9,7 @@ const UserDataContext = createContext({
 	userEntityType: null, // 'customer' | 'employee' | null
 	login: async (_email, _password) => {},
 	logout: async () => {},
+	authLoading: false,
 });
 
 export function UserDataProvider({ children }) {
@@ -19,6 +20,8 @@ export function UserDataProvider({ children }) {
 	const [userEntityData, setUserEntityData] = useState(null);
 	const [userEntityType, setUserEntityType] = useState(null);
 
+	const [authLoading, setAuthLoading] = useState(true);
+
 	// consume some hooks to perform login/logout and set the above states accordingly
 	const { login, logout, getUserData } = useAuth();
 
@@ -27,7 +30,8 @@ export function UserDataProvider({ children }) {
 			const result = await getUserData(
 				setUserInfo,
 				setUserEntityData,
-				setUserEntityType
+				setUserEntityType,
+				setAuthLoading
 			);
 
 			if (!result || !result.success) {
@@ -62,8 +66,10 @@ export function UserDataProvider({ children }) {
 						setUserInfo,
 						setUserEntityData,
 						setUserEntityType,
-						navigate
+						navigate,
+						setAuthLoading
 					),
+				authLoading,
 			}}
 		>
 			{children}

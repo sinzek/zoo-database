@@ -1,0 +1,54 @@
+.portal-customer-main-content {
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	gap: 2rem;
+	position: relative;
+}
+
+.bg-img {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	z-index: -1;
+	opacity: 0.3;
+}
+
+.options-grid {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+}
+
+.option-card {
+	background-color: var(--color-dgreen);
+	border-radius: 8px;
+	padding: 1.5rem;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	text-align: center;
+	transition: transform 0.2s, box-shadow 0.2s;
+	cursor: pointer;
+	color: var(--color-lgreen);
+	transition: all 0.15s ease;
+}
+
+.option-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+	text-decoration: none;
+	background-color: var(--color-green);
+	color: var(--color-dbrown);
+}
+
+.option-card:active {
+	transform: translateY(0);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	background-color: var(--color-dgreen);
+}
