@@ -29,11 +29,9 @@ export const db = await mysql.createConnection({
 });
 
 export async function query(sql, params) {
-	const [result] = await db.query(sql, params);
-
-	if (result.affectedRows === 0) {
-		throw new Error('[DB ERROR] No rows affected');
-	}
-
+	const [result, info] = await db.query(sql, params);
+	
+	// For SELECT queries, just return the result
+	// For INSERT/UPDATE/DELETE queries, return the result with info
 	return result;
 }

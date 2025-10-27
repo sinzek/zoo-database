@@ -12,6 +12,7 @@ export function registerDietRoutes(app) {
 	);
 	app.post('/api/diet/get-by-id', dietController.getOneById);
 	app.post('/api/diet/get-with-schedule', dietController.getOneWithSchedule);
+	app.post('/api/diet/get-by-animal-with-schedule', dietController.getOneByAnimalIdWithSchedule);
 	app.post('/api/diet/get-schedule-days', dietController.getScheduleDaysByDiet);
 	app.post(
 		'/api/diet/add-schedule-day',

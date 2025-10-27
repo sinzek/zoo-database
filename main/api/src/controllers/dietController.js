@@ -20,16 +20,20 @@ async function createOne(req, _res) {
 	const newDiet = req.body;
 
 	if (!newDiet) throw new Error('Missing diet data');
+	if (!newDiet.animalId) throw new Error('Missing animalId');
 
 	const dietId = crypto.randomUUID();
 
 	const dietData = {
 		dietId,
+		animalId: newDiet.animalId,
 		specialNotes: newDiet.specialNotes || null,
 		deletedAt: null,
 	};
 
 	await createOneQuery('Diet', dietData);
+
+	console.log('Created diet with data:', dietData);
 
 	// If schedule days are provided, create them
 	if (newDiet.scheduleDays && Array.isArray(newDiet.scheduleDays)) {
@@ -45,7 +49,7 @@ async function createOne(req, _res) {
 		}
 	}
 
-	return [{ dietId, ...newDiet }];
+	return [{ ...dietData, scheduleDays: newDiet.scheduleDays || [] }];
 }
 
 /**
@@ -88,6 +92,46 @@ async function getOneWithSchedule(req, _res) {
 	);
 
 	return [{ ...diet, scheduleDays: scheduleRows }];
+}
+
+/**
+ * Retrieves a diet by animalId with all its associated schedule days.
+ * @param {string} req.body.animalId - UUID of the animal
+ * @returns {Promise<Array>} Array containing the diet object with scheduleDays array, or empty array if no diet found
+ */
+async function getOneByAnimalIdWithSchedule(req, _res) {
+	const { animalId } = req.body;
+
+	if (!animalId) throw new Error('Missing animalId');
+
+	// Get diet info by animalId
+	const dietRows = await query(
+		`SELECT * FROM Diet WHERE animalId = ? AND deletedAt IS NULL`,
+		[animalId]
+	);
+
+	console.log('getOneByAnimalIdWithSchedule - dietRows:', dietRows);
+
+	// Return empty array if no diet found
+	if (!dietRows || dietRows.length === 0) {
+		console.log('No diet found for animalId:', animalId);
+		return [];
+	}
+
+	const diet = dietRows[0];
+
+	// Get schedule days using query directly
+	const scheduleRows = await query(
+		`SELECT * FROM DietScheduleDay WHERE dietId = ?`,
+		[diet.dietId]
+	);
+
+	console.log('Schedule rows for diet:', scheduleRows);
+
+	// Return as array: [payload, cookies, status]
+	const dietData = [{ ...diet, scheduleDays: scheduleRows || [] }];
+	console.log('Returning diet result:', dietData);
+	return [dietData];
 }
 
 /**
@@ -265,6 +309,7 @@ export default {
 	createOne,
 	getOneById,
 	getOneWithSchedule,
+	getOneByAnimalIdWithSchedule,
 	updateOne,
 	deleteOne,
 	addScheduleDay,

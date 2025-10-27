@@ -35,11 +35,15 @@ export function FeedingScheduleDetailPage({ animalId }) {
 	});
 	const [showNewForm, setShowNewForm] = useState(false);
 	const [isZookeeperPlus, setIsZookeeperPlus] = useState(false);
+	const [showCreateDietForm, setShowCreateDietForm] = useState(false);
+	const [newDietFormData, setNewDietFormData] = useState({
+		specialNotes: '',
+	});
 
 	useEffect(() => {
 		// Check if user can edit (zookeeper+)
 		if (userEntityData?.accessLevel) {
-			const zookeeperLevels = ['zookeeper', 'senior-zookeeper', 'veterinarian', 'senior-veterinarian', 'executive'];
+			const zookeeperLevels = ['zookeeper', 'veterinarian', 'manager', 'executive', 'db_admin'];
 			setIsZookeeperPlus(zookeeperLevels.includes(userEntityData.accessLevel));
 		}
 
@@ -59,15 +63,19 @@ export function FeedingScheduleDetailPage({ animalId }) {
 		if (animalResult.success) {
 			setAnimal(animalResult.data);
 
-			// Get diet for this animal
-			if (animalResult.data.dietId) {
-				const dietResult = await api('/api/diet/get-with-schedule', 'POST', {
-					dietId: animalResult.data.dietId,
-				});
+			// Get diet for this animal by animalId
+			const dietResult = await api('/api/diet/get-by-animal-with-schedule', 'POST', {
+				animalId: animalResult.data.animalId,
+			});
 
-				if (dietResult.success) {
-					setDiet(dietResult.data);
-				}
+			console.log('Diet result:', dietResult);
+			
+			if (dietResult.success && dietResult.data && dietResult.data.length > 0) {
+				console.log('Setting diet:', dietResult.data[0]);
+				setDiet(dietResult.data[0]);
+			} else {
+				console.log('Animal does not have a diet assigned');
+				setDiet(null);
 			}
 		}
 
@@ -77,13 +85,13 @@ export function FeedingScheduleDetailPage({ animalId }) {
 	const handleNewDaySubmit = async (e) => {
 		e.preventDefault();
 		
-		if (!animal?.dietId) {
+		if (!diet?.dietId) {
 			showToast('Animal does not have a diet assigned', 'error');
 			return;
 		}
 
 		const result = await api('/api/diet/add-schedule-day', 'POST', {
-			dietId: animal.dietId,
+			dietId: diet.dietId,
 			...newDayFormData,
 		});
 
@@ -151,6 +159,28 @@ export function FeedingScheduleDetailPage({ animalId }) {
 		}
 	};
 
+	const handleCreateDiet = async (e) => {
+		e.preventDefault();
+		
+		const result = await api('/api/diet/create', 'POST', {
+			animalId,
+			...newDietFormData,
+		});
+
+		if (result.success) {
+			console.log('Diet created successfully:', result);
+			showToast('Diet created successfully', 'success');
+			setShowCreateDietForm(false);
+			setNewDietFormData({
+				specialNotes: '',
+			});
+			// Reload data to fetch the newly created diet
+			await loadData();
+		} else {
+			showToast('Failed to create diet', 'error');
+		}
+	};
+
 	const goBack = () => {
 		navigate('/portal/feeding-schedules');
 	};
@@ -194,7 +224,7 @@ export function FeedingScheduleDetailPage({ animalId }) {
 			)}
 
 			<div className='schedule-section'>
-				{isZookeeperPlus && (
+				{isZookeeperPlus && diet && (
 					<div className='schedule-actions'>
 						{!showNewForm && (
 							<button
@@ -282,7 +312,59 @@ export function FeedingScheduleDetailPage({ animalId }) {
 				)}
 
 				{!diet ? (
-					<p className='no-diet'>No feeding schedule assigned to this animal.</p>
+					<div className='no-diet-container'>
+						<p className='no-diet'>No feeding schedule assigned to this animal.</p>
+						{isZookeeperPlus && (
+							<>
+								{!showCreateDietForm ? (
+									<button
+										onClick={() => setShowCreateDietForm(true)}
+										className='create-diet-button'
+									>
+										<Plus size={16} />
+										Create Diet for This Animal
+									</button>
+								) : (
+									<form onSubmit={handleCreateDiet} className='create-diet-form'>
+										<h3>Create Diet</h3>
+										<div className='form-group'>
+											<label>Special Notes</label>
+											<textarea
+												value={newDietFormData.specialNotes}
+												onChange={(e) =>
+													setNewDietFormData({
+														...newDietFormData,
+														specialNotes: e.target.value,
+													})
+												}
+												rows={3}
+												placeholder='Any special dietary requirements...'
+											/>
+										</div>
+										<div className='form-actions'>
+											<button type='submit' className='save-button'>
+												<Save size={16} />
+												Create Diet
+											</button>
+											<button
+												type='button'
+												onClick={() => {
+													setShowCreateDietForm(false);
+													setNewDietFormData({
+														specialNotes: '',
+													});
+												}}
+												className='cancel-button'
+											>
+												<X size={16} />
+												Cancel
+											</button>
+										</div>
+									</form>
+								)}
+							</>
+						)}
+					</div>
 				) : diet.scheduleDays && diet.scheduleDays.length === 0 ? (
 					<p className='no-schedule'>No feeding schedule days configured.</p>
 				) : (

@@ -118,8 +118,8 @@
 	padding: 0.75rem;
 	border: 2px solid var(--color-brown);
 	border-radius: 6px;
-	background-color: var(--color-foreground);
-	color: var(--color-foreground-text);
+	background-color: var(--color-dbrown);
+	color: var(--color-foreground);
 	font-size: 1rem;
 	font-family: inherit;
 }
@@ -130,12 +130,68 @@
 	margin-top: 1rem;
 }
 
+.no-diet-container {
+	text-align: center;
+	padding: 3rem;
+}
+
 .no-diet,
 .no-schedule {
-	text-align: center;
 	color: var(--color-lbrown);
-	padding: 3rem;
 	font-size: 1.1rem;
+	margin-bottom: 0.5rem;
+}
+
+.no-diet-hint {
+	color: var(--color-brown);
+	font-size: 0.9rem;
+	font-style: italic;
+}
+
+.create-diet-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.75rem 1.5rem;
+	margin-top: 1rem;
+	background-color: var(--color-green);
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background-color 0.2s;
+	font-size: 1rem;
+	width: 100%;
+	max-width: 400px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.create-diet-button:hover {
+	background-color: var(--color-lgreen);
+}
+
+.create-diet-form {
+	background-color: rgba(37, 31, 26, 0.8);
+	border-radius: 12px;
+	border: 2px solid var(--color-brown);
+	padding: 1.5rem;
+	margin-top: 1rem;
+	width: 100%;
+	max-width: 500px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.create-diet-form h3 {
+	color: var(--color-green);
+	margin-bottom: 1rem;
+}
+
+.create-diet-form .form-group textarea {
+	background-color: var(--color-dbrown);
+	color: var(--color-foreground);
 }
 
 .schedule-days {
