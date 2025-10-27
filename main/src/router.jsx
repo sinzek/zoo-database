@@ -23,6 +23,7 @@ import { MedicalRecordDetailPage } from './pages/portal/medicalRecords/medicalRe
 import { FeedingSchedulesPage } from './pages/portal/feedingSchedules/feedingSchedules';
 import { FeedingScheduleDetailPage } from './pages/portal/feedingSchedules/feedingScheduleDetail';
 import { ScheduleManagementPage } from './pages/portal/scheduleManagement/scheduleManagement';
+import { PortalHabitatsPage } from './pages/portal/habitats/portalHabitats';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -50,6 +51,7 @@ export default function Router() {
 		'/portal/animals': PortalAnimalsPage,
 		'/portal/medical-records': MedicalRecordsPage,
 		'/portal/feeding-schedules': FeedingSchedulesPage,
+		'/portal/habitats': PortalHabitatsPage,
 		'/portal/buy-tickets': BuyTicketsPage,
 		'/portal/cart': CartPage,
 		'/portal/shop': ShopPage,
