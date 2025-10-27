@@ -18,6 +18,10 @@ import { Sidebar } from './pages/portal/sidebar/sidebar';
 import { useUserData } from './context/userDataContext';
 import { ShiftSchedulePage } from './pages/portal/shiftSchedule/shiftSchedule';
 import { PortalAnimalsPage } from './pages/portal/animals/animals';
+import { MedicalRecordsPage } from './pages/portal/medicalRecords/medicalRecords';
+import { MedicalRecordDetailPage } from './pages/portal/medicalRecords/medicalRecordDetail';
+import { FeedingSchedulesPage } from './pages/portal/feedingSchedules/feedingSchedules';
+import { FeedingScheduleDetailPage } from './pages/portal/feedingSchedules/feedingScheduleDetail';
 import { ScheduleManagementPage } from './pages/portal/scheduleManagement/scheduleManagement';
 
 export default function Router() {
@@ -28,6 +32,8 @@ export default function Router() {
 	const isLoginOrSignupPage = path === '/login' || path === '/signup';
 
 	const habitatMatch = match('/habitats/:id');
+	const medicalRecordMatch = match('/portal/medical-records/:animalId');
+	const feedingScheduleMatch = match('/portal/feeding-schedules/:animalId');
 
 	let content = null;
 
@@ -42,6 +48,8 @@ export default function Router() {
 		'/portal': PortalPage,
 		'/portal/account': AccountPage,
 		'/portal/animals': PortalAnimalsPage,
+		'/portal/medical-records': MedicalRecordsPage,
+		'/portal/feeding-schedules': FeedingSchedulesPage,
 		'/portal/buy-tickets': BuyTicketsPage,
 		'/portal/cart': CartPage,
 		'/portal/shop': ShopPage,
@@ -53,6 +61,10 @@ export default function Router() {
 
 	if (habitatMatch) {
 		content = <HabitatDetailsPage id={habitatMatch.id} />;
+	} else if (medicalRecordMatch) {
+		content = <MedicalRecordDetailPage animalId={medicalRecordMatch.animalId} />;
+	} else if (feedingScheduleMatch) {
+		content = <FeedingScheduleDetailPage animalId={feedingScheduleMatch.animalId} />;
 	} else if (pathMap[path]) {
 		const Component = pathMap[path];
 		content = <Component />;
