@@ -49,7 +49,7 @@
 .day-column {
 	background-color: rgba(37, 31, 26, 0.8);
 	border-radius: 12px;
-	border: 2px solid var(--color-brown);
+	border: 2px solid var(--color-dgreen);
 	min-height: 200px;
 	display: flex;
 	flex-direction: column;
@@ -62,16 +62,17 @@
 .day-header {
 	padding: 0.75rem;
 	text-align: center;
-	border-bottom: 1px solid var(--color-brown);
-	background-color: var(--color-brown);
+	border-bottom: 1px solid var(--color-dgreen);
+	background-color: var(--color-dgreen);
 	border-radius: 11px 11px 0 0;
 	font-weight: 600;
 }
 
 .day-name {
-	font-size: 0.9rem;
-	color: var(--color-lbrown);
+	color: var(--color-lgreen);
 	margin-right: 0.5rem;
+	font-weight: 700;
+	font-family: inherit;
 }
 
 .day-date {
@@ -89,7 +90,7 @@
 .shift-card {
 	background-color: var(--color-dbrown);
 	border: 1px solid var(--color-lbrown);
-	border-radius: 6px;
+	border-radius: 10px;
 	padding: 0.75rem;
 	font-size: 0.9rem;
 }
@@ -102,13 +103,14 @@
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	font-weight: 600;
+	font-size: 0.9rem !important;
+	font-weight: 400;
 	color: var(--color-lgreen);
 }
 
 .status-icon {
-	width: 18px;
-	height: 18px;
+	width: 16px;
+	height: 16px;
 	flex-shrink: 0;
 }
 
@@ -136,7 +138,7 @@
 
 .no-shifts {
 	text-align: center;
-	color: var(--color-lbrown);
+	color: var(--color-lbrown) !important;
 	font-size: 0.9rem;
 	padding: 1rem 0;
 	height: 100%;

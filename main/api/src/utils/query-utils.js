@@ -141,7 +141,7 @@ export async function updateOneQuery(
  * @throws If the delete fails
  */
 export async function deleteOneQuery(tableName, keyColumn, keyValue) {
-	const [result] = await query(
+	const result = await query(
 		`
 		UPDATE ${tableName}
 		SET deletedAt = CURRENT_DATE()

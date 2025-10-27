@@ -22,6 +22,7 @@ import { MedicalRecordsPage } from './pages/portal/medicalRecords/medicalRecords
 import { MedicalRecordDetailPage } from './pages/portal/medicalRecords/medicalRecordDetail';
 import { FeedingSchedulesPage } from './pages/portal/feedingSchedules/feedingSchedules';
 import { FeedingScheduleDetailPage } from './pages/portal/feedingSchedules/feedingScheduleDetail';
+import { ScheduleManagementPage } from './pages/portal/scheduleManagement/scheduleManagement';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -53,6 +54,7 @@ export default function Router() {
 		'/portal/cart': CartPage,
 		'/portal/shop': ShopPage,
 		'/portal/shift-schedule': ShiftSchedulePage,
+		'/portal/schedule-management': ScheduleManagementPage,
 
 		'/testing': TestingPage,
 	};
