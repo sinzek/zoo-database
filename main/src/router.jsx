@@ -64,7 +64,12 @@ export default function Router() {
 				ueType={userEntityType}
 				uedata={userEntityData}
 			/>
-			{content}
+			<div
+				className='content-container'
+				id='main-content'
+			>
+				{content}
+			</div>
 		</div>
 	);
 }

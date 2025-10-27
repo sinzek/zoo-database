@@ -69,7 +69,7 @@ export function TopMenu() {
 							marginRight: '1rem',
 						}}
 					>
-						Employed by{' '}
+						<strong>{userEntityData.jobTitle}</strong> at{' '}
 						<strong>{businessEmployeeWorksFor.name}</strong>
 					</p>
 				)}

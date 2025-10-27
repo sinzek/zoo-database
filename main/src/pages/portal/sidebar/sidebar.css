@@ -1,0 +1,52 @@
+.portal-sidebar {
+	min-width: 238px;
+	max-width: 238px;
+	background-color: var(--color-dgreen);
+	padding: 10rem 15px 20px 15px;
+	position: fixed;
+	top: 0;
+	height: 100vh;
+}
+
+.portal-sidebar-links {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+.portal-sidebar-links li {
+	margin-bottom: 1rem;
+}
+
+.portal-sidebar-links li a {
+	color: var(--color-lgreen);
+	text-decoration: none;
+	font-size: 1.15rem;
+	background-color: var(--color-brown);
+	width: 100%;
+	box-sizing: border-box;
+	padding: 0.75rem 0.75rem;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	border-radius: 10px;
+	transition:
+		background-color 0.15s,
+		color 0.15s;
+}
+
+.portal-sidebar-link-icon {
+	width: 1.5rem;
+	height: 1.5rem;
+	padding: 0.25rem;
+	stroke: var(--color-green);
+	background-color: var(--color-dgreen);
+	border-radius: 5px;
+}
+
+.portal-sidebar-links li a.active,
+.portal-sidebar-links li a:hover {
+	background-color: var(--color-dbrown);
+	color: var(--color-dgreen);
+	text-decoration: none;
+}
