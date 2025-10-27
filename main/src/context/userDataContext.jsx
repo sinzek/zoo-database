@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useAuth } from '../hooks/useAuth';
 import { useRouter } from './routerContext';
+import { hasMinAccessLvl } from '../utils/access';
 
 const UserDataContext = createContext({
 	userInfo: null, // { userId, email } | null
@@ -14,7 +15,7 @@ const UserDataContext = createContext({
 });
 
 export function UserDataProvider({ children }) {
-	const { navigate } = useRouter();
+	const { navigate, path } = useRouter();
 	const userDataFetched = useRef(false);
 
 	const [userInfo, setUserInfo] = useState(null);
@@ -58,6 +59,25 @@ export function UserDataProvider({ children }) {
 			fetchUserData();
 		}
 	}, [userInfo, getUserData, logout, navigate, getBusinessEmployeeWorksFor]);
+
+	useEffect(() => {
+		if (typeof window === 'undefined' || authLoading || businessLoading)
+			return;
+
+		const contentContainer = document.querySelector('#main-content');
+		if (contentContainer) {
+			const isMinZookeeper = hasMinAccessLvl('zookeeper', userEntityData);
+			if (
+				userEntityType === 'employee' &&
+				isMinZookeeper &&
+				path.startsWith('/portal')
+			) {
+				contentContainer.style.marginLeft = '238px';
+			} else {
+				contentContainer.style.marginLeft = '0px';
+			}
+		}
+	}, [userEntityType, userEntityData, authLoading, businessLoading, path]);
 
 	return (
 		<UserDataContext.Provider

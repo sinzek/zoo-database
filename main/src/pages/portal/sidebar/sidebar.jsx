@@ -3,6 +3,7 @@ import { Link } from '../../../components/link';
 import PropTypes from 'prop-types';
 import { useRouter } from '../../../context/routerContext';
 import { availableLinksForAccessLevel } from './utils';
+import './sidebar.css';
 
 export function Sidebar({ ueType, uedata }) {
 	const { path } = useRouter();
@@ -19,15 +20,15 @@ export function Sidebar({ ueType, uedata }) {
 
 	return (
 		<div className='portal-sidebar'>
-			<h2>The Zoo^TM</h2>
 			<nav>
-				<ul>
+				<ul className='portal-sidebar-links'>
 					{links.map((link) => (
 						<li key={link.label}>
 							<Link
 								to={link.to}
 								className={path === link.to ? 'active' : ''}
 							>
+								<link.icon className='portal-sidebar-link-icon' />
 								{link.label}
 							</Link>
 						</li>
