@@ -1,0 +1,232 @@
+.portal-habitats-page {
+	max-width: 1400px;
+	margin: auto;
+	padding: 24px;
+	padding-top: 80px;
+	color: var(--color-foreground);
+}
+
+.habitats-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 2rem;
+}
+
+.habitats-header h1 {
+	color: var(--color-green);
+	margin: 0;
+}
+
+.add-button {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem 1.5rem;
+	background-color: var(--color-green);
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background-color 0.2s;
+	font-size: 1rem;
+}
+
+.add-button:hover {
+	background-color: var(--color-lgreen);
+}
+
+.centered-loader {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 400px;
+}
+
+.error-message {
+	color: #ff6b6b;
+	font-weight: 600;
+	font-size: 1.2rem;
+	text-align: center;
+	margin-top: 2rem;
+}
+
+.habitat-form-container {
+	background-color: rgba(37, 31, 26, 0.8);
+	border-radius: 12px;
+	border: 2px solid var(--color-brown);
+	padding: 1.5rem;
+	margin-bottom: 2rem;
+}
+
+.habitat-form h2 {
+	color: var(--color-green);
+	margin-bottom: 1.5rem;
+}
+
+.form-group {
+	margin-bottom: 1.5rem;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: 0.5rem;
+	color: var(--color-lgreen);
+	font-weight: 600;
+}
+
+.form-group input,
+.form-group textarea {
+	width: 100%;
+	padding: 0.75rem;
+	border: 2px solid var(--color-brown);
+	border-radius: 8px;
+	background-color: var(--color-dbrown);
+	color: var(--color-foreground);
+	font-size: 1rem;
+	font-family: inherit;
+	resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+	outline: none;
+	border-color: var(--color-green);
+}
+
+.form-hint {
+	font-size: 0.85rem;
+	color: var(--color-lbrown);
+	margin-top: 0.25rem;
+}
+
+.form-actions {
+	display: flex;
+	gap: 1rem;
+	justify-content: flex-end;
+	margin-top: 1.5rem;
+}
+
+.save-button,
+.cancel-button {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem 1.5rem;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.2s;
+	font-size: 1rem;
+}
+
+.save-button {
+	background-color: var(--color-green);
+	color: white;
+}
+
+.save-button:hover {
+	background-color: var(--color-lgreen);
+}
+
+.cancel-button {
+	background-color: #666;
+	color: white;
+}
+
+.cancel-button:hover {
+	background-color: #777;
+}
+
+.habitats-list h2 {
+	color: var(--color-green);
+	margin-bottom: 1rem;
+}
+
+.habitats-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	gap: 1rem;
+}
+
+.habitat-card {
+	background-color: rgba(37, 31, 26, 0.8);
+	border-radius: 12px;
+	border: 2px solid var(--color-brown);
+	padding: 1.5rem;
+	transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.habitat-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.habitat-header {
+	margin-bottom: 1rem;
+}
+
+.habitat-header h3 {
+	color: var(--color-lgreen);
+	margin: 0;
+	font-size: 1.2rem;
+}
+
+.habitat-actions {
+	display: flex;
+	gap: 0.5rem;
+	margin-top: 1rem;
+	justify-content: flex-start;
+}
+
+.habitat-info p {
+	color: var(--color-lbrown);
+	margin: 0;
+	line-height: 1.6;
+}
+
+.edit-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.5rem 1rem;
+	background-color: var(--color-brown);
+	color: var(--color-foreground);
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: all 0.2s;
+	font-size: 0.9rem;
+}
+
+.edit-button:hover {
+	background-color: var(--color-lbrown);
+}
+
+.delete-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.5rem 1rem;
+	background-color: #dc3545;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: all 0.2s;
+	font-size: 0.9rem;
+}
+
+.delete-button:hover {
+	background-color: #c82333;
+}
+
+.no-habitats {
+	text-align: center;
+	color: var(--color-lbrown);
+	padding: 3rem;
+	font-size: 1.1rem;
+}
+
