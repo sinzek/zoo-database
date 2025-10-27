@@ -13,6 +13,8 @@ import {
 	Save,
 	X,
 	ChevronLeft,
+	Plus,
+	Trash2,
 } from 'lucide-react';
 import './medicalRecordDetail.css';
 import { Button } from '../../../components/button';
@@ -30,17 +32,21 @@ export function MedicalRecordDetailPage({ animalId }) {
 		reasonForVisit: '',
 		checkoutDate: '',
 	});
+	const [showNewRecordForm, setShowNewRecordForm] = useState(false);
+	const [newRecordFormData, setNewRecordFormData] = useState({
+		veterinarianNotes: '',
+		reasonForVisit: '',
+		visitDate: '',
+		checkoutDate: '',
+	});
 	const [isVeterinarian, setIsVeterinarian] = useState(false);
 
 	useEffect(() => {
-		// Check if user is a veterinarian
+		// Check if user is a veterinarian or above
 		if (userEntityData?.accessLevel) {
-			const vetLevels = [
-				'veterinarian',
-				'senior-veterinarian',
-				'executive',
-			];
-			setIsVeterinarian(vetLevels.includes(userEntityData.accessLevel));
+			const vetLevels = ['veterinarian', 'manager', 'executive', 'db_admin'];
+			const isVet = vetLevels.includes(userEntityData.accessLevel);
+			setIsVeterinarian(isVet);
 		}
 
 		if (animalId) {
@@ -76,12 +82,24 @@ export function MedicalRecordDetailPage({ animalId }) {
 		setLoading(false);
 	};
 
+	const formatDateForInput = (dateString) => {
+		if (!dateString) return '';
+		const date = new Date(dateString);
+		// Convert to YYYY-MM-DDTHH:mm format for datetime-local
+		const year = date.getFullYear();
+		const month = String(date.getMonth() + 1).padStart(2, '0');
+		const day = String(date.getDate()).padStart(2, '0');
+		const hours = String(date.getHours()).padStart(2, '0');
+		const minutes = String(date.getMinutes()).padStart(2, '0');
+		return `${year}-${month}-${day}T${hours}:${minutes}`;
+	};
+
 	const handleEdit = (record) => {
 		setEditingId(record.medicalRecordId);
 		setEditingFormData({
 			veterinarianNotes: record.veterinarianNotes || '',
 			reasonForVisit: record.reasonForVisit || '',
-			checkoutDate: record.checkoutDate || '',
+			checkoutDate: formatDateForInput(record.checkoutDate),
 		});
 	};
 
@@ -100,6 +118,23 @@ export function MedicalRecordDetailPage({ animalId }) {
 		}
 	};
 
+	const handleDelete = async (medicalRecordId) => {
+		if (!confirm('Are you sure you want to delete this medical record?')) {
+			return;
+		}
+
+		const result = await api('/api/medical-record/delete', 'POST', {
+			medicalRecordId,
+		});
+
+		if (result.success) {
+			showToast('Medical record deleted successfully', 'success');
+			loadData();
+		} else {
+			showToast('Failed to delete medical record', 'error');
+		}
+	};
+
 	const handleCancel = () => {
 		setEditingId(null);
 		setEditingFormData({
@@ -107,6 +142,29 @@ export function MedicalRecordDetailPage({ animalId }) {
 			reasonForVisit: '',
 			checkoutDate: '',
 		});
+	};
+
+	const handleNewRecordSubmit = async (e) => {
+		e.preventDefault();
+		
+		const result = await api('/api/medical-record/create', 'POST', {
+			animalId,
+			...newRecordFormData,
+		});
+
+		if (result.success) {
+			showToast('Medical record created successfully', 'success');
+			setShowNewRecordForm(false);
+			setNewRecordFormData({
+				veterinarianNotes: '',
+				reasonForVisit: '',
+				visitDate: '',
+				checkoutDate: '',
+			});
+			loadData();
+		} else {
+			showToast('Failed to create medical record', 'error');
+		}
 	};
 
 	const goBack = () => {
@@ -182,7 +240,102 @@ export function MedicalRecordDetailPage({ animalId }) {
 			)}
 
 			<div className='records-section'>
-				<h2>Medical History</h2>
+				<div className='records-section-header'>
+					<h2>Medical History</h2>
+					{isVeterinarian && (
+						<button
+							onClick={() => setShowNewRecordForm(!showNewRecordForm)}
+							className='add-record-button'
+						>
+							<Plus size={16} />
+							{showNewRecordForm ? 'Cancel' : 'Add Medical Record'}
+						</button>
+					)}
+				</div>
+
+				{showNewRecordForm && (
+					<form onSubmit={handleNewRecordSubmit} className='new-record-form'>
+						<h3>Create New Medical Record</h3>
+						<div className='form-group'>
+							<label>Reason for Visit *</label>
+							<input
+								type='text'
+								value={newRecordFormData.reasonForVisit}
+								onChange={(e) =>
+									setNewRecordFormData({
+										...newRecordFormData,
+										reasonForVisit: e.target.value,
+									})
+								}
+								required
+							/>
+						</div>
+						<div className='form-group'>
+							<label>Visit Date *</label>
+							<input
+								type='datetime-local'
+								value={newRecordFormData.visitDate}
+								onChange={(e) =>
+									setNewRecordFormData({
+										...newRecordFormData,
+										visitDate: e.target.value,
+									})
+								}
+								required
+							/>
+						</div>
+						<div className='form-group'>
+							<label>Checkout Date</label>
+							<input
+								type='datetime-local'
+								value={newRecordFormData.checkoutDate}
+								onChange={(e) =>
+									setNewRecordFormData({
+										...newRecordFormData,
+										checkoutDate: e.target.value,
+									})
+								}
+							/>
+							<p className='form-hint'>Leave empty if animal is still in care</p>
+						</div>
+						<div className='form-group'>
+							<label>Veterinarian Notes</label>
+							<textarea
+								value={newRecordFormData.veterinarianNotes}
+								onChange={(e) =>
+									setNewRecordFormData({
+										...newRecordFormData,
+										veterinarianNotes: e.target.value,
+									})
+								}
+								rows={4}
+							/>
+						</div>
+						<div className='form-actions'>
+							<button type='submit' className='save-button'>
+								<Save size={16} />
+								Create Record
+							</button>
+							<button
+								type='button'
+								onClick={() => {
+									setShowNewRecordForm(false);
+									setNewRecordFormData({
+										veterinarianNotes: '',
+										reasonForVisit: '',
+										visitDate: '',
+										checkoutDate: '',
+									});
+								}}
+								className='cancel-button'
+							>
+								<X size={16} />
+								Cancel
+							</button>
+						</div>
+					</form>
+				)}
+
 				{records.length === 0 ? (
 					<p className='no-records'>
 						No medical records found for this animal.
@@ -278,15 +431,22 @@ export function MedicalRecordDetailPage({ animalId }) {
 													{record.reasonForVisit}
 												</h3>
 												{isVeterinarian && (
-													<button
-														onClick={() =>
-															handleEdit(record)
-														}
-														className='edit-button'
-													>
-														<Edit size={16} />
-														Edit
-													</button>
+													<div className='record-actions'>
+														<button
+															onClick={() => handleEdit(record)}
+															className='edit-button'
+														>
+															<Edit size={16} />
+															Edit
+														</button>
+														<button
+															onClick={() => handleDelete(record.medicalRecordId)}
+															className='delete-button'
+														>
+															<Trash2 size={16} />
+															Delete
+														</button>
+													</div>
 												)}
 											</div>
 											<div className='record-info'>
