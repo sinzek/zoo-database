@@ -16,19 +16,34 @@ async function createOne(req, _res) {
 	const newAnimal = req.body;
 	const animalId = crypto.randomUUID();
 
+	// Get a default diet if dietId is not provided
+	let dietId = newAnimal.dietId;
+	if (!dietId) {
+		// Get the first available diet or create a default one
+		const defaultDiets = await query(
+			`SELECT dietId FROM Diet WHERE deletedAt IS NULL LIMIT 1`
+		);
+		if (defaultDiets && defaultDiets.length > 0) {
+			dietId = defaultDiets[0].dietId;
+		} else {
+			throw new Error('No diet available. Please create a diet first.');
+		}
+	}
+
 	const animalData = {
 		animalId,
 		firstName: newAnimal.firstName,
-		lastName: newAnimal.lastName,
+		lastName: newAnimal.lastName || null,
 		commonName: newAnimal.commonName,
 		species: newAnimal.species,
 		genus: newAnimal.genus,
 		birthDate: newAnimal.birthDate,
-		importedFrom: newAnimal.importedFrom,
-		importDate: newAnimal.importDate,
+		importedFrom: newAnimal.importedFrom || null,
+		importDate: newAnimal.importDate || null,
 		sex: newAnimal.sex,
-		behavior: newAnimal.behavior,
+		behavior: newAnimal.behavior || null,
 		habitatId: newAnimal.habitatId,
+		dietId: dietId,
 	};
 
 	await createOneQuery('Animal', animalData);
@@ -45,13 +60,31 @@ async function createOne(req, _res) {
 async function updateOne(req, _res) {
 	const updatedAnimal = req.body;
 
-	if (!updatedAnimal) {
-		throw new Error('Missing animal data');
+	if (!updatedAnimal || !updatedAnimal.animalId) {
+		throw new Error('Missing animal data or animalId');
 	}
 
-	await updateOneQuery('Animal', updatedAnimal, 'animalId');
+	// Extract fields we want to update, explicitly keeping animalId
+	const animalUpdateData = {
+		animalId: updatedAnimal.animalId,
+		firstName: updatedAnimal.firstName,
+		lastName: updatedAnimal.lastName || null,
+		commonName: updatedAnimal.commonName,
+		species: updatedAnimal.species,
+		genus: updatedAnimal.genus,
+		birthDate: updatedAnimal.birthDate,
+		deathDate: updatedAnimal.deathDate || null,
+		importedFrom: updatedAnimal.importedFrom || null,
+		importDate: updatedAnimal.importDate || null,
+		sex: updatedAnimal.sex,
+		behavior: updatedAnimal.behavior || null,
+		habitatId: updatedAnimal.habitatId,
+		imageUrl: updatedAnimal.imageUrl || null,
+	};
+	
+	await updateOneQuery('Animal', animalUpdateData, 'animalId');
 
-	return [updatedAnimal];
+	return [animalUpdateData];
 }
 
 /**
@@ -142,8 +175,11 @@ async function getAllGroupedByHabitat(_req, _res) {
 				species: row.species,
 				genus: row.genus,
 				birthDate: row.birthDate,
+				deathDate: row.deathDate,
 				importedFrom: row.importedFrom,
 				importDate: row.importDate,
+				sex: row.sex,
+				habitatId: row.habitatId,
 				imageUrl: row.imageUrl,
 			});
 		}

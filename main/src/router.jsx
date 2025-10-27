@@ -17,6 +17,7 @@ import { ShopPage } from './pages/portal/shop/shop';
 import { Sidebar } from './pages/portal/sidebar/sidebar';
 import { useUserData } from './context/userDataContext';
 import { ShiftSchedulePage } from './pages/portal/shiftSchedule/shiftSchedule';
+import { PortalAnimalsPage } from './pages/portal/animals/animals';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -39,6 +40,7 @@ export default function Router() {
 
 		'/portal': PortalPage,
 		'/portal/account': AccountPage,
+		'/portal/animals': PortalAnimalsPage,
 		'/portal/buy-tickets': BuyTicketsPage,
 		'/portal/cart': CartPage,
 		'/portal/shop': ShopPage,
