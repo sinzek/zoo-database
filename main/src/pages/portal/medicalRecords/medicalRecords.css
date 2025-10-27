@@ -1,9 +1,13 @@
 .portal-medical-records-page {
-	max-width: 1400px;
+	max-width: 90%;
 	margin: auto auto;
 	padding: 24px;
 	color: var(--color-foreground);
 
+	.medical-records-header h1 {
+		color: var(--color-lgreen);
+		margin-bottom: 2rem;
+	}
 	.medical-records-header h1 {
 		color: var(--color-green);
 		margin-bottom: 2rem;
@@ -26,6 +30,18 @@
 
 	.animal-section {
 		margin-bottom: 2rem;
+		width: 100%;
+	}
+
+	.portal-medical-records-page {
+		max-width: 90%;
+		margin: auto auto;
+		padding: 24px;
+		color: var(--color-foreground);
+		width: 100%;
+	}
+	.animal-section {
+		margin-bottom: 2rem;
 	}
 
 	.section-header {
@@ -36,6 +52,16 @@
 		margin-bottom: 1rem;
 	}
 
+	.animals-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: 1rem;
+		max-height: 80vh;
+		overflow-y: auto;
+		padding: 1rem;
+		background-color: rgba(37, 31, 26, 0.3);
+		border-radius: 8px;
+	}
 	.animals-grid {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr !important;
