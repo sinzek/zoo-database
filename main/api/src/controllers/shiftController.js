@@ -1,5 +1,4 @@
 import crypto from 'crypto';
-import { db } from '../db/mysql.js';
 import {
 	createOneQuery,
 	deleteOneQuery,
@@ -25,15 +24,15 @@ async function createOne(req, _res) {
 
 	const shiftData = {
 		shiftId,
-		start: newShift.start,
-		end: newShift.end,
+		start: new Date(newShift.start),
+		end: new Date(newShift.end),
 		attractionId: newShift.attractionId || null,
 		deletedAt: null,
 	};
 
 	await createOneQuery('Shift', shiftData);
 
-	return [{ shiftId, ...newShift }];
+	return [{ shift: shiftData }];
 }
 
 /**
@@ -81,7 +80,7 @@ async function getNByDateRange(req, _res) {
 	if (!startDate || !endDate) throw new Error('Missing startDate or endDate');
 
 	// using db.query for date range query
-	const rows = await db.query(
+	const rows = await query(
 		`
 		SELECT *
 		FROM Shift
@@ -90,6 +89,22 @@ async function getNByDateRange(req, _res) {
 		`,
 		[startDate, endDate]
 	);
+
+	for (const row of rows) {
+		const shiftId = row.shiftId;
+
+		const assignedEmployees = await query(
+			`
+			SELECT e.*, ets.totalHours, ets.shiftTakenId
+			FROM Employee e
+			JOIN EmployeeTakesShift ets ON e.employeeId = ets.employeeId
+			WHERE ets.shiftId = ? AND e.deletedAt IS NULL
+			`,
+			[shiftId]
+		);
+
+		row.assignedEmployees = assignedEmployees || [];
+	}
 
 	return [rows];
 }

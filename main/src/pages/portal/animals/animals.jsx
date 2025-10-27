@@ -3,8 +3,13 @@ import { useUserData } from '../../../context/userDataContext';
 import { Button } from '../../../components/button';
 import { showToast } from '../../../components/toast/showToast';
 import { Loader } from '../../../components/loader/loader';
-import { fetchAnimals, createAnimal, updateAnimal, fetchHabitats } from './utils';
-import { Plus, Edit2, Save, X, Trash2, Skull } from 'lucide-react';
+import {
+	fetchAnimals,
+	createAnimal,
+	updateAnimal,
+	fetchHabitats,
+} from './utils';
+import { Plus, Edit2, Save, X, Skull } from 'lucide-react';
 import './animals.css';
 
 export function PortalAnimalsPage() {
@@ -47,7 +52,7 @@ export function PortalAnimalsPage() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		
+
 		// For now, we'll create animals without diet - this needs to be handled separately
 		const animalData = {
 			...formData,
@@ -55,7 +60,10 @@ export function PortalAnimalsPage() {
 		};
 
 		const result = editingId
-			? await updateAnimal(editingId, { ...animalData, animalId: editingId })
+			? await updateAnimal(editingId, {
+					...animalData,
+					animalId: editingId,
+				})
 			: await createAnimal(animalData);
 
 		if (result.success) {
@@ -89,14 +97,14 @@ export function PortalAnimalsPage() {
 
 	const handleEdit = (animal) => {
 		setEditingId(animal.animalId);
-		
+
 		// Helper function to format date for HTML input
 		const formatDateForInput = (dateString) => {
 			if (!dateString) return '';
 			const date = new Date(dateString);
 			return date.toISOString().split('T')[0];
 		};
-		
+
 		setFormData({
 			firstName: animal.firstName || '',
 			lastName: animal.lastName || '',
@@ -113,12 +121,17 @@ export function PortalAnimalsPage() {
 			imageUrl: animal.imageUrl || '',
 		});
 		setShowAddForm(true);
-		
+
 		// Scroll to the form after state updates
 		setTimeout(() => {
-			const formElement = document.querySelector('.animal-form-container');
+			const formElement = document.querySelector(
+				'.animal-form-container'
+			);
 			if (formElement) {
-				formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				formElement.scrollIntoView({
+					behavior: 'smooth',
+					block: 'start',
+				});
 			}
 		}, 0);
 	};
@@ -151,251 +164,264 @@ export function PortalAnimalsPage() {
 
 	return (
 		<div className='portal-animals-page'>
-			<div className='animals-header'>
-				<h1>Animal Management</h1>
-				<Button
-					onClick={() => {
-						setShowAddForm(!showAddForm);
-						if (showAddForm) {
-							handleCancel();
-						}
-					}}
-					className='btn-green'
-				>
-					{showAddForm ? (
-						<>
-							<X size={18} />
-							Cancel
-						</>
-					) : (
-						<>
-							<Plus size={18} />
-							Add Animal
-						</>
-					)}
-				</Button>
-			</div>
-
-			{showAddForm && (
-				<div className='animal-form-container'>
-					<form onSubmit={handleSubmit} className='animal-form'>
-						<h2>{editingId ? 'Edit Animal' : 'Add New Animal'}</h2>
-						
-						<div className='form-grid'>
-							<div className='form-group'>
-								<label>First Name *</label>
-								<input
-									type='text'
-									value={formData.firstName}
-									onChange={(e) =>
-										setFormData({
-											...formData,
-											firstName: e.target.value,
-										})
-									}
-									required
-								/>
-							</div>
-
-							<div className='form-group'>
-								<label>Last Name</label>
-								<input
-									type='text'
-									value={formData.lastName}
-									onChange={(e) =>
-										setFormData({
-											...formData,
-											lastName: e.target.value,
-										})
-									}
-								/>
-							</div>
-
-							<div className='form-group'>
-								<label>Common Name *</label>
-								<input
-									type='text'
-									value={formData.commonName}
-									onChange={(e) =>
-										setFormData({
-											...formData,
-											commonName: e.target.value,
-										})
-									}
-									required
-								/>
-							</div>
-
-							<div className='form-group'>
-								<label>Species *</label>
-								<input
-									type='text'
-									value={formData.species}
-									onChange={(e) =>
-										setFormData({
-											...formData,
-											species: e.target.value,
-										})
-									}
-									required
-								/>
-							</div>
-
-							<div className='form-group'>
-								<label>Genus *</label>
-								<input
-									type='text'
-									value={formData.genus}
-									onChange={(e) =>
-										setFormData({
-											...formData,
-											genus: e.target.value,
-										})
-									}
-									required
-								/>
-							</div>
-
-							<div className='form-group'>
-								<label>Birth Date *</label>
-								<input
-									type='date'
-									value={formData.birthDate}
-									onChange={(e) =>
-										setFormData({
-											...formData,
-											birthDate: e.target.value,
-										})
-									}
-									required
-								/>
-							</div>
-
-							<div className='form-group'>
-								<label>Death Date</label>
-								<input
-									type='date'
-									value={formData.deathDate}
-									onChange={(e) =>
-										setFormData({
-											...formData,
-											deathDate: e.target.value,
-										})
-									}
-								/>
-							</div>
-
-							<div className='form-group'>
-								<label>Sex *</label>
-								<select
-									value={formData.sex}
-									onChange={(e) =>
-										setFormData({
-											...formData,
-											sex: e.target.value,
-										})
-									}
-									required
-								>
-									<option value='male'>Male</option>
-									<option value='female'>Female</option>
-								</select>
-							</div>
-
-							<div className='form-group'>
-								<label>Habitat *</label>
-								<select
-									value={formData.habitatId}
-									onChange={(e) =>
-										setFormData({
-											...formData,
-											habitatId: e.target.value,
-										})
-									}
-									required
-								>
-									<option value=''>Select Habitat</option>
-									{habitats.map((habitat) => (
-										<option
-											key={habitat.habitatId}
-											value={habitat.habitatId}
-										>
-											{habitat.name}
-										</option>
-									))}
-								</select>
-							</div>
-
-							<div className='form-group full-width'>
-								<label>Behavior</label>
-								<textarea
-									value={formData.behavior}
-									onChange={(e) =>
-										setFormData({
-											...formData,
-											behavior: e.target.value,
-										})
-									}
-									rows={3}
-								/>
-							</div>
-
-							<div className='form-group'>
-								<label>Imported From</label>
-								<input
-									type='text'
-									value={formData.importedFrom}
-									onChange={(e) =>
-										setFormData({
-											...formData,
-											importedFrom: e.target.value,
-										})
-									}
-								/>
-							</div>
-
-							<div className='form-group'>
-								<label>Import Date</label>
-								<input
-									type='date'
-									value={formData.importDate}
-									onChange={(e) =>
-										setFormData({
-											...formData,
-											importDate: e.target.value,
-										})
-									}
-								/>
-							</div>
-
-							<div className='form-group full-width'>
-								<label>Image URL</label>
-								<input
-									type='text'
-									value={formData.imageUrl}
-									onChange={(e) =>
-										setFormData({
-											...formData,
-											imageUrl: e.target.value,
-										})
-									}
-									placeholder='https://...'
-								/>
-							</div>
-						</div>
-
-						<div className='form-actions'>
-							<Button type='button' onClick={handleCancel}>
+			<div className='form-container'>
+				<div className='animals-header'>
+					<h1>Animal Management</h1>
+					<Button
+						onClick={() => {
+							setShowAddForm(!showAddForm);
+							if (showAddForm) {
+								handleCancel();
+							}
+						}}
+						className='btn-green'
+					>
+						{showAddForm ? (
+							<>
+								<X size={18} />
 								Cancel
-							</Button>
-							<Button type='submit' className='btn-green'>
-								<Save size={18} />
-								{editingId ? 'Update' : 'Create'} Animal
-							</Button>
-						</div>
-					</form>
+							</>
+						) : (
+							<>
+								<Plus size={18} />
+								Add Animal
+							</>
+						)}
+					</Button>
 				</div>
-			)}
+
+				{showAddForm && (
+					<div className='animal-form-container'>
+						<form
+							onSubmit={handleSubmit}
+							className='animal-form'
+						>
+							<h2>
+								{editingId ? 'Edit Animal' : 'Add New Animal'}
+							</h2>
+
+							<div className='form-grid'>
+								<div className='form-group'>
+									<label>First Name *</label>
+									<input
+										type='text'
+										value={formData.firstName}
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												firstName: e.target.value,
+											})
+										}
+										required
+									/>
+								</div>
+
+								<div className='form-group'>
+									<label>Last Name</label>
+									<input
+										type='text'
+										value={formData.lastName}
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												lastName: e.target.value,
+											})
+										}
+									/>
+								</div>
+
+								<div className='form-group'>
+									<label>Common Name *</label>
+									<input
+										type='text'
+										value={formData.commonName}
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												commonName: e.target.value,
+											})
+										}
+										required
+									/>
+								</div>
+
+								<div className='form-group'>
+									<label>Species *</label>
+									<input
+										type='text'
+										value={formData.species}
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												species: e.target.value,
+											})
+										}
+										required
+									/>
+								</div>
+
+								<div className='form-group'>
+									<label>Genus *</label>
+									<input
+										type='text'
+										value={formData.genus}
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												genus: e.target.value,
+											})
+										}
+										required
+									/>
+								</div>
+
+								<div className='form-group'>
+									<label>Birth Date *</label>
+									<input
+										type='date'
+										value={formData.birthDate}
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												birthDate: e.target.value,
+											})
+										}
+										required
+									/>
+								</div>
+
+								<div className='form-group'>
+									<label>Death Date</label>
+									<input
+										type='date'
+										value={formData.deathDate}
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												deathDate: e.target.value,
+											})
+										}
+									/>
+								</div>
+
+								<div className='form-group'>
+									<label>Sex *</label>
+									<select
+										value={formData.sex}
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												sex: e.target.value,
+											})
+										}
+										required
+									>
+										<option value='male'>Male</option>
+										<option value='female'>Female</option>
+									</select>
+								</div>
+
+								<div className='form-group'>
+									<label>Habitat *</label>
+									<select
+										value={formData.habitatId}
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												habitatId: e.target.value,
+											})
+										}
+										required
+									>
+										<option value=''>Select Habitat</option>
+										{habitats.map((habitat) => (
+											<option
+												key={habitat.habitatId}
+												value={habitat.habitatId}
+											>
+												{habitat.name}
+											</option>
+										))}
+									</select>
+								</div>
+
+								<div className='form-group full-width'>
+									<label>Behavior</label>
+									<textarea
+										value={formData.behavior}
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												behavior: e.target.value,
+											})
+										}
+										rows={3}
+									/>
+								</div>
+
+								<div className='form-group'>
+									<label>Imported From</label>
+									<input
+										type='text'
+										value={formData.importedFrom}
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												importedFrom: e.target.value,
+											})
+										}
+									/>
+								</div>
+
+								<div className='form-group'>
+									<label>Import Date</label>
+									<input
+										type='date'
+										value={formData.importDate}
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												importDate: e.target.value,
+											})
+										}
+									/>
+								</div>
+
+								<div className='form-group full-width'>
+									<label>Image URL</label>
+									<input
+										type='text'
+										value={formData.imageUrl}
+										onChange={(e) =>
+											setFormData({
+												...formData,
+												imageUrl: e.target.value,
+											})
+										}
+										placeholder='https://...'
+									/>
+								</div>
+							</div>
+
+							<div className='form-actions'>
+								<Button
+									type='button'
+									onClick={handleCancel}
+								>
+									Cancel
+								</Button>
+								<Button
+									type='submit'
+									className='btn-green'
+								>
+									<Save size={18} />
+									{editingId ? 'Update' : 'Create'} Animal
+								</Button>
+							</div>
+						</form>
+					</div>
+				)}
+			</div>
 
 			<div className='animals-list'>
 				<h2>All Animals</h2>
@@ -404,7 +430,10 @@ export function PortalAnimalsPage() {
 				) : (
 					<div className='animals-grid'>
 						{animals.map((animal) => (
-							<div key={animal.animalId} className='animal-card'>
+							<div
+								key={animal.animalId}
+								className='animal-card'
+							>
 								<div className='animal-header'>
 									<h3>
 										{animal.firstName} {animal.lastName}
@@ -437,7 +466,8 @@ export function PortalAnimalsPage() {
 										{animal.commonName}
 									</p>
 									<p>
-										<strong>Species:</strong> {animal.species}
+										<strong>Species:</strong>{' '}
+										{animal.species}
 									</p>
 									<p>
 										<strong>Genus:</strong> {animal.genus}
@@ -480,4 +510,3 @@ export function PortalAnimalsPage() {
 		</div>
 	);
 }
-

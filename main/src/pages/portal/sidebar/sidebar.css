@@ -2,16 +2,21 @@
 	min-width: 238px;
 	max-width: 238px;
 	background-color: var(--color-dgreen);
-	padding: 10rem 15px 20px 15px;
+	padding: 10rem 15px 80px 15px;
 	position: fixed;
 	top: 0;
-	height: 100vh;
+	min-height: 100vh;
+	max-height: 100vh;
 }
 
 .portal-sidebar-links {
 	list-style-type: none;
 	padding: 0;
 	margin: 0;
+	overflow-y: auto;
+	height: calc(100vh - 10rem);
+	scrollbar-width: none; /* Hides scrollbar in Firefox */
+	-ms-overflow-style: none; /* Hides scrollbar in IE and Edge */
 }
 
 .portal-sidebar-links li {

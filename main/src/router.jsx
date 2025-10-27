@@ -18,6 +18,7 @@ import { Sidebar } from './pages/portal/sidebar/sidebar';
 import { useUserData } from './context/userDataContext';
 import { ShiftSchedulePage } from './pages/portal/shiftSchedule/shiftSchedule';
 import { PortalAnimalsPage } from './pages/portal/animals/animals';
+import { ScheduleManagementPage } from './pages/portal/scheduleManagement/scheduleManagement';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -45,6 +46,7 @@ export default function Router() {
 		'/portal/cart': CartPage,
 		'/portal/shop': ShopPage,
 		'/portal/shift-schedule': ShiftSchedulePage,
+		'/portal/schedule-management': ScheduleManagementPage,
 
 		'/testing': TestingPage,
 	};

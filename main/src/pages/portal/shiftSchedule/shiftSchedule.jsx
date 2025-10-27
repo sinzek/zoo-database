@@ -30,10 +30,10 @@ export function ShiftSchedulePage() {
 		end.setDate(end.getDate() + 13); // 13 days after start (total 14 days)
 		end.setHours(23, 59, 59, 999);
 
-		return { start, end };
+		return { startDate: start, endDate: end };
 	};
 
-	const [dateRange, setDateRange] = useState(getInitialDateRange);
+	const [dateRange, setDateRange] = useState(getInitialDateRange());
 
 	useEffect(() => {
 		const loadShiftSchedule = async () => {
@@ -46,6 +46,8 @@ export function ShiftSchedulePage() {
 					userEntityData.employeeId,
 					dateRange
 				);
+				console.log('Loaded shifts:', shifts);
+
 				setShiftSchedule(shifts);
 				hasFetchedShifts.current = true;
 			} catch (err) {
@@ -63,22 +65,22 @@ export function ShiftSchedulePage() {
 
 	const handleDateChange = (weeksToAdd) => {
 		setDateRange((prevRange) => {
-			const newStart = new Date(prevRange.start);
+			const newStart = new Date(prevRange.startDate);
 			newStart.setDate(newStart.getDate() + weeksToAdd * 7);
 
 			const newEnd = new Date(newStart);
 			newEnd.setDate(newEnd.getDate() + 13);
 			newEnd.setHours(23, 59, 59, 999);
 
-			return { start: newStart, end: newEnd };
+			return { startDate: newStart, endDate: newEnd };
 		});
 	};
 
 	const groupedShifts = useMemo(() => {
 		const groups = {};
 		for (
-			let d = new Date(dateRange.start);
-			d <= dateRange.end;
+			let d = new Date(dateRange.startDate);
+			d <= dateRange.endDate;
 			d.setDate(d.getDate() + 1)
 		) {
 			const dateStr = d.toISOString().split('T')[0];
@@ -174,8 +176,8 @@ export function ShiftSchedulePage() {
 						<ArrowLeft size={16} /> Previous Week
 					</Button>
 					<span className='date-range-display'>
-						{formatDate(dateRange.start)} -{' '}
-						{formatDate(dateRange.end)}
+						{formatDate(dateRange.startDate)} -{' '}
+						{formatDate(dateRange.endDate)}
 					</span>
 					<Button
 						variant='green'
