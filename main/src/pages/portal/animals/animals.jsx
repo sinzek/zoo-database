@@ -424,7 +424,15 @@ export function PortalAnimalsPage() {
 			</div>
 
 			<div className='animals-list'>
-				<h2>All Animals</h2>
+				<h2
+					style={{
+						marginLeft: '20px',
+						color: 'var(--color-lbrown)',
+						fontWeight: '500',
+					}}
+				>
+					All Animals
+				</h2>
 				{animals.length === 0 ? (
 					<p className='no-animals'>No animals found.</p>
 				) : (
