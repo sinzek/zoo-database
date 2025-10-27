@@ -3,6 +3,7 @@
 	margin: auto auto;
 	padding: 24px;
 	color: var(--color-foreground);
+	margin-top: 100px;
 }
 
 .schedule-header {
@@ -44,11 +45,12 @@
 	display: grid;
 	grid-template-columns: repeat(7, 1fr);
 	gap: 8px;
+	width: 100%;
 }
 
 .day-column {
 	background-color: rgba(37, 31, 26, 0.8);
-	border-radius: 12px;
+	border-radius: 16px;
 	border: 2px solid var(--color-dgreen);
 	min-height: 200px;
 	display: flex;
@@ -88,11 +90,10 @@
 }
 
 .shift-card {
-	background-color: var(--color-dbrown);
-	border: 1px solid var(--color-lbrown);
+	background-color: var(--color-brown);
 	border-radius: 10px;
 	padding: 0.75rem;
-	font-size: 0.9rem;
+	font-size: 0.8rem;
 }
 
 .shift-card.past-shift {
@@ -103,12 +104,13 @@
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	font-size: 0.9rem !important;
-	font-weight: 400;
+	font-size: 0.85rem !important;
+	font-weight: 500;
 	color: var(--color-lgreen);
 }
 
 .status-icon {
+	margin-top: 2px;
 	width: 16px;
 	height: 16px;
 	flex-shrink: 0;
@@ -123,7 +125,7 @@
 }
 
 .status-icon.upcoming {
-	color: var(--color-lbrown);
+	color: var(--color-lgreen);
 }
 
 .clock-times {

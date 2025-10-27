@@ -17,10 +17,12 @@ import {
 	Trash2,
 } from 'lucide-react';
 import './medicalRecordDetail.css';
+import { Button } from '../../../components/button';
 
+// eslint-disable-next-line react/prop-types
 export function MedicalRecordDetailPage({ animalId }) {
 	const { navigate } = useRouter();
-	const { userEntityData, userEntityType } = useUserData();
+	const { userEntityData } = useUserData();
 	const [animal, setAnimal] = useState(null);
 	const [records, setRecords] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -54,7 +56,7 @@ export function MedicalRecordDetailPage({ animalId }) {
 
 	const loadData = async () => {
 		setLoading(true);
-		
+
 		// Get animal details
 		const animalResult = await api('/api/animal/get-one-by-id', 'POST', {
 			animalId,
@@ -65,9 +67,13 @@ export function MedicalRecordDetailPage({ animalId }) {
 		}
 
 		// Get medical records
-		const recordsResult = await api('/api/medical-record/get-by-animal', 'POST', {
-			animalId,
-		});
+		const recordsResult = await api(
+			'/api/medical-record/get-by-animal',
+			'POST',
+			{
+				animalId,
+			}
+		);
 
 		if (recordsResult.success) {
 			setRecords(recordsResult.data || []);
@@ -189,10 +195,14 @@ export function MedicalRecordDetailPage({ animalId }) {
 
 	return (
 		<div className='medical-record-detail-page'>
-			<button onClick={goBack} className='back-button'>
+			<Button
+				variant='outline'
+				onClick={goBack}
+				size='lg'
+			>
 				<ChevronLeft size={20} />
 				Back to Medical Records
-			</button>
+			</Button>
 
 			{animal && (
 				<div className='animal-header'>
@@ -211,11 +221,19 @@ export function MedicalRecordDetailPage({ animalId }) {
 						<p className='common-name'>{animal.commonName}</p>
 						{animal.birthDate && (
 							<p className='birth-date'>
-								Born: {new Date(animal.birthDate).toLocaleDateString()}
+								Born:{' '}
+								{new Date(
+									animal.birthDate
+								).toLocaleDateString()}
 							</p>
 						)}
 						{animal.deathDate && (
-							<p className='death-date'>Deceased: {new Date(animal.deathDate).toLocaleDateString()}</p>
+							<p className='death-date'>
+								Deceased:{' '}
+								{new Date(
+									animal.deathDate
+								).toLocaleDateString()}
+							</p>
 						)}
 					</div>
 				</div>
@@ -319,36 +337,50 @@ export function MedicalRecordDetailPage({ animalId }) {
 				)}
 
 				{records.length === 0 ? (
-					<p className='no-records'>No medical records found for this animal.</p>
+					<p className='no-records'>
+						No medical records found for this animal.
+					</p>
 				) : (
 					<div className='records-list'>
 						{records.map((record) => {
-							const isEditing = editingId === record.medicalRecordId;
+							const isEditing =
+								editingId === record.medicalRecordId;
 							return (
-								<div key={record.medicalRecordId} className='record-card'>
+								<div
+									key={record.medicalRecordId}
+									className='record-card'
+								>
 									{isEditing ? (
 										<div className='record-edit-form'>
 											<div className='form-group'>
 												<label>Reason for Visit</label>
 												<input
 													type='text'
-													value={editingFormData.reasonForVisit}
+													value={
+														editingFormData.reasonForVisit
+													}
 													onChange={(e) =>
 														setEditingFormData({
 															...editingFormData,
-															reasonForVisit: e.target.value,
+															reasonForVisit:
+																e.target.value,
 														})
 													}
 												/>
 											</div>
 											<div className='form-group'>
-												<label>Veterinarian Notes</label>
+												<label>
+													Veterinarian Notes
+												</label>
 												<textarea
-													value={editingFormData.veterinarianNotes}
+													value={
+														editingFormData.veterinarianNotes
+													}
 													onChange={(e) =>
 														setEditingFormData({
 															...editingFormData,
-															veterinarianNotes: e.target.value,
+															veterinarianNotes:
+																e.target.value,
 														})
 													}
 													rows={4}
@@ -358,24 +390,34 @@ export function MedicalRecordDetailPage({ animalId }) {
 												<label>Checkout Date</label>
 												<input
 													type='datetime-local'
-													value={editingFormData.checkoutDate}
+													value={
+														editingFormData.checkoutDate
+													}
 													onChange={(e) =>
 														setEditingFormData({
 															...editingFormData,
-															checkoutDate: e.target.value,
+															checkoutDate:
+																e.target.value,
 														})
 													}
 												/>
 											</div>
 											<div className='form-actions'>
 												<button
-													onClick={() => handleSave(record.medicalRecordId)}
+													onClick={() =>
+														handleSave(
+															record.medicalRecordId
+														)
+													}
 													className='save-button'
 												>
 													<Save size={16} />
 													Save
 												</button>
-												<button onClick={handleCancel} className='cancel-button'>
+												<button
+													onClick={handleCancel}
+													className='cancel-button'
+												>
 													<X size={16} />
 													Cancel
 												</button>
@@ -410,25 +452,42 @@ export function MedicalRecordDetailPage({ animalId }) {
 											<div className='record-info'>
 												<div className='info-row'>
 													<Calendar size={16} />
-													<strong>Visit Date:</strong> {formatDate(record.visitDate)}
+													<strong>
+														Visit Date:
+													</strong>{' '}
+													{formatDate(
+														record.visitDate
+													)}
 												</div>
 												{record.checkoutDate && (
 													<div className='info-row'>
 														<Clock size={16} />
-														<strong>Checkout:</strong> {formatDate(record.checkoutDate)}
+														<strong>
+															Checkout:
+														</strong>{' '}
+														{formatDate(
+															record.checkoutDate
+														)}
 													</div>
 												)}
 												{!record.checkoutDate && (
 													<div className='info-row active'>
 														<Clock size={16} />
-														<strong>Status:</strong> Active (Still in care)
+														<strong>
+															Status:
+														</strong>{' '}
+														Active (Still in care)
 													</div>
 												)}
 											</div>
 											{record.veterinarianNotes && (
 												<div className='record-notes'>
 													<strong>Notes:</strong>
-													<p>{record.veterinarianNotes}</p>
+													<p>
+														{
+															record.veterinarianNotes
+														}
+													</p>
 												</div>
 											)}
 										</>
@@ -442,4 +501,3 @@ export function MedicalRecordDetailPage({ animalId }) {
 		</div>
 	);
 }
-

@@ -242,6 +242,7 @@ export function ShiftSchedulePage() {
 										}
 									)}
 								</span>
+
 								<span className='day-date'>
 									{formatDate(new Date(dateStr))}
 								</span>

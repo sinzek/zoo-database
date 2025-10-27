@@ -3,288 +3,227 @@
 	margin: auto;
 	padding: 24px;
 	color: var(--color-foreground);
-}
 
-.centered-loader {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: 400px;
-}
+	.centered-loader {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 400px;
+	}
 
-.back-button {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	padding: 0.75rem 1.5rem;
-	margin-bottom: 2rem;
-	background-color: var(--color-brown);
-	color: var(--color-foreground);
-	border: none;
-	border-radius: 8px;
-	cursor: pointer;
-	transition: background-color 0.2s;
-}
+	.back-button {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.75rem 1.5rem;
+		margin-bottom: 2rem;
+		background-color: var(--color-brown);
+		color: var(--color-foreground);
+		border: none;
+		border-radius: 8px;
+		cursor: pointer;
+		transition: background-color 0.2s;
+	}
 
-.back-button:hover {
-	background-color: var(--color-lbrown);
-}
+	.back-button:hover {
+		background-color: var(--color-lbrown);
+	}
 
-.animal-header {
-	display: flex;
-	gap: 2rem;
-	margin-bottom: 3rem;
-	padding: 2rem;
-	background-color: rgba(37, 31, 26, 0.8);
-	border-radius: 12px;
-	border: 2px solid var(--color-brown);
-}
+	.animal-header {
+		display: flex;
+		gap: 2rem;
+		margin-bottom: 3rem;
+		padding: 2rem;
+		background-color: rgba(37, 31, 26, 0.8);
+		border-radius: 12px;
+		border: 2px solid var(--color-brown);
+	}
 
-.animal-header-image {
-	width: 200px;
-	height: 200px;
-	object-fit: cover;
-	border-radius: 8px;
-	border: 2px solid var(--color-lgreen);
-}
+	.animal-header-image {
+		width: 200px;
+		height: 200px;
+		object-fit: cover;
+		border-radius: 8px;
+		border: 2px solid var(--color-lgreen);
+	}
 
-.animal-header-info h1 {
-	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-	color: var(--color-green);
-	margin-bottom: 0.5rem;
-}
+	.animal-header-info h1 {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		color: var(--color-green);
+		margin-bottom: 0.5rem;
+	}
 
-.animal-header-info .common-name {
-	font-size: 1.2rem;
-	color: var(--color-lbrown);
-	margin-bottom: 0.5rem;
-}
+	.animal-header-info .common-name {
+		font-size: 1.2rem;
+		color: var(--color-lbrown);
+		margin-bottom: 0.5rem;
+	}
 
-.birth-date,
-.death-date {
-	color: var(--color-lbrown);
-	font-size: 0.95rem;
-	margin: 0.25rem 0;
-}
+	.birth-date,
+	.death-date {
+		color: var(--color-lbrown);
+		font-size: 0.95rem;
+		margin: 0.25rem 0;
+	}
 
-.death-date {
-	color: #ff6b6b;
-}
+	.death-date {
+		color: #ff6b6b;
+	}
 
-.records-section h2 {
-	color: var(--color-lgreen);
-	margin-bottom: 0;
-	margin-right: 1rem;
-}
+	.records-section h2 {
+		color: var(--color-lgreen);
+		margin-bottom: 1.5rem;
+	}
 
-.records-section-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 1.5rem;
-}
+	.no-records {
+		text-align: center;
+		color: var(--color-lbrown);
+		padding: 3rem;
+		font-size: 1.1rem;
+	}
 
-.add-record-button {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	padding: 0.75rem 1.5rem;
-	background-color: var(--color-green);
-	color: white;
-	border: none;
-	border-radius: 8px;
-	cursor: pointer;
-	transition: background-color 0.2s;
-	font-size: 1rem;
-}
+	.records-list {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
 
-.add-record-button:hover {
-	background-color: var(--color-lgreen);
-}
+	.record-card {
+		background-color: rgba(37, 31, 26, 0.8);
+		border-radius: 12px;
+		border: 2px solid var(--color-brown);
+		padding: 1.5rem;
+		transition: border-color 0.2s;
+	}
 
-.new-record-form {
-	background-color: rgba(37, 31, 26, 0.8);
-	border-radius: 12px;
-	border: 2px solid var(--color-brown);
-	padding: 1.5rem;
-	margin-bottom: 2rem;
-}
+	.record-card:hover {
+		border-color: var(--color-lgreen);
+	}
 
-.new-record-form h3 {
-	color: var(--color-green);
-	margin-bottom: 1.5rem;
-}
+	.record-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 1rem;
+	}
 
-.form-hint {
-	font-size: 0.85rem;
-	color: var(--color-lbrown);
-	margin-top: 0.25rem;
-}
+	.record-header h3 {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		color: var(--color-green);
+		margin: 0;
+	}
 
-.no-records {
-	text-align: center;
-	color: var(--color-lbrown);
-	padding: 3rem;
-	font-size: 1.1rem;
-}
+	.edit-button,
+	.save-button,
+	.cancel-button {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 1rem;
+		border-radius: 6px;
+		border: none;
+		cursor: pointer;
+		transition: all 0.2s;
+		font-size: 0.9rem;
+	}
 
-.records-list {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
-}
+	.edit-button {
+		background-color: var(--color-brown);
+		color: var(--color-foreground);
+	}
 
-.record-card {
-	background-color: rgba(37, 31, 26, 0.8);
-	border-radius: 12px;
-	border: 2px solid var(--color-brown);
-	padding: 1.5rem;
-	transition: border-color 0.2s;
-}
+	.edit-button:hover {
+		background-color: var(--color-lbrown);
+	}
 
-.record-card:hover {
-	border-color: var(--color-lgreen);
-}
+	.save-button {
+		background-color: var(--color-green);
+		color: white;
+	}
 
-.record-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 1rem;
-}
+	.save-button:hover {
+		background-color: var(--color-lgreen);
+	}
 
-.record-header h3 {
-	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-	color: var(--color-green);
-	margin: 0;
-}
+	.cancel-button {
+		background-color: #ff6b6b;
+		color: white;
+	}
 
-.record-actions {
-	display: flex;
-	gap: 0.5rem;
-}
+	.cancel-button:hover {
+		background-color: #ff5252;
+	}
 
-.edit-button,
-.save-button,
-.cancel-button {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	padding: 0.5rem 1rem;
-	border-radius: 6px;
-	border: none;
-	cursor: pointer;
-	transition: all 0.2s;
-	font-size: 0.9rem;
-}
+	.record-info {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		margin-bottom: 1rem;
+	}
 
-.edit-button {
-	background-color: var(--color-brown);
-	color: var(--color-foreground);
-}
+	.info-row {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		color: var(--color-lbrown);
+	}
 
-.edit-button:hover {
-	background-color: var(--color-lbrown);
-}
+	.info-row.active {
+		color: var(--color-green);
+	}
 
-.save-button {
-	background-color: var(--color-green);
-	color: white;
-}
+	.record-notes {
+		margin-top: 1rem;
+		padding-top: 1rem;
+		border-top: 1px solid var(--color-brown);
+	}
 
-.save-button:hover {
-	background-color: var(--color-lgreen);
-}
+	.record-notes strong {
+		color: var(--color-lgreen);
+	}
 
-.cancel-button {
-	background-color: #ff6b6b;
-	color: white;
-}
+	.record-notes p {
+		margin-top: 0.5rem;
+		color: var(--color-lbrown);
+		line-height: 1.6;
+	}
 
-.cancel-button:hover {
-	background-color: #ff5252;
-}
+	.record-edit-form {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
 
-.delete-button {
-	background-color: #ff6b6b;
-	color: white;
-}
+	.form-group label {
+		display: block;
+		margin-bottom: 0.5rem;
+		color: var(--color-lgreen);
+		font-weight: 600;
+	}
 
-.delete-button:hover {
-	background-color: #ff5252;
-}
+	.form-group textarea {
+		width: 100%;
+		padding: 0.75rem;
+		border: 2px solid var(--color-brown);
+		border-radius: 6px;
+		background-color: var(--color-foreground);
+		color: var(--color-foreground-text);
+		font-size: 1rem;
+		font-family: inherit;
+	}
 
-.record-info {
-	display: flex;
-	flex-direction: column;
-	gap: 0.75rem;
-	margin-bottom: 1rem;
-}
+	.form-group textarea {
+		resize: vertical;
+		min-height: 100px;
+	}
 
-.info-row {
-	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-	color: var(--color-lbrown);
+	.form-actions {
+		display: flex;
+		gap: 1rem;
+		margin-top: 0.5rem;
+	}
 }
-
-.info-row.active {
-	color: var(--color-green);
-}
-
-.record-notes {
-	margin-top: 1rem;
-	padding-top: 1rem;
-	border-top: 1px solid var(--color-brown);
-}
-
-.record-notes strong {
-	color: var(--color-lgreen);
-}
-
-.record-notes p {
-	margin-top: 0.5rem;
-	color: var(--color-lbrown);
-	line-height: 1.6;
-}
-
-.record-edit-form {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
-}
-
-.form-group label {
-	display: block;
-	margin-bottom: 0.5rem;
-	color: var(--color-lgreen);
-	font-weight: 600;
-}
-
-.form-group input,
-.form-group textarea {
-	width: 100%;
-	padding: 0.75rem;
-	border: 2px solid var(--color-brown);
-	border-radius: 6px;
-	background-color: var(--color-dbrown);
-	color: var(--color-foreground);
-	font-size: 1rem;
-	font-family: inherit;
-}
-
-.form-group textarea {
-	resize: vertical;
-	min-height: 100px;
-}
-
-.form-actions {
-	display: flex;
-	gap: 1rem;
-	margin-top: 0.5rem;
-}
-

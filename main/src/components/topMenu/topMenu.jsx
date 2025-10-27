@@ -73,6 +73,14 @@ export function TopMenu() {
 						<strong>{businessEmployeeWorksFor.name}</strong>
 					</p>
 				)}
+				<p className='topmenu-clock-text'>
+					<Button
+						variant='green'
+						size='sm'
+					>
+						Clock In
+					</Button>
+				</p>
 				{userEntityType === 'customer' && (
 					<Link
 						to='/portal/cart'
