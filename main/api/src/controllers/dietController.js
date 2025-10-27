@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { db } from '../db/mysql.js';
+import { query } from '../db/mysql.js';
 import {
 	createOneQuery,
 	getNByKeyQuery,
@@ -129,8 +129,8 @@ async function deleteOne(req, _res) {
 
 	if (!dietId) throw new Error('Missing dietId');
 
-	// using db.query for soft delete
-	await db.query(
+	// using query for soft delete
+	await query(
 		`
 		UPDATE Diet
 		SET deletedAt = CURRENT_TIMESTAMP()
@@ -223,8 +223,8 @@ async function deleteScheduleDay(req, _res) {
 
 	if (!dietScheduleDayId) throw new Error('Missing dietScheduleDayId');
 
-	// using db.query for hard delete (cascade will handle this properly)
-	await db.query(
+	// using query for hard delete (cascade will handle this properly)
+	await query(
 		`
 		DELETE FROM DietScheduleDay
 		WHERE dietScheduleDayId = ?
@@ -246,8 +246,8 @@ async function getScheduleByDayOfWeek(req, _res) {
 
 	if (!dayOfWeek) throw new Error('Missing dayOfWeek');
 
-	// using db.query to get all schedules for a specific day
-	const rows = await db.query(
+	// using query to get all schedules for a specific day
+	const rows = await query(
 		`
 		SELECT ds.*, d.specialNotes
 		FROM DietScheduleDay ds
