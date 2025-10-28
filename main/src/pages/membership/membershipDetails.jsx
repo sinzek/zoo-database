@@ -1,15 +1,31 @@
 import React from 'react';
 
 import membershipData from '../../data/membership'; 
-import { Link } from '../../components/link'; 
 import './membership.css';
 
+import { Link } from '../../components/link'; 
+import { useRouter } from '../../context/routerContext';
+import { useUserData } from '../../context/userDataContext'; 
+
 const MembershipDetailPage = ({ id }) => {
-    
+    const { navigate } = useRouter(); 
+    const { userInfo } = useUserData(); 
 
     const membershipItem = membershipData.find(
         (item) => item.id === id
     );
+
+// Checks to see if user is logged in for directing purposes
+const handlePurchaseClick = () => {
+        const purchaseUrl = `/membership/buy/${membershipItem.id}`; //target URL
+
+        if (userInfo) {
+            navigate(purchaseUrl);
+        } else {
+
+            navigate(`/login?redirect=${encodeURIComponent(purchaseUrl)}`); 
+        }
+    };
 
 
     if (!membershipItem) {
@@ -40,7 +56,10 @@ const MembershipDetailPage = ({ id }) => {
                     ))}
                 </ul>
                 
-                <button className="buy-button">{membershipItem.title.toUpperCase()} MEMBERSHIP</button>
+
+                <Link to={`/membership/buy/${membershipItem.id}`} className="buy-button">
+                 {membershipItem.title.toUpperCase()} MEMBERSHIP </Link>
+
                 <Link to="/membership" className="back-link">← Back to Membership Options</Link>
             </div>
         </div>

@@ -9,6 +9,8 @@ import {
 } from 'react';
 import PropTypes from 'prop-types';
 
+import membershipData from '../data/membership';
+
 const ShoppingCartContext = createContext(null);
 
 /**
@@ -43,23 +45,55 @@ export function ShoppingCartProvider({ children }) {
 	}, [cart]);
 
 	const addItemToCart = useCallback((item, quantity = 1) => {
-		setCart((prevCart) => {
-			const newCart = [...prevCart];
-			const existingIndex = newCart.findIndex(
-				(cartItem) => cartItem.itemId === item.itemId
-			);
+	let itemAdded = false; // Flag to track success
 
-			if (existingIndex >= 0) {
-				newCart[existingIndex] = {
-					...newCart[existingIndex],
-					quantity: newCart[existingIndex].quantity + quantity,
-				};
-			} else {
-				newCart.push({ ...item, quantity });
-			}
-			return newCart;
-		});
-	}, []);
+		setCart((prevCart) => {
+
+			//Check if itemToAdd is a membership
+			const isAddingMembership = membershipData.some(m => m.id === item.itemId);
+
+			if (isAddingMembership) {
+							//Check if a membership already exists in the cart
+						const existingMembership = prevCart.find(cartItem => 
+										membershipData.some(m => m.id === cartItem.itemId)
+							);
+
+							if (existingMembership) {
+								//Membership exists; do not add another. Return the cart unchanged.
+								console.warn("You can only have one membership in your cart.");
+								itemAdded = false; //Explicitly set flag
+								return prevCart; 
+							} else {
+								//No membership exists; add the new one with quantity 1.
+								console.log("Adding new membership to cart:", { ...item, quantity: 1 });
+								itemAdded = true; //Alt flag
+								return [...prevCart, { ...item, quantity: 1 }];
+							}
+						}
+			else {
+							// 6. Handle Non-Membership Items (Original Logic)
+							itemAdded = true; //Set flag for membership logic
+							const newCart = [...prevCart];
+							const existingIndex = newCart.findIndex(
+								(cartItem) => cartItem.itemId === item.itemId
+							);
+
+							if (existingIndex >= 0) {
+								// Update quantity for existing non-membership item
+								newCart[existingIndex] = {
+									...newCart[existingIndex],
+									quantity: newCart[existingIndex].quantity + quantity,
+								};
+							} else {
+								// Add new non-membership item
+								newCart.push({ ...item, quantity });
+							}
+							return newCart;
+						}
+					});
+					
+					return itemAdded;
+				}, []);
 
 	const removeItemFromCart = useCallback((itemId) => {
 		setCart((prevCart) =>
@@ -68,7 +102,14 @@ export function ShoppingCartProvider({ children }) {
 	}, []);
 
 	const updateItemQuantity = useCallback((itemId, quantity) => {
-		const newQuantity = Math.max(0, quantity);
+		const isUpdatingMembership = membershipData.some(m => m.id === itemId);
+		const newQuantity = isUpdatingMembership ? 1 : Math.max(0, quantity);
+		//const newQuantity = Math.max(0, quantity);
+
+		if (isUpdatingMembership && quantity > 1) {
+             console.warn("Capping membership quantity at 1.");
+        }
+
 		setCart((prevCart) => {
 			return prevCart
 				.map((cartItem) => {

@@ -5,6 +5,8 @@ import { Link } from '../../../components/link';
 import { Trash2 } from 'lucide-react';
 import { Frown } from 'lucide-react';
 
+import membershipData from '../../../data/membership';
+
 export function CartPage() {
 	const {
 		cart,
@@ -13,6 +15,11 @@ export function CartPage() {
 		clearCart,
 		cartItemCount,
 	} = useShoppingCart();
+
+//Cap on membership quantity
+const isMembership = (item) => {
+        return membershipData.some(m => m.id === item.itemId);
+    };
 
 	const currencyFormatter = useMemo(
 		() =>
@@ -190,32 +197,46 @@ export function CartPage() {
 									gap: '16px',
 								}}
 							>
-								<label
-									style={{
-										display: 'flex',
-										alignItems: 'center',
-										gap: '8px',
-										color: 'var(--color-lbrown)',
-										fontWeight: 600,
-									}}
-								>
-									Qty
-									<input
-										type='number'
-										min='1'
-										value={item.quantity}
-										onChange={(e) =>
-											updateItemQuantity(
-												item.itemId,
-												parseInt(e.target.value, 10)
-											)
-										}
+
+							
+							<div className="quantity-control-area"> 
+								{isMembership(item) ? (
+									//IF it IS a membership, show static text "Qty: 1"
+									<span style={{ fontWeight: 600, color: 'var(--color-lbrown)' }}>
+										Qty: 1
+									</span>
+								) : (
+									//ELSE show the interactive input
+									<label
 										style={{
-											width: '70px',
-											textAlign: 'center',
+											display: 'flex',
+											alignItems: 'center',
+											gap: '8px',
+											color: 'var(--color-lbrown)',
+											fontWeight: 600,
 										}}
-									/>
-								</label>
+									>
+										Qty
+										<input
+											type='number'
+											min='0' 
+											value={item.quantity}
+											onChange={(e) =>
+												
+												updateItemQuantity(
+													item.itemId,
+													Math.max(1, parseInt(e.target.value, 10) || 0) 
+												)
+											}
+											style={{
+												width: '70px',
+												textAlign: 'center',
+											}}
+										/>
+									</label>
+								)}
+							</div>
+
 								<Button
 									variant='outline'
 									size='sm'

@@ -24,7 +24,7 @@ const MembershipCard = ({ title, price, details, bestValue = false, image, link 
 const MembershipPage = () => {
   
 
-  const memberships = membershipData.filter(m => m.id !== 'flock' && m.id !== 'asante');
+  const membership = membershipData.filter(m => m.id !== 'flock' && m.id !== 'asante');
   const donorClubs = membershipData.filter(m => m.id === 'flock' || m.id === 'asante');
 
   return (
@@ -33,7 +33,7 @@ const MembershipPage = () => {
 
       <div className="membership-grid">
 
-        {memberships.map((mem) => (
+        {membership.map((mem) => (
           <MembershipCard key={mem.id} {...mem} />
         ))}
       </div>

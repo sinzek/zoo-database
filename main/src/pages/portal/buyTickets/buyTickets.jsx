@@ -6,7 +6,7 @@ import { Button } from '../../../components/button';
 import { Link } from '../../../components/link';
 import { Check } from 'lucide-react';
 
-const zooBusinessId = '9d924bce-2e2a-4a9a-8de0-1f4458a2d8a4'; // temp
+const zooBusinessId = '9d924bce-2e2a-4a9a-8de0-1f4458a2d8a4'; 
 
 const EXAMPLE_TICKET = {
 	itemId: 'c3af22f3-0f23-4fef-82c3-6e729a0a0f01',

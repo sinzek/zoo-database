@@ -28,7 +28,7 @@ export function PortalCustomerPageContent() {
 
 	const options = [
 		{ name: 'Buy Tickets', link: '/portal/buy-tickets', icon: Ticket },
-		{ name: 'Memberships', link: '/memberships', icon: UserCheck },
+		{ name: 'Memberships', link: '/membership', icon: UserCheck },
 		{ name: 'Shop', link: '/portal/shop', icon: ShoppingBasket },
 		{ name: 'Attractions', link: '/attractions', icon: FerrisWheel },
 		{ name: 'Habitats', link: '/habitats', icon: TreePalm },

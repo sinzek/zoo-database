@@ -67,8 +67,8 @@ async function getOneByID(req, _res){
 }
 
 async function getN(_req, _res) {
-	const memberships = await getAllQuery('Membership');
-	return [memberships];
+	const membership = await getAllQuery('Membership');
+	return [membership];
 }
 
 // no need to fetch memberships by customerId here, customerId is unique in Membership table

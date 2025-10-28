@@ -28,6 +28,8 @@ import { PortalHabitatsPage } from './pages/portal/habitats/portalHabitats';
 import MembershipPage from './pages/membership/membership';
 import MembershipDetailPage from './pages/membership/membershipDetails';
 
+import { BuyMembershipPage } from './pages/portal/buyMembership/buyMembership';
+
 export default function Router() {
 	const { path, match } = useRouter();
 	const { userEntityType, userEntityData } = useUserData();
@@ -40,6 +42,12 @@ export default function Router() {
 	const feedingScheduleMatch = match('/portal/feeding-schedules/:animalId');
 
 	const membershipMatch = match('/membership/:id');
+
+	const buyMembershipMatch = match('/membership/buy/:id');
+
+
+
+
 
 	let content = null;
 
@@ -70,7 +78,15 @@ export default function Router() {
 
 if (habitatMatch) {
         content = <HabitatDetailsPage id={habitatMatch.id} />;
-    } else if (medicalRecordMatch) {
+    }
+	
+	else if (buyMembershipMatch) { 
+        content = <BuyMembershipPage id={buyMembershipMatch.id} />;
+    } else if (membershipMatch) {
+        content = <MembershipDetailPage id={membershipMatch.id} />;
+    }
+
+	else if (medicalRecordMatch) {
         content = <MedicalRecordDetailPage animalId={medicalRecordMatch.animalId} />;
     } else if (feedingScheduleMatch) {
         content = <FeedingScheduleDetailPage animalId={feedingScheduleMatch.animalId} />;
