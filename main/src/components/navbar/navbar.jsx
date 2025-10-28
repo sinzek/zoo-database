@@ -11,7 +11,7 @@ export function Navbar() {
 		{ href: '/animals', label: 'Animals' },
 		{ href: '/habitats', label: 'Habitats' },
 		{ href: '/attractions', label: 'Attractions' },
-		{ href: '/memberships', label: 'Memberships' },
+		{ href: '/membership', label: 'Memberships' },
 	];
 
 	return (

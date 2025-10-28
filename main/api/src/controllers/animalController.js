@@ -1,18 +1,12 @@
+import { db } from '../db/mysql.js';
 import crypto from 'crypto';
 import {
 	createOneQuery,
 	getNByKeyQuery,
 	updateOneQuery,
 } from '../utils/query-utils.js';
-import { query } from '../db/mysql.js';
 
-/**
- * Creates a new animal record.
- * @param {*} req - The request object containing the animal data in req.body
- * @param {*} _res - The response object (not used).
- * @returns {Promise<Array>} - An array containing the newly created animal object.
- */
-async function createOne(req, _res) {
+async function createOne(req, _res){
 	const newAnimal = req.body;
 	const animalId = crypto.randomUUID();
 
@@ -46,18 +40,12 @@ async function createOne(req, _res) {
 		dietId: dietId,
 	};
 
-	await createOneQuery('Animal', animalData);
 
-	return [animalData];
+	await createOneQuery('Animal', animalData);
+	return [{animalId, ...animalData}];
 }
 
-/**
- * Updates an existing animal record.
- * @param {*} req - The request object containing the updated animal data in req.body
- * @param {*} _res - The response object (not used).
- * @returns {Promise<Array>} - An array containing the updated animal object.
- */
-async function updateOne(req, _res) {
+async function updateOne(req, _res){
 	const updatedAnimal = req.body;
 
 	if (!updatedAnimal || !updatedAnimal.animalId) {
@@ -87,46 +75,38 @@ async function updateOne(req, _res) {
 	return [animalUpdateData];
 }
 
-/**
- * Retrieves a single animal by its ID.
- * @param {string} req.body.findAnimalId - UUID of the animal to retrieve
- * @returns {Promise<Array>} Array containing the animal object
- * @throws If findAnimalId is missing or no animal is found
- */
 async function getOneById(req, _res) {
-	const { animalId } = req.body;
-
-	if (!animalId) {
-		throw new Error('Missing animalId');
+	const {findAnimalId} = req.body; 
+	if(!findAnimalId) {
+		throw new Error('Missing animal ID');
 	}
+	const rows = await getNByKeyQuery('Animal', 'animalId', findAnimalId);
 
-	const [animal] = await getNByKeyQuery('Animal', 'animalId', animalId);
-
-	return [animal];
+	return [rows[0]];
 }
 
-async function getNByHabitat(req, _res) {
-	const { habitatId } = req.body;
+async function getManyByHabitat(req, _res){
+	const requestedHabitat = req.body;
+	const habitatId = requestedHabitat.habitatId;
 
 	if (!habitatId) throw new Error('Missing habitatId');
 
-	const animals = await getNByKeyQuery('Animal', 'habitatId', habitatId);
-
-	return [animals];
+	const rows = await getNByKeyQuery('Animal', 'habitatId', habitatId);
+	
+	return rows;
 }
 
-async function getNByHandler(req, _res) {
-	//by employeeid
-	const { employeeId } = req.body;
+async function getManyByHandler(req, _res){ //by employeeid
+	const handlerInfo = req.body;
 
-	if (!employeeId) throw new Error('Missing employeeId');
+	if (!handlerInfo.EmployeeId) throw new Error('Missing EmployeeId');
 
-	// using query for complex join
-	const animals = await query(
+	// using db.query for complex join query
+	const rows = await db.query(
 		`
 		SELECT Animal.*
 		FROM Animal, TakesCareOf
-		WHERE TakesCareOf.employeeId = ? AND TakesCareOf.animalId = Animal.animalId AND Animal.deletedAt IS NULL;       
+		WHERE TakesCareOf.employeeID = ? AND TakesCareOf.animalID = Animal.animalID AND Animal.deletedAt IS NULL;       
 		`,
 		[employeeId]
 	);
