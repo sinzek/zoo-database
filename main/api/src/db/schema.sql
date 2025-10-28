@@ -4,9 +4,10 @@ CREATE TABLE Customer (
     lastName VARCHAR(50) NOT NULL CHECK (LENGTH(lastName) >= 1),
     middleInitial CHAR(1), -- optional middle initial
     joinDate DATETIME NOT NULL DEFAULT NOW(), -- defaults to current date
-    email VARCHAR(100) UNIQUE NOT NULL,
-    passwordHash CHAR(64) NOT NULL, -- sha256 hash (64 hex chars)
     deletedAt DATETIME NULL -- soft delete (null if not deleted)
+    userId CHAR(36) UNIQUE NULL -- uuid, unique foreign key to User(userId)
+
+    FOREIGN KEY (userId) REFERENCES User(userId) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE TABLE Business (
@@ -46,13 +47,13 @@ CREATE TABLE Employee (
 	terminationDate DATE NULL,
 	birthDate DATE NOT NULL,
 	phone VARCHAR(20) NOT NULL CHECK(LENGTH(phone)>9),
-	email VARCHAR(100) UNIQUE NOT NULL,
-	passwordHash CHAR(64) NOT NULL,
 	deletedAt DATE NULL,
 	supervisorId CHAR(36) NULL,
+    userId CHAR(36) UNIQUE NULL, -- uuid, unique foreign key to User(userId)
 
 	FOREIGN KEY (businessId) REFERENCES Business(businessId) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (supervisorId) REFERENCES Employee(employeeId) ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (userId) REFERENCES User(userId) ON DELETE SET NULL ON UPDATE CASCADE,
     CHECK(terminationDate IS NULL OR terminationDate > hireDate)
 );
 
@@ -181,6 +182,10 @@ CREATE TABLE Habitat(
 	habitatId CHAR(36) PRIMARY KEY,
 	name VARCHAR(100) NOT NULL CHECK(LENGTH(name) > 3),
 	description VARCHAR(500) NOT NULL,
+	imageUrl VARCHAR(200) DEFAULT NULL,
+	extraDetails VARCHAR(1000) DEFAULT NULL,
+	climate VARCHAR(500) DEFAULT NULL,
+	funFact VARCHAR(500) DEFAULT NULL,
 	deletedAt DATE NULL
 );
 

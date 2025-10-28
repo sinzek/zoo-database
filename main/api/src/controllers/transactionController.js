@@ -58,7 +58,7 @@ async function getNByCustomer(req, _res){
 
 	const transactionIds = purchasedItemRecords.map(record => record.transactionId);
 
-	const transactions = [];
+	let transactions = [];
 	for(const transactionId of transactionIds) {
 		const transactionArr = await getNByKeyQuery('Transaction', 'transactionId', transactionId);
 		if(transactionArr.length > 1) {

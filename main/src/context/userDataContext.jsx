@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useAuth } from '../hooks/useAuth';
 import { useRouter } from './routerContext';
+import { hasMinAccessLvl } from '../utils/access';
 
 const UserDataContext = createContext({
 	userInfo: null, // { userId, email } | null
@@ -9,38 +10,74 @@ const UserDataContext = createContext({
 	userEntityType: null, // 'customer' | 'employee' | null
 	login: async (_email, _password) => {},
 	logout: async () => {},
+	authLoading: false,
+	businessEmployeeWorksFor: null, // { businessId, name, ... } | null
 });
 
 export function UserDataProvider({ children }) {
-	const { navigate } = useRouter();
+	const { navigate, path } = useRouter();
 	const userDataFetched = useRef(false);
 
 	const [userInfo, setUserInfo] = useState(null);
 	const [userEntityData, setUserEntityData] = useState(null);
 	const [userEntityType, setUserEntityType] = useState(null);
+	const [businessEmployeeWorksFor, setBusinessEmployeeWorksFor] =
+		useState(null);
+	const [businessLoading, setBusinessLoading] = useState(false);
+
+	const [authLoading, setAuthLoading] = useState(true);
 
 	// consume some hooks to perform login/logout and set the above states accordingly
-	const { login, logout, getUserData } = useAuth();
+	const { login, logout, getUserData, getBusinessEmployeeWorksFor } =
+		useAuth();
 
 	useEffect(() => {
 		async function fetchUserData() {
 			const result = await getUserData(
 				setUserInfo,
 				setUserEntityData,
-				setUserEntityType
+				setUserEntityType,
+				setAuthLoading
 			);
 
 			if (!result || !result.success) {
 				// failed to get user data, not logged in
 				return;
 			}
+
+			if (result.data.relatedInfo.type === 'employee') {
+				await getBusinessEmployeeWorksFor(
+					result.data.relatedInfo.data.businessId,
+					setBusinessEmployeeWorksFor,
+					setBusinessLoading
+				);
+			}
 		}
 
-		if (userInfo === null && !userDataFetched.current) {
+		if (!userInfo && !userDataFetched.current) {
 			userDataFetched.current = true;
 			fetchUserData();
 		}
-	}, [userInfo, getUserData, logout, navigate]);
+	}, [userInfo, getUserData, logout, navigate, getBusinessEmployeeWorksFor]);
+
+	useEffect(() => {
+		if (typeof window === 'undefined' || authLoading || businessLoading)
+			return;
+
+		const contentContainer = document.querySelector('#main-content');
+		if (contentContainer) {
+			const isMinZookeeper = hasMinAccessLvl('zookeeper', userEntityData);
+			if (
+				userEntityType === 'employee' &&
+				isMinZookeeper &&
+				path.startsWith('/portal')
+			) {
+				contentContainer.style.marginLeft = '238px';
+			} else {
+				contentContainer.style.marginLeft = '0px';
+			}
+		}
+	}, [userEntityType, userEntityData, authLoading, businessLoading, path]);
 
 	return (
 		<UserDataContext.Provider
@@ -62,8 +99,11 @@ export function UserDataProvider({ children }) {
 						setUserInfo,
 						setUserEntityData,
 						setUserEntityType,
-						navigate
+						navigate,
+						setAuthLoading
 					),
+				authLoading: authLoading || businessLoading,
+				businessEmployeeWorksFor,
 			}}
 		>
 			{children}

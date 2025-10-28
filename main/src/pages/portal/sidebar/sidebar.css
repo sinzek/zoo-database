@@ -1,0 +1,63 @@
+.portal-sidebar {
+	min-width: 266px;
+	max-width: 238px;
+	padding: 6rem 0 80px 0;
+	position: fixed;
+	top: 0;
+	min-height: 100vh;
+	max-height: 100vh;
+}
+
+.portal-sidebar-links {
+	list-style-type: none;
+	padding: 1rem 1rem;
+	margin: 0;
+	overflow-y: auto;
+	height: calc(100vh - 10rem);
+	scrollbar-width: none; /* Hides scrollbar in Firefox */
+	-ms-overflow-style: none; /* Hides scrollbar in IE and Edge */
+}
+
+.portal-sidebar-links li {
+	margin-bottom: 1rem;
+}
+
+.portal-sidebar-links li a {
+	color: var(--color-green);
+	text-decoration: none;
+	font-size: 1rem;
+	background-color: var(--color-brown);
+	width: 100%;
+	box-sizing: border-box;
+	padding: 0.75rem 0.75rem;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	border-radius: 10px;
+	transition: all 0.15s ease;
+}
+
+.portal-sidebar-link-icon {
+	width: 1.5rem;
+	height: 1.5rem;
+	padding: 0.25rem;
+	stroke: var(--color-lgreen);
+	background-color: var(--color-dgreen);
+	border-radius: 5px;
+	transition: all 0.15s ease;
+}
+
+.portal-sidebar-links li a.active,
+.portal-sidebar-links li a:hover {
+	background-color: var(--color-brown);
+	color: var(--color-lgreen);
+	text-decoration: none;
+	translate: 0 -2px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+	scale: 1.02;
+
+	.portal-sidebar-link-icon {
+		background-color: var(--color-lgreen);
+		stroke: var(--color-dbrown);
+	}
+}

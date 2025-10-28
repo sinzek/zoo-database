@@ -66,7 +66,11 @@ async function getOneById(req, _res) {
 
 	if (!employeeId) throw new Error('Missing employeeId');
 
-	const [employee] = await getNByKeyQuery('Employee', 'employeeId', employeeId);
+	const [employee] = await getNByKeyQuery(
+		'Employee',
+		'employeeId',
+		employeeId
+	);
 
 	return [employee];
 }
@@ -76,9 +80,13 @@ async function getNByBusiness(req, _res) {
 
 	if (!businessId) throw new Error('Missing businessId');
 
-	const employees = await getNByKeyQuery('Employee', 'businessId', businessId);
+	const employees = await getNByKeyQuery(
+		'Employee',
+		'businessId',
+		businessId
+	);
 
-	return employees; // array of employees with given businessId
+	return [employees]; // array of employees with given businessId
 }
 
 /**
@@ -117,20 +125,26 @@ async function getNByAnimal(req, _res) {
 
 	if (!animalId) throw new Error('Missing animalId');
 
-	const takesCareOfRecords = await getNByKeyQuery('TakesCareOf', 'animalId', animalId);
+	const takesCareOfRecords = await getNByKeyQuery(
+		'TakesCareOf',
+		'animalId',
+		animalId
+	);
 
-	const employeeIds = takesCareOfRecords.map(record => record.employeeId);
+	const employeeIds = takesCareOfRecords.map((record) => record.employeeId);
 
-	const employees = [];
+	let employees = [];
 
 	for (const empId of employeeIds) {
-		const employees = await getNByKeyQuery('Employee', 'employeeId', empId);
-		if(employees.length > 1) {
-			employees = employees.concat(employees);
-		} else if(employees.length === 1) {
-			employees.push(employees[0]);
+		try {
+			const emps = await getNByKeyQuery('Employee', 'employeeId', empId);
+			employees = employees.concat(emps);
+		} catch (err) {
+			if (err.message.includes('No records found')) {
+				// skip if no employee found for this id
+				continue;
+			}
 		}
-		// otherwise skip, no employee found
 	}
 
 	return [employees]; // array of employees who take care of the given animal
@@ -140,9 +154,9 @@ async function getNByBusinessAndAccessLevel(req, _res) {
 	const { businessId, accessLevel } = req.body;
 
 	if (!businessId) throw new Error('Missing businessId');
-	if(!accessLevel) throw new Error('Missing accessLevel');
+	if (!accessLevel) throw new Error('Missing accessLevel');
 
-	if(!ACCESS_LEVELS[accessLevel]) {
+	if (!ACCESS_LEVELS[accessLevel]) {
 		throw new Error('Invalid access level');
 	}
 
@@ -160,4 +174,11 @@ async function getNByBusinessAndAccessLevel(req, _res) {
 //Get Access Level
 //Update Employee
 
-export default { createOne, getOneById, getNByBusiness, updateOne, getNByAnimal, getNByBusinessAndAccessLevel };
+export default {
+	createOne,
+	getOneById,
+	getNByBusiness,
+	updateOne,
+	getNByAnimal,
+	getNByBusinessAndAccessLevel,
+};

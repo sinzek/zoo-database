@@ -49,14 +49,14 @@ export default function AnimalsPage() {
 				<div className='hero-btn-list'>
 					<Link
 						to='/habitats'
-						className='btn btn-green'
+						className='btn btn-green btn-lg'
 						href='/habitats'
 					>
 						Habitats
 					</Link>
 					<Link
 						to='/'
-						className='btn btn-outline'
+						className='btn btn-outline btn-lg'
 						href='/'
 					>
 						← Home
@@ -79,9 +79,11 @@ export default function AnimalsPage() {
 				</div>
 
 				<div className='section'>
-					<div className='habitat-rows'>
+					<div className='habitat-row'>
 						{loading ? (
-							<Skeleton className='habitat-row-skeleton' />
+							Array(3).fill(0).map((_, idx) => (
+								<Skeleton key={`skeleton-${idx}`} className='animal-loader' />
+							))
 						) : (
 							animalsByHabitat.map(
 								({ habitatId, habitatName, animals }) => (
@@ -94,9 +96,7 @@ export default function AnimalsPage() {
 										</h2>
 										<div className='animal-grid'>
 											{animals.map((animal) => (
-												<Link
-													href={`/animals/${animal.animalId}`}
-													to={`/animals/${animal.animalId}`}
+												<div
 													key={animal.animalId}
 													className='animal-card'
 												>
@@ -118,7 +118,7 @@ export default function AnimalsPage() {
 													<p className='animal-scientific-name'>
 														<i>{animal.species}</i>
 													</p>
-												</Link>
+												</div>
 											))}
 										</div>
 									</div>

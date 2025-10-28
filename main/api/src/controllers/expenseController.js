@@ -65,7 +65,7 @@ async function getManyByBusiness(req, _res) {
 
 	const rows = await getNByKeyQuery('Expense', 'businessId', businessId);
 
-	return rows;
+	return [rows];
 }
 
 /**
@@ -99,7 +99,7 @@ async function getManyByDateRange(req, _res) {
 
 	const rows = await db.query(query, params);
 
-	return rows;
+	return [rows];
 }
 
 /**

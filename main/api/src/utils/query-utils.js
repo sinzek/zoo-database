@@ -17,7 +17,7 @@ export async function createOneQuery(tableName, data) {
 	const values = Object.values(data);
 	const placeholders = columns.map(() => '?').join(', ');
 
-	const [result] = await query(
+	const result = await query(
 		`
         INSERT INTO ${tableName} (${columns.join(', ')})
         VALUES(${placeholders});
@@ -106,20 +106,19 @@ export async function updateOneQuery(
 	let columns = Object.keys(data);
 	let values = Object.values(data);
 
-	if (columns[keyColumn] === undefined) {
+	if (!data[keyColumn]) {
 		throw new Error(
 			`Data object must include the key column: ${keyColumn}`
 		);
 	}
 
 	// remove keyColumn from columns and values to avoid updating it
+	const keyColumnIndex = columns.indexOf(keyColumn);
 	columns = columns.filter((col) => col !== keyColumn);
-	values = Object.values(data).filter(
-		(_x, idx) => columns[idx] !== keyColumn
-	);
+	values = values.filter((val, idx) => idx !== keyColumnIndex);
 	const setClause = columns.map((col) => `${col} = ?`).join(', ');
 
-	const [result] = await query(
+	const result = await query(
 		`
 		UPDATE ${tableName}
 		SET ${setClause}
@@ -142,7 +141,7 @@ export async function updateOneQuery(
  * @throws If the delete fails
  */
 export async function deleteOneQuery(tableName, keyColumn, keyValue) {
-	const [result] = await query(
+	const result = await query(
 		`
 		UPDATE ${tableName}
 		SET deletedAt = CURRENT_DATE()

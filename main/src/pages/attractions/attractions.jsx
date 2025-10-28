@@ -67,10 +67,10 @@ export default function AttractionsPage() {
           From keeper talks to immersive tours—find something for everyone.
         </p>
         <div className="hero-btn-list">
-          <Link to="/animals" className="btn btn-green" href="/animals">
+          <Link to="/animals" className="btn btn-green btn-lg" href="/animals">
             Animals
           </Link>
-          <Link to="/" className="btn btn-outline" href="/">
+          <Link to="/" className="btn btn-outline btn-lg" href="/">
             ← Home
           </Link>
         </div>

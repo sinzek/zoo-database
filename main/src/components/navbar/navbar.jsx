@@ -1,10 +1,11 @@
 import { useUserData } from '../../context/userDataContext';
-import { api } from '../../utils/client-api-utils';
+import { Button } from '../button';
+
 import { Link } from '../link';
 import './navbar.css';
 
 export function Navbar() {
-	const { userInfo, logout } = useUserData();
+	const { userInfo, logout, authLoading } = useUserData();
 
 	const links = [
 		{ href: '/animals', label: 'Animals' },
@@ -12,17 +13,6 @@ export function Navbar() {
 		{ href: '/attractions', label: 'Attractions' },
 		{ href: '/membership', label: 'Memberships' },
 	];
-
-	const testApi = async () => {
-		const res = await api('/api/dummy-data/gen-customers', 'POST');
-
-		if (!res.success) {
-			alert('API Test Error: ' + res.error);
-			return;
-		}
-
-		alert('API Test Success: ' + JSON.stringify(res.data));
-	};
 
 	return (
 		<nav className='navbar'>
@@ -57,38 +47,41 @@ export function Navbar() {
 							<div className='navbar-underline' />
 						</li>
 					))}
-					<li
-						className='navbar-item-special'
-						onClick={testApi}
-					>
-						Test the API
-					</li>
 				</ul>
 			</div>
 			<div className='buttons'>
 				{userInfo ? (
-					<button
-						className='btn btn-lgreen'
-						onClick={logout}
-					>
-						Log out
-					</button>
+					<>
+						<Button
+							variant='lgreen'
+							size='lg'
+							onClick={logout}
+							loading={authLoading}
+						>
+							Log out
+						</Button>
+						<Link
+							to='/portal'
+							className='btn btn-brown btn-lg'
+							href='/portal'
+						>
+							My Portal
+						</Link>
+					</>
 				) : (
 					<Link
 						to='/login'
-						className='btn btn-lgreen'
 						href='/login'
 					>
-						Login
+						<Button
+							variant='lgreen'
+							size='lg'
+							loading={authLoading}
+						>
+							Login
+						</Button>
 					</Link>
 				)}
-				<Link
-					to='/signup'
-					className='btn btn-brown'
-					href='/signup'
-				>
-					Sign Up
-				</Link>
 			</div>
 		</nav>
 	);

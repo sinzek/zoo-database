@@ -7,7 +7,7 @@ export default function NotFoundPage() {
 			<h1>404 - Page Not Found</h1>
 			<Link
 				to='/'
-				className='btn btn-green'
+				className='btn btn-green btn-lg'
 				href='/'
 			>
 				Return Home

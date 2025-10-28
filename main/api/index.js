@@ -1,9 +1,14 @@
 import { App } from './src/app.js';
-import { registerDummyDataRoutes } from './src/routes/dummyData.js';
 import { registerEmployeeRoutes } from './src/routes/employee.js';
 import { registerAuthRoutes } from './src/routes/auth.js';
+import { registerRevenueReportRoutes } from './src/routes/revenueReport.js';
+import { registerShiftReportRoutes } from './src/routes/shiftReport.js';
 import { registerHabitatRoutes } from './src/routes/habitat.js';
 import { registerAnimalRoutes } from './src/routes/animal.js';
+import { registerShiftRoutes } from './src/routes/shift.js';
+import { registerBusinessRoutes } from './src/routes/business.js';
+import { registerMedicalRecordRoutes } from './src/routes/medicalRecord.js';
+import { registerDietRoutes } from './src/routes/diet.js';
 
 /**
  * Main entry point for the API
@@ -17,10 +22,15 @@ export default async function handler(req, res) {
 
 	// !--- start route registration ---!
 	registerAuthRoutes(app);
-	registerDummyDataRoutes(app);
 	registerEmployeeRoutes(app);
+	registerRevenueReportRoutes(app);
+	registerShiftReportRoutes(app);
 	registerHabitatRoutes(app);
 	registerAnimalRoutes(app);
+	registerShiftRoutes(app);
+	registerBusinessRoutes(app);
+	registerMedicalRecordRoutes(app);
+	registerDietRoutes(app);
 	// !--- end route registration ---!
 
 	return await app.handleVercel(req, res);

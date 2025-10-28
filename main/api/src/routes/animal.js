@@ -1,5 +1,6 @@
 import { withAccessLevel } from '../utils/auth-utils.js';
 import animalController from '../controllers/animalController.js';
+import animalReportController from '../controllers/animalReportController.js';
 
 export function registerAnimalRoutes(app) {
 	app.post(
@@ -17,4 +18,5 @@ export function registerAnimalRoutes(app) {
 		'/api/animal/get-all-grouped-by-habitat',
 		animalController.getAllGroupedByHabitat
 	);
+   app.post('/api/animal/report', withAccessLevel('zookeeper', animalReportController.getAnimalReport));
 }

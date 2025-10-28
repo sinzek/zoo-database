@@ -68,7 +68,7 @@ export default function HabitatDetailsPage({ id }) {
 				<Link
 					to='/habitats'
 					href='/habitats'
-					className='btn btn-outline'
+					className='btn btn-outline btn-lg'
 				>
 					← Back to Habitats
 				</Link>
@@ -92,14 +92,14 @@ export default function HabitatDetailsPage({ id }) {
 					<Link
 						to='/habitats'
 						href='/habitats'
-						className='btn btn-outline'
+						className='btn btn-outline btn-lg'
 					>
 						← All Habitats
 					</Link>
 					<Link
 						to='/'
 						href='/'
-						className='btn btn-green'
+						className='btn btn-green btn-lg'
 					>
 						Home
 					</Link>
@@ -251,7 +251,7 @@ export default function HabitatDetailsPage({ id }) {
 						<Link
 							to='/habitats'
 							href='/habitats'
-							className='btn btn-outline'
+							className='btn btn-outline btn-lg'
 						>
 							← Back to Habitats
 						</Link>

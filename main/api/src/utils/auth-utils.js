@@ -94,7 +94,7 @@ export const withAuth = (handler) => async (req, res) => {
  * @param {Function} handler 
  * @returns {Function}
  */
-export async function withAccessLevel(requiredLevel, handler) {
+export function withAccessLevel(requiredLevel, handler) {
 	return withAuth(async (req, res) => {
 		const userId = req.user.data.id;
 
