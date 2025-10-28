@@ -28,14 +28,6 @@ export function availableLinksForAccessLevel(uedata) {
 	if (hasMinAccessLvl('zookeeper', uedata)) {
 		links.push(
 			{ to: '/portal/animals', label: 'Animals', icon: PawPrint },
-<<<<<<< HEAD
-			{
-				to: '/portal/attractions',
-				label: 'Attractions',
-				icon: Ticket,
-			},
-=======
->>>>>>> main
 			{
 				to: '/portal/medical-records',
 				label: 'Medical Records',
