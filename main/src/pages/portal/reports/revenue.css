@@ -1,0 +1,237 @@
+.portal-revenue-page {
+	max-width: 1400px;
+	margin: auto;
+	padding: 24px;
+	padding-top: 80px;
+	color: var(--color-foreground);
+}
+
+.revenue-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 2rem;
+}
+
+.revenue-header h1 {
+	color: var(--color-green);
+	margin: 0;
+}
+
+.revenue-form-container {
+	background-color: rgba(37, 31, 26, 0.8);
+	border-radius: 12px;
+	border: 2px solid var(--color-brown);
+	padding: 1.5rem;
+	margin-bottom: 2rem;
+}
+
+.revenue-form h2 {
+	color: var(--color-green);
+	margin-bottom: 1.5rem;
+}
+
+.revenue-form .form-group {
+	margin-bottom: 1.5rem;
+}
+
+.revenue-form .form-group label {
+	display: block;
+	margin-bottom: 0.5rem;
+	color: var(--color-lgreen);
+	font-weight: 600;
+	font-size: 1em;
+}
+
+.revenue-form .form-group input,
+.revenue-form .form-group select {
+	width: 100%;
+	padding: 0.75rem;
+	background-color: var(--color-dbrown);
+	border: 2px solid var(--color-lbrown);
+	border-radius: 8px;
+	color: var(--color-foreground);
+	font-size: 0.9rem;
+	transition: all 0.2s;
+}
+
+.revenue-form .form-group input:focus,
+.revenue-form .form-group select:focus {
+	outline: none;
+	border-color: var(--color-green);
+}
+
+.revenue-form .form-group input[type="checkbox"] {
+	width: auto;
+	margin-right: 0.5rem;
+}
+
+.checkbox-group {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.business-checkbox-container {
+	max-height: 150px;
+	overflow-y: auto;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 8px;
+	padding: 0.5rem;
+	background-color: var(--color-dbrown);
+}
+
+.business-checkbox-item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-bottom: 0.5rem;
+	cursor: pointer;
+}
+
+.business-checkbox-item:last-child {
+	margin-bottom: 0;
+}
+
+.business-checkbox-item input[type="checkbox"] {
+	width: auto;
+}
+
+.revenue-form-actions {
+	display: flex;
+	gap: 1rem;
+	margin-top: 2rem;
+}
+
+.save-button,
+.cancel-button {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem 1.5rem;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 1rem;
+	transition: all 0.2s;
+}
+
+.save-button {
+	background-color: var(--color-green);
+	color: white;
+}
+
+.save-button:hover {
+	background-color: var(--color-lgreen);
+}
+
+.centered-loader {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 400px;
+}
+
+.error-message {
+	color: #ff6b6b;
+	font-weight: 600;
+	font-size: 1.2rem;
+	text-align: center;
+	margin-top: 2rem;
+}
+
+.revenue-list h2 {
+	color: var(--color-green);
+	margin-bottom: 1.5rem;
+}
+
+.revenue-card {
+	background-color: rgba(37, 31, 26, 0.8);
+	border: 2px solid var(--color-brown);
+	border-radius: 12px;
+	padding: 1.5rem;
+	transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.revenue-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.revenue-info h3 {
+	color: var(--color-lgreen);
+	margin: 0 0 1rem 0;
+	font-size: 1.2rem;
+}
+
+.revenue-info p {
+	margin: 0.5rem 0;
+	font-size: 0.9rem;
+	color: var(--color-lbrown);
+}
+
+.revenue-info strong {
+	color: var(--color-lgreen);
+	font-weight: 600;
+}
+
+.transactions-table,
+.expenses-table {
+	width: 100%;
+	font-size: 0.85rem;
+	border-collapse: collapse;
+}
+
+.transactions-table thead,
+.expenses-table thead {
+	position: sticky;
+	top: 0;
+	background-color: var(--color-dbrown);
+	z-index: 10;
+}
+
+.transactions-table thead tr,
+.expenses-table thead tr {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.transactions-table th,
+.expenses-table th {
+	text-align: left;
+	padding: 0.5rem;
+	font-weight: 600;
+}
+
+.transactions-table th:last-child,
+.expenses-table th:last-child {
+	text-align: right;
+}
+
+.transactions-table tbody tr,
+.expenses-table tbody tr {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.transactions-table td,
+.expenses-table td {
+	padding: 0.5rem;
+}
+
+.transactions-table td:last-child,
+.expenses-table td:last-child {
+	text-align: right;
+}
+
+.table-container {
+	max-height: 300px;
+	overflow-y: auto;
+	position: relative;
+	margin-top: 0.5rem;
+}
+
+.table-section h4 {
+	color: var(--color-lgreen);
+	margin: 1rem 0 0.5rem 0;
+	font-size: 1rem;
+}
+

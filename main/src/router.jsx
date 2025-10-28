@@ -25,6 +25,8 @@ import { FeedingSchedulesPage } from './pages/portal/feedingSchedules/feedingSch
 import { FeedingScheduleDetailPage } from './pages/portal/feedingSchedules/feedingScheduleDetail';
 import { ScheduleManagementPage } from './pages/portal/scheduleManagement/scheduleManagement';
 import { PortalAttractionsPage } from './pages/portal/attractions/portalAttractions';
+import { PortalReportsPage } from './pages/portal/reports/reports';
+import { PortalRevenueReportPage } from './pages/portal/reports/revenue';
 import { PortalHabitatsPage } from './pages/portal/habitats/portalHabitats';
 import { BusinessManagementPage } from './pages/portal/businessManagement/businessManagement';
 import { NotificationsPage } from './pages/portal/notifications/notifications';
@@ -33,7 +35,6 @@ import { MembershipTransactionPage } from './pages/portal/membershipTransaction/
 
 import { PortalEmployeesPage } from './pages/portal/employees/employees';
 import { ShiftReportPage } from './pages/portal/reports/shiftReport/shiftReport';
-import { PortalReportsPage } from './pages/portal/reports/reports';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -74,11 +75,11 @@ export default function Router() {
 		'/portal/shop': ShopPage,
 		'/portal/shift-schedule': ShiftSchedulePage,
 		'/portal/schedule-management': ScheduleManagementPage,
+		'/portal/reports': PortalReportsPage,
+		'/portal/reports/revenue': PortalRevenueReportPage,
 		'/portal/business-management': BusinessManagementPage,
 		'/portal/notifications': NotificationsPage,
-		'/portal/reports': PortalReportsPage,
 		'/portal/reports/shifts': ShiftReportPage,
-		'/portal/reports/revenue': <div>Revenue report</div>,
 		'/portal/reports/animals': <div>Animals & Medical report</div>,
 
 		'/testing': TestingPage,

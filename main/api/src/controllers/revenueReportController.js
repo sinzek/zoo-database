@@ -1,4 +1,4 @@
-import { db } from '../db/mysql.js';
+import { query as sqlQuery } from '../db/mysql.js';
 
 /**
  * Generates a comprehensive revenue report combining transactions and expenses.
@@ -30,12 +30,13 @@ async function getRevenueReport(req, _res) {
 		const placeholders = businessIds.map(() => '?').join(', ');
 		businessWhereClause += ` AND b.businessId IN (${placeholders})`;
 		businessParams = [...businessIds];
-	} else if (businessType) {
-		// Filter by business type otherwise if businessType was given in request body
-		businessWhereClause += ' AND b.type = ?';
-		businessParams = [businessType];
 	}
-	//otherwise if neither it just gets all of them cause no WHERE clause.
+	
+	// Apply business type filter in addition to (or instead of) business IDs
+	if (businessType) {
+		businessWhereClause += ' AND b.type = ?';
+		businessParams.push(businessType);
+	}
 
 	// Main query to get businesses
 	const businessQuery = `
@@ -48,37 +49,61 @@ async function getRevenueReport(req, _res) {
 		ORDER BY b.name
 	`;
 
-	const businesses = await db.query(businessQuery, businessParams);
+	const businesses = await sqlQuery(businessQuery, businessParams);
+	console.log('Businesses found:', businesses.length);
+	console.log('Businesses type:', typeof businesses, 'is array?', Array.isArray(businesses));
+	console.log('First business:', businesses[0]);
+	console.log('Business query:', businessQuery);
+	console.log('Business params:', businessParams);
+
+	// businesses is an array of objects
+	const businessArray = Array.isArray(businesses) ? businesses : [businesses];
 
 	// For each business, get transactions and expenses
 	const reports = await Promise.all(
-		businesses.map(async (business) => {
-			// Get transactions for this business (with optional date filtering)
+		businessArray.map(async (business) => {
+			console.log('Processing business:', typeof business, JSON.stringify(business));
+			// Get transactions for this business with customer names
+			// Priority: Membership customer > PurchasedItem customer > PurchasedItem employee
 			let transactionsQuery = `
-				SELECT 
-					transactionId,
-					description,
-					amount,
-					transactionDate,
-					businessId
-				FROM Transaction
-				WHERE businessId = ? AND deletedAt IS NULL
+				SELECT DISTINCT
+					t.transactionId,
+					t.description,
+					t.amount,
+					t.businessId,
+					t.purchaseDate,
+					COALESCE(
+						NULLIF(CONCAT(mc.firstName, ' ', mc.lastName), ' '),
+						NULLIF(CONCAT(ic.firstName, ' ', ic.lastName), ' '),
+						NULLIF(CONCAT(ie.firstName, ' ', ie.lastName), ' '),
+						'Unknown'
+					) as customerName,
+					m.membershipId,
+					i.name as itemName
+				FROM Transaction t
+				LEFT JOIN Membership m ON t.transactionId = m.transactionId
+				LEFT JOIN Customer mc ON m.customerId = mc.customerId AND mc.deletedAt IS NULL
+				LEFT JOIN PurchasedItem pi ON t.transactionId = pi.transactionId
+				LEFT JOIN Item i ON pi.itemId = i.itemId AND i.deletedAt IS NULL
+				LEFT JOIN Customer ic ON pi.customerId = ic.customerId AND ic.deletedAt IS NULL
+				LEFT JOIN Employee ie ON pi.customerId = ie.employeeId
+				WHERE t.businessId = ? AND t.deletedAt IS NULL
 			`;
 			const transactionParams = [business.businessId];
 
-			// Add date range filtering for transactions if startDate or endDate was given in request body
+			// Add optional date range filtering using purchaseDate
 			if (startDate) {
-				transactionsQuery += ` AND transactionDate >= ?`;
+				transactionsQuery += ` AND purchaseDate >= ?`;
 				transactionParams.push(startDate);
 			}
 			if (endDate) {
-				transactionsQuery += ` AND transactionDate <= ?`;
+				transactionsQuery += ` AND purchaseDate <= ?`;
 				transactionParams.push(endDate);
 			}
 
-			transactionsQuery += ` ORDER BY transactionDate DESC`;
+			transactionsQuery += ` ORDER BY purchaseDate DESC`;
 
-			const transactions = await db.query(transactionsQuery, transactionParams);
+			const transactions = await sqlQuery(transactionsQuery, transactionParams);
 
 			// Get expenses for this business (with optional date filtering)
 			let expensesQuery = `
@@ -105,14 +130,15 @@ async function getRevenueReport(req, _res) {
 
 			expensesQuery += ` ORDER BY purchaseDate DESC`;
 
-			const expenses = await db.query(expensesQuery, expenseParams);
+			const expenses = await sqlQuery(expensesQuery, expenseParams);
 
 			// Calculate totals
 			const totalRevenue = transactions.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
 			const totalExpenses = expenses.reduce((sum, e) => sum + parseFloat(e.cost || 0), 0);
 			const netProfit = totalRevenue - totalExpenses;
 
-			return {
+			console.log('Business being processed:', business);
+			const result = {
 				businessId: business.businessId,
 				businessName: business.businessName,
 				businessType: business.businessType,
@@ -128,10 +154,12 @@ async function getRevenueReport(req, _res) {
 					endDate: endDate || null
 				}
 			};
+			console.log('Result object:', result);
+			return result;
 		})
 	);
 
-	return reports;
+	return [reports];
 }
 
 /**
@@ -145,10 +173,10 @@ async function getRevenueReport(req, _res) {
  * @returns {Promise<Array>} Array of summary reports (without detailed transaction/expense arrays)
  */
 async function getRevenueReportSummary(req, _res) {
-	const fullReport = await getRevenueReport(req, _res);
+	const [fullReport] = await getRevenueReport(req, _res);
 	
 	// Remove the detailed transaction and expense arrays for a lighter response
-	return fullReport.map(report => ({
+	return [fullReport.map(report => ({
 		businessId: report.businessId,
 		businessName: report.businessName,
 		businessType: report.businessType,
@@ -158,7 +186,7 @@ async function getRevenueReportSummary(req, _res) {
 		transactionCount: report.transactionCount,
 		expenseCount: report.expenseCount,
 		dateRange: report.dateRange
-	}));
+	}))];
 }
 
 /**
@@ -173,7 +201,7 @@ async function getRevenueReportSummary(req, _res) {
  * @returns {Promise<Object>} Single aggregated report with grand totals
  */
 async function getAllBusinessesRevenueReport(req, _res) {
-	const reports = await getRevenueReport(req, _res);
+	const [reports] = await getRevenueReport(req, _res);
 	
 	const aggregated = reports.reduce(
 		(acc, report) => ({
@@ -195,7 +223,7 @@ async function getAllBusinessesRevenueReport(req, _res) {
 	);
 
 	//totalRevenue, totalExpenses, netprofit are floats and must be converted to strings with 2 decimal places in order to be returned as JSON.
-	return {
+	return [{
 		...aggregated,
 		totalRevenue: parseFloat(aggregated.totalRevenue.toFixed(2)),
 		totalExpenses: parseFloat(aggregated.totalExpenses.toFixed(2)),
@@ -210,7 +238,7 @@ async function getAllBusinessesRevenueReport(req, _res) {
 			businessType: r.businessType,
 			netProfit: r.netProfit
 		}))
-	};
+	}];
 }
 
 export default {
