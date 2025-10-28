@@ -68,6 +68,7 @@ export function useAuth() {
 		setUserInfo,
 		setUserEntityData,
 		setUserEntityType,
+		setMembership,
 		setAuthLoading
 	) => {
 		setAuthLoading(true);
@@ -78,11 +79,12 @@ export function useAuth() {
 			return; // not logged in, no action needed
 		}
 
-		const { user, relatedInfo } = result.data;
+		const { user, relatedInfo, membership } = result.data;
 
 		setUserInfo(user);
 		setUserEntityData(relatedInfo.data);
 		setUserEntityType(relatedInfo.type);
+		setMembership(membership);
 		setAuthLoading(false);
 		return { success: true, data: result.data };
 	};

@@ -145,8 +145,8 @@ export function BuyTicketsPage() {
 							color: 'var(--color-lgreen)',
 						}}
 					>
-						Choose tickets for your perfect day at the zoo, then add
-						them to your cart for a quick checkout.
+						Buy tickets!!! Please!!!! Buy now!!! Your money -&gt;
+						our pockets!
 					</p>
 				</header>
 

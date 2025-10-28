@@ -25,6 +25,8 @@ import { FeedingScheduleDetailPage } from './pages/portal/feedingSchedules/feedi
 import { ScheduleManagementPage } from './pages/portal/scheduleManagement/scheduleManagement';
 import { PortalHabitatsPage } from './pages/portal/habitats/portalHabitats';
 import { BusinessManagementPage } from './pages/portal/businessManagement/businessManagement';
+import { NotificationsPage } from './pages/portal/notifications/notifications';
+import { MembershipsPage } from './pages/memberships/memberships';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -46,6 +48,7 @@ export default function Router() {
 		'/habitats': HabitatsPage,
 		'/attractions': AttractionsPage,
 		'/animals': AnimalsPage,
+		'/memberships': MembershipsPage,
 
 		'/portal': PortalPage,
 		'/portal/account': AccountPage,
@@ -58,7 +61,8 @@ export default function Router() {
 		'/portal/shop': ShopPage,
 		'/portal/shift-schedule': ShiftSchedulePage,
 		'/portal/schedule-management': ScheduleManagementPage,
-		'/portal/business-management': () => <BusinessManagementPage />,
+		'/portal/business-management': BusinessManagementPage,
+		'/portal/notifications': NotificationsPage,
 
 		'/testing': TestingPage,
 	};

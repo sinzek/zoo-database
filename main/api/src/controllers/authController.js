@@ -1,6 +1,8 @@
 import { query } from '../db/mysql.js';
 import { sha256Hash, signJWT } from '../utils/auth-utils.js';
 import { getCustomerOrEmployeeById } from '../utils/auth-utils.js';
+import { checkIfUserHasExpiredMembership } from '../utils/notif-utils.js';
+import { getMembershipByCustomerId } from '../utils/other-utils.js';
 
 // im using underscore-prefixed variables to avoid linting errors
 // about unused variables since these are just placeholders
@@ -77,7 +79,16 @@ async function getUserData(req, _res) {
 
 	if (!relatedInfo) throw new Error('No related user info found'); // should not happen
 
-	return [{ user, relatedInfo }]; // omit passwordHash
+	let membership = null;
+
+	if (relatedInfo.type === 'customer') {
+		await checkIfUserHasExpiredMembership(userId);
+		membership = await getMembershipByCustomerId(
+			relatedInfo.data.customerId
+		);
+	}
+
+	return [{ user, relatedInfo, membership }]; // omit passwordHash
 }
 
 export default { login, logout, getUserData };

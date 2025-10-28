@@ -9,6 +9,8 @@ import { registerShiftRoutes } from './src/routes/shift.js';
 import { registerBusinessRoutes } from './src/routes/business.js';
 import { registerMedicalRecordRoutes } from './src/routes/medicalRecord.js';
 import { registerDietRoutes } from './src/routes/diet.js';
+import { registerNotificationRoutes } from './src/routes/notification.js';
+import { registerPurchaseRoutes } from './src/routes/purchase.js';
 
 /**
  * Main entry point for the API
@@ -31,6 +33,8 @@ export default async function handler(req, res) {
 	registerBusinessRoutes(app);
 	registerMedicalRecordRoutes(app);
 	registerDietRoutes(app);
+	registerNotificationRoutes(app);
+	registerPurchaseRoutes(app);
 	// !--- end route registration ---!
 
 	return await app.handleVercel(req, res);

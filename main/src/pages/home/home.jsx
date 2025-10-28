@@ -1,3 +1,4 @@
+import { ArrowUpRight, GithubIcon } from 'lucide-react';
 import { Link } from '../../components/link';
 import { BackgroundDots } from './components/backgroundDots';
 import './home.css';
@@ -22,17 +23,24 @@ export default function HomePage() {
 					<Link
 						to='/animals'
 						className='btn btn-green btn-lg'
-						href='/animals'
 					>
 						Animals
 					</Link>
 					<Link
 						to='/habitats'
 						className='btn btn-outline btn-lg'
-						href='/habitats'
 					>
 						Habitats
 					</Link>
+					<a
+						href='https://github.com/sinzek/zoo-database'
+						className='btn btn-green btn-lg'
+						target='_blank'
+						rel='noopener noreferrer'
+					>
+						<GithubIcon />
+						Source Code <ArrowUpRight />
+					</a>
 				</div>
 			</div>
 			<div className='section light-bg'>
