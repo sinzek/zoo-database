@@ -31,6 +31,8 @@ import { NotificationsPage } from './pages/portal/notifications/notifications';
 import { MembershipsPage } from './pages/memberships/memberships';
 import { MembershipTransactionPage } from './pages/portal/membershipTransaction/membershipTransaction';
 
+import { PortalEmployeesPage } from './pages/portal/employees/employees';
+
 export default function Router() {
 	const { path, match } = useRouter();
 	const { userEntityType, userEntityData } = useUserData();
@@ -60,6 +62,7 @@ export default function Router() {
 		'/portal': PortalPage,
 		'/portal/account': AccountPage,
 		'/portal/animals': PortalAnimalsPage,
+		'/portal/employees': PortalEmployeesPage,
 		'/portal/medical-records': MedicalRecordsPage,
 		'/portal/feeding-schedules': FeedingSchedulesPage,
 		'/portal/attractions': PortalAttractionsPage,
