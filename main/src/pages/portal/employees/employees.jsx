@@ -132,15 +132,15 @@ export function PortalEmployeesPage() {
 
 		const employeeData = {
 			...formData,
-			middleInitial: formData.middleInitial || null,
-			hourlyWage: parseFloat(formData.hourlyWage),
-			supervisorId: formData.supervisorId || null, //Allow null supervisor
-			terminationDate: formData.terminationDate || null,
-			// Only include sensitive data if necessary and handled securely by API
-			// ssn: formData.ssn,
-			// payInfoAccountNum: formData.payInfoAccountNum || null,
-			// payInfoRoutingNum: formData.payInfoRoutingNum || null,
-			userId: null,
+            middleInitial: formData.middleInitial || null,
+            hourlyWage: parseFloat(formData.hourlyWage),
+            supervisorId: formData.supervisorId || null, //Allow null supervisor
+            terminationDate: formData.terminationDate || null,
+            // Only include sensitive data if necessary and handled securely by API
+            ssn: formData.ssn, 
+            payInfoAccountNum: formData.payInfoAccountNum || null,
+            payInfoRoutingNum: formData.payInfoRoutingNum || null,
+            userId: null,
 		};
 		if (!editingId) {
 			delete employeeData.employeeId;
@@ -427,11 +427,11 @@ export function PortalEmployeesPage() {
 										required
 									/>
 								</div>
-								{/* SSN */}
-								{/* <div className='form-group'>
+                                {/* SSN */}
+                                <div className='form-group'>
 									<label htmlFor="ssn">SSN *</label>
 									<input id="ssn" type='text' pattern="\d{9}" title="SSN must be 9 digits" value={formData.ssn} onChange={(e) => setFormData({...formData, ssn: e.target.value})} required />
-								</div> */}
+								</div> 
 
 								{/* Job Info */}
 								<div className='form-group'>
