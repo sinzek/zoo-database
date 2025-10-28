@@ -14,6 +14,19 @@ import { cn } from '../../../utils/cn';
 import { Loader } from '../../../components/loader/loader';
 import { dateIsWithin6Hours } from './utils';
 
+// avoiding utc skew
+const toLocalDateKey = (d) => {
+	const y = d.getFullYear();
+	const m = String(d.getMonth() + 1).padStart(2, '0');
+	const day = String(d.getDate()).padStart(2, '0');
+	return `${y}-${m}-${day}`;
+};
+
+const fromLocalDateKey = (key) => {
+	const [y, m, d] = key.split('-').map(Number);
+	return new Date(y, m - 1, d); // local midnight
+};
+
 export function ShiftSchedulePage() {
 	const { userEntityData, userEntityType } = useUserData();
 	const [shiftSchedule, setShiftSchedule] = useState([]);
@@ -87,23 +100,21 @@ export function ShiftSchedulePage() {
 			d <= dateRange.endDate;
 			d.setDate(d.getDate() + 1)
 		) {
-			const dateStr = d.toISOString().split('T')[0];
+			const dateStr = toLocalDateKey(new Date(d));
 			data[dateStr] = { shifts: [], clockTimes: [] };
 		}
 
 		shiftSchedule?.forEach((shift) => {
-			const shiftDateStr = new Date(shift.start)
-				.toISOString()
-				.split('T')[0];
+			const shiftDateStr = toLocalDateKey(new Date(shift.start));
 			if (data[shiftDateStr]) {
 				data[shiftDateStr].shifts.push(shift);
 			}
 		});
 
 		clockTimes?.forEach((clockTime) => {
-			const clockTimeDateStr = new Date(clockTime.startTime)
-				.toISOString()
-				.split('T')[0];
+			const clockTimeDateStr = toLocalDateKey(
+				new Date(clockTime.startTime)
+			);
 			if (data[clockTimeDateStr]) {
 				data[clockTimeDateStr].clockTimes.push(clockTime);
 			}
@@ -273,100 +284,105 @@ export function ShiftSchedulePage() {
 			{!isLoading && !error && (
 				<div className='schedule-grid'>
 					{Object.entries(calendarData).map(
-						([dateStr, { shifts, clockTimes: dayClockTimes }]) => (
-							<div
-								key={dateStr}
-								className={cn(
-									'day-column',
-									new Date(dateStr) < new Date() && 'past-day'
-								)}
-							>
-								<div className='day-header'>
-									<span className='day-name'>
-										{new Date(dateStr).toLocaleDateString(
-											'en-US',
-											{
-												weekday: 'short',
-											}
-										)}
-									</span>
+						([dateStr, { shifts, clockTimes: dayClockTimes }]) => {
+							const displayDate = fromLocalDateKey(dateStr);
 
-									<span className='day-date'>
-										{formatDate(new Date(dateStr))}
-									</span>
-								</div>
-								<div className='shifts-list'>
-									{shifts.length > 0 && (
-										<div className='day-section'>
-											<h4 className='day-section-header'>
-												Shifts
-											</h4>
-											{shifts.map((shift) => (
-												<div
-													key={shift.shiftId}
-													className={cn(
-														'shift-card',
-														new Date(shift.end) <
-															new Date() &&
-															'past-shift'
-													)}
-												>
-													<div className='shift-time'>
-														{getShiftStatusIcon(
-															shift
-														)}
-														<span>
-															{formatTime(
-																shift.start
-															)}{' '}
-															-{' '}
-															{formatTime(
+							return (
+								<div
+									key={dateStr}
+									className={cn(
+										'day-column',
+										displayDate < new Date() && 'past-day'
+									)}
+								>
+									<div className='day-header'>
+										<span className='day-name'>
+											{displayDate.toLocaleDateString(
+												'en-US',
+												{
+													weekday: 'short',
+												}
+											)}
+										</span>
+
+										<span className='day-date'>
+											{formatDate(displayDate)}
+										</span>
+									</div>
+									<div className='shifts-list'>
+										{shifts.length > 0 && (
+											<div className='day-section'>
+												<h4 className='day-section-header'>
+													Shifts
+												</h4>
+												{shifts.map((shift) => (
+													<div
+														key={shift.shiftId}
+														className={cn(
+															'shift-card',
+															new Date(
 																shift.end
+															) < new Date() &&
+																'past-shift'
+														)}
+													>
+														<div className='shift-time'>
+															{getShiftStatusIcon(
+																shift
 															)}
-														</span>
+															<span>
+																{formatTime(
+																	shift.start
+																)}{' '}
+																-{' '}
+																{formatTime(
+																	shift.end
+																)}
+															</span>
+														</div>
 													</div>
-												</div>
-											))}
-										</div>
-									)}
-									{dayClockTimes.length > 0 && (
-										<div className='day-section'>
-											<h4 className='day-section-header'>
-												Clock Times
-											</h4>
-											{dayClockTimes.map((ct) => (
-												<div
-													key={ct.clockTimeId}
-													className='clock-time-card'
-												>
-													<div className='shift-time'>
-														<Clock
-															className='status-icon'
-															aria-label='Clock Time'
-														/>
-														<span>
-															{formatTime(
-																ct.startTime
-															)}{' '}
-															-{' '}
-															{formatTime(
-																ct.endTime
-															)}
-														</span>
-													</div>
-												</div>
-											))}
-										</div>
-									)}
-									{shifts.length === 0 &&
-										dayClockTimes.length === 0 && (
-											<div className='no-shifts'>
-												No activity
+												))}
 											</div>
 										)}
+										{dayClockTimes.length > 0 && (
+											<div className='day-section'>
+												<h4 className='day-section-header'>
+													Clock Times
+												</h4>
+												{dayClockTimes.map((ct) => (
+													<div
+														key={ct.clockTimeId}
+														className='clock-time-card'
+													>
+														<div className='shift-time'>
+															<Clock
+																className='status-icon'
+																aria-label='Clock Time'
+															/>
+															<span>
+																{formatTime(
+																	ct.startTime
+																)}{' '}
+																-{' '}
+																{formatTime(
+																	ct.endTime
+																)}
+															</span>
+														</div>
+													</div>
+												))}
+											</div>
+										)}
+										{shifts.length === 0 &&
+											dayClockTimes.length === 0 && (
+												<div className='no-shifts'>
+													No activity
+												</div>
+											)}
+									</div>
 								</div>
-							</div>
-						)
+							);
+						}
 					)}
 				</div>
 			)}

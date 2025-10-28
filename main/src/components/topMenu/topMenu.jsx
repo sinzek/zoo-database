@@ -26,6 +26,7 @@ export function TopMenu() {
 		businessEmployeeWorksFor,
 		clockedInSince,
 		clock,
+		membership,
 	} = useUserData();
 	const { path } = useRouter();
 
@@ -38,7 +39,7 @@ export function TopMenu() {
 
 	const { cartItemCount } = useShoppingCart();
 
-	const mouseLeaveDebounceTime = 500; // milliseconds
+	const mouseLeaveDebounceTime = 1000; // milliseconds
 
 	const handleFade = (direction) => {
 		const userMenu = document.querySelector('.user-menu');
@@ -91,32 +92,37 @@ export function TopMenu() {
 				</Link>
 			</div>
 			<div className='user-menu-container'>
-				{clockedInSince && (
-					<p className='topmenu-clock-text'>
-						Clocked in for {` ${formatDuration(elapsedTime)}`}
-					</p>
-				)}
-				{!clockedInSince && (
-					<p className='topmenu-clock-text'>
-						<Button
-							variant='green'
-							size='sm'
-							onClick={() => clock('in')}
-						>
-							Clock In
-						</Button>
-					</p>
-				)}
-				{clockedInSince && (
-					<p className='topmenu-clock-text'>
-						<Button
-							variant='green'
-							size='sm'
-							onClick={() => clock('out')}
-						>
-							Clock out
-						</Button>
-					</p>
+				{userEntityType === 'employee' && (
+					<>
+						{clockedInSince && (
+							<p className='topmenu-clock-text'>
+								Clocked in for{' '}
+								{` ${formatDuration(elapsedTime)}`}
+							</p>
+						)}
+						{!clockedInSince && (
+							<p className='topmenu-clock-text'>
+								<Button
+									variant='green'
+									size='sm'
+									onClick={() => clock('in')}
+								>
+									Clock In
+								</Button>
+							</p>
+						)}
+						{clockedInSince && (
+							<p className='topmenu-clock-text'>
+								<Button
+									variant='green'
+									size='sm'
+									onClick={() => clock('out')}
+								>
+									Clock out
+								</Button>
+							</p>
+						)}
+					</>
 				)}
 				{userEntityType === 'employee' && businessEmployeeWorksFor && (
 					<p
@@ -132,21 +138,41 @@ export function TopMenu() {
 				)}
 
 				{userEntityType === 'customer' && (
-					<Link
-						to='/portal/cart'
-						className='user-menu-link shopping-cart-btn'
-					>
-						<Button
-							variant='outline'
-							size='sm'
+					<>
+						{membership && (
+							<p style={{ color: 'var(--color-lgreen)' }}>
+								Membership:{' '}
+								<strong>
+									{membership.level[0].toUpperCase() +
+										membership.level.slice(1)}
+								</strong>{' '}
+								• Expires{' '}
+								<strong>
+									{new Date(
+										membership.expireDate
+									).toLocaleDateString()}
+								</strong>
+							</p>
+						)}
+						<Link
+							to='/portal/cart'
+							className='user-menu-link shopping-cart-btn'
 						>
-							<ShoppingCart
-								size={16}
-								style={{ marginRight: '0.2rem' }}
-							/>
-							Shopping Cart ({cartItemCount})
-						</Button>
-					</Link>
+							<Button
+								variant='outline'
+								size='sm'
+							>
+								<ShoppingCart
+									size={16}
+									style={{
+										marginRight: '0.2rem',
+										marginLeft: '0.2rem',
+									}}
+								/>
+								Shopping Cart ({cartItemCount})
+							</Button>
+						</Link>
+					</>
 				)}
 				<div className='user-menu'>
 					<button
@@ -171,12 +197,19 @@ export function TopMenu() {
 						<ul
 							onMouseEnter={handleMouseEnter}
 							onMouseLeave={handleMouseLeave}
+							className='user-menu-dropdown'
 						>
 							<Link
 								to='/portal'
 								className='user-menu-link'
 							>
 								<li>Portal Home</li>
+							</Link>
+							<Link
+								to='/portal/notifications'
+								className='user-menu-link'
+							>
+								<li>Notifications</li>
 							</Link>
 							<Link
 								to='/portal/account'

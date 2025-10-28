@@ -1,0 +1,143 @@
+.shift-report-page {
+	max-width: 1200px;
+	margin: 100px auto 48px;
+	padding: 24px;
+	color: var(--color-foreground);
+	box-sizing: border-box;
+}
+
+/* Header */
+.shift-report-page > header {
+	display: grid;
+	gap: 8px;
+	margin-bottom: 0.5rem;
+}
+.shift-report-page > header h1 {
+	color: var(--color-green);
+	margin: 0;
+}
+.shift-report-page > header p {
+	color: var(--color-lgreen);
+	margin: 0;
+}
+
+/* Filters (uses .label/.input already in markup) */
+.shift-report-page .label {
+	display: inline-block;
+	font-weight: 600;
+	font-size: 0.9rem;
+	color: var(--color-lgreen);
+	margin-bottom: 6px;
+}
+.shift-report-page .input {
+	width: 100%;
+	background-color: var(--color-dbrown);
+	color: var(--color-foreground);
+	border: 2px solid var(--color-lbrown);
+	border-radius: 50px;
+	padding: 0.6rem 0.75rem;
+	box-sizing: border-box;
+}
+
+.shift-report-page select {
+	border-radius: 20px !important;
+}
+
+.shift-report-page .input:focus,
+.shift-report-page .input:focus-visible {
+	outline: none;
+	border-color: var(--color-green);
+	background-color: var(--color-brown);
+}
+.shift-report-page select[multiple].input {
+	min-height: 140px;
+}
+
+/* Generic section card (wraps each business block) */
+.shift-report-page section {
+	border: 1px solid var(--color-lbrown);
+	border-radius: 12px;
+	overflow: hidden;
+	background: rgba(37, 31, 26, 0.6);
+}
+
+/* Section header (business header) */
+.shift-report-page section > header {
+	background: var(--color-brown);
+	padding: 16px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+	border-bottom: 1px solid var(--color-lbrown);
+}
+.shift-report-page section > header h2 {
+	color: var(--color-lgreen);
+	margin: 0;
+	font-size: 1.25rem;
+}
+.shift-report-page section > header .sub {
+	color: var(--color-lgreen);
+}
+
+/* Table styling (applies to Full/Summary/Aggregated tables) */
+.shift-report-page table {
+	width: 100%;
+	border-collapse: collapse;
+	background: transparent;
+}
+.shift-report-page thead tr {
+	background-color: var(--color-dbrown);
+}
+.shift-report-page th,
+.shift-report-page td {
+	padding: 10px;
+	text-align: left;
+	vertical-align: top;
+}
+.shift-report-page th {
+	color: var(--color-lgreen);
+	font-weight: 700;
+	font-size: 0.95rem;
+}
+.shift-report-page tbody tr {
+	border-top: 1px solid var(--color-lbrown);
+}
+.shift-report-page tbody tr:hover {
+	background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* “Meta” info row above report content */
+.shift-report-page .report-meta {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 12px;
+	margin-top: 12px;
+	color: var(--color-lgreen);
+	font-size: 14px;
+}
+
+/* Simple strip used in aggregated summary (stats row) */
+.shift-report-page .summary-strip {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	background: var(--color-brown);
+	border: 1px solid var(--color-lbrown);
+	border-radius: 12px;
+	padding: 16px;
+}
+
+/* Utility */
+.shift-report-page .table-wrap {
+	overflow-x: auto;
+	border: 1px solid var(--color-lbrown);
+	border-radius: 8px;
+}
+.shift-report-page .muted {
+	color: var(--color-lgreen);
+}
+.shift-report-page .danger {
+	color: #ff6b6b;
+}

@@ -1,0 +1,94 @@
+.memberships-page {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2rem;
+	color: var(--color-lgreen);
+	position: relative;
+}
+
+.memberships-page .hero-container {
+	text-align: center;
+	width: 100%;
+}
+
+.memberships-page h1 {
+	font-size: 3rem;
+	color: var(--color-green);
+	margin-bottom: 1rem;
+}
+
+.memberships-page p {
+	font-size: 1.2rem;
+	color: var(--color-lbrown);
+}
+
+.tiers-container {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	gap: 2rem;
+	width: 100%;
+	max-width: 1200px;
+}
+
+.tier-card {
+	background-color: var(--color-brown);
+	border-radius: 12px;
+	padding: 2rem;
+	display: flex;
+	flex-direction: column;
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.tier-card h2 {
+	font-size: 1.8rem;
+	color: var(--color-green);
+	margin-top: 0;
+}
+
+.tier-card .price {
+	font-size: 1.5rem;
+	font-weight: bold;
+	color: var(--color-lgreen);
+	margin: 0.5rem 0;
+}
+
+.tier-card .zoobucks {
+	font-size: 1rem;
+	font-weight: normal;
+	color: var(--color-lbrown);
+}
+
+.tier-card .description {
+	font-size: 1rem;
+	color: var(--color-lbrown);
+	min-height: 40px;
+}
+
+.tier-card .features {
+	list-style: '✓ ';
+	padding-left: 1.5rem;
+	margin: 1rem 0;
+	flex-grow: 1;
+}
+
+.tier-card .features li {
+	margin-bottom: 0.5rem;
+	color: var(--color-lgreen);
+}
+
+.purchase-btn {
+	margin-top: auto;
+}
+
+.wide-image {
+	width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: -1;
+	filter: blur(10px) brightness(0.25);
+	object-fit: cover;
+
+	clip-path: polygon(0 0, 100% 0, 100% 60%, 0 60%); /* Clips the bottom 20% */
+}

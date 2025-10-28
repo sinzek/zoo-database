@@ -1,4 +1,3 @@
-
 import crypto from 'crypto';
 import {
 	createOneQuery,
@@ -17,7 +16,7 @@ import {
  * @returns {Promise<Array>} Array containing the created item object with generated itemId
  * @throws {Error} If item data is missing
  */
-async function createOne(req, _res){
+async function createOne(req, _res) {
 	const newItem = req.body;
 
 	if (!newItem) throw new Error('Missing item data');
@@ -28,15 +27,15 @@ async function createOne(req, _res){
 		description: newItem.description || null,
 		price: newItem.price,
 		uiImage: newItem.uiImage, // ! CHANGE UIPHOTOURL TO UIIMAGE BLOB TYPE
-		businessId: newItem.businessId
-	}
+		businessId: newItem.businessId,
+	};
 
 	await createOneQuery('Item', newItemData);
 
 	return [newItemData];
 }
 
-async function deleteOne(req, _res){
+async function deleteOne(req, _res) {
 	const { itemId } = req.body;
 
 	if (!itemId) throw new Error('Missing itemId');
@@ -46,7 +45,7 @@ async function deleteOne(req, _res){
 	return [{ message: `Successfully deleted item with ID: ${itemId}` }];
 }
 
-async function updateOne(req, _res){
+async function updateOne(req, _res) {
 	const updatedItem = req.body;
 
 	if (!updatedItem || !updatedItem.itemId) {
@@ -58,7 +57,7 @@ async function updateOne(req, _res){
 	return [updatedItem];
 }
 
-async function getOneById(req, _res){
+async function getOneById(req, _res) {
 	const { itemId } = req.body;
 
 	if (!itemId) throw new Error('Missing itemId');
@@ -68,7 +67,7 @@ async function getOneById(req, _res){
 	return [item];
 }
 
-async function getNByBusiness(req, _res){
+async function getNByBusiness(req, _res) {
 	const { businessId } = req.body;
 
 	if (!businessId) throw new Error('Missing businessId');
@@ -78,4 +77,29 @@ async function getNByBusiness(req, _res){
 	return items;
 }
 
-export default {createOne, deleteOne, updateOne , getOneById, getNByBusiness};
+async function getNAndBusinesses(_req, _res) {
+	const items = await getNByKeyQuery('Item', '1', '1'); // get all items
+
+	const businessIds = [...new Set(items.map((item) => item.businessId))];
+
+	const businesses = {};
+	for (const businessId of businessIds) {
+		const [business] = await getNByKeyQuery(
+			'Business',
+			'businessId',
+			businessId
+		);
+		businesses[businessId] = business;
+	}
+
+	return [{ items, businesses }];
+}
+
+export default {
+	createOne,
+	deleteOne,
+	updateOne,
+	getOneById,
+	getNByBusiness,
+	getNAndBusinesses,
+};

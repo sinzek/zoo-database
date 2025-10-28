@@ -29,6 +29,13 @@ import { PortalReportsPage } from './pages/portal/reports/reports';
 import { PortalRevenueReportPage } from './pages/portal/reports/revenue';
 import { PortalHabitatsPage } from './pages/portal/habitats/portalHabitats';
 import { BusinessManagementPage } from './pages/portal/businessManagement/businessManagement';
+import { NotificationsPage } from './pages/portal/notifications/notifications';
+import { MembershipsPage } from './pages/memberships/memberships';
+import { MembershipTransactionPage } from './pages/portal/membershipTransaction/membershipTransaction';
+
+import { PortalEmployeesPage } from './pages/portal/employees/employees';
+import { ShiftReportPage } from './pages/portal/reports/shiftReport/shiftReport';
+import { PortalReportsPage } from './pages/portal/reports/reports';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -37,10 +44,13 @@ export default function Router() {
 	const isAuthProtectedPage = path.startsWith('/portal');
 	const isLoginOrSignupPage = path === '/login' || path === '/signup';
 
-    const habitatMatch = match('/habitats/:id');
-    const attractionMatch = match('/attractions/:id');
+	const habitatMatch = match('/habitats/:id');
+	const attractionMatch = match('/attractions/:id');
 	const medicalRecordMatch = match('/portal/medical-records/:animalId');
 	const feedingScheduleMatch = match('/portal/feeding-schedules/:animalId');
+	const membershipTransactionMatch = match(
+		'/portal/membership-transaction/:transactionId'
+	);
 
 	let content = null;
 
@@ -51,10 +61,12 @@ export default function Router() {
 		'/habitats': HabitatsPage,
 		'/attractions': AttractionsPage,
 		'/animals': AnimalsPage,
+		'/memberships': MembershipsPage,
 
 		'/portal': PortalPage,
 		'/portal/account': AccountPage,
 		'/portal/animals': PortalAnimalsPage,
+		'/portal/employees': PortalEmployeesPage,
 		'/portal/medical-records': MedicalRecordsPage,
 		'/portal/feeding-schedules': FeedingSchedulesPage,
 		'/portal/attractions': PortalAttractionsPage,
@@ -66,15 +78,18 @@ export default function Router() {
 		'/portal/schedule-management': ScheduleManagementPage,
 		'/portal/reports': PortalReportsPage,
 		'/portal/reports/revenue': PortalRevenueReportPage,
-		'/portal/business-management': () => <BusinessManagementPage />,
+		'/portal/business-management': BusinessManagementPage,
+		'/portal/notifications': NotificationsPage,
+		'/portal/reports/shifts': ShiftReportPage,
+		'/portal/reports/animals': <div>Animals & Medical report</div>,
 
 		'/testing': TestingPage,
 	};
 
-    if (habitatMatch) {
+	if (habitatMatch) {
 		content = <HabitatDetailsPage id={habitatMatch.id} />;
-    } else if (attractionMatch) {
-        content = <AttractionDetailPage id={attractionMatch.id} />;
+	} else if (attractionMatch) {
+		content = <AttractionDetailPage id={attractionMatch.id} />;
 	} else if (medicalRecordMatch) {
 		content = (
 			<MedicalRecordDetailPage animalId={medicalRecordMatch.animalId} />
@@ -85,6 +100,8 @@ export default function Router() {
 				animalId={feedingScheduleMatch.animalId}
 			/>
 		);
+	} else if (membershipTransactionMatch) {
+		content = <MembershipTransactionPage />;
 	} else if (pathMap[path]) {
 		const Component = pathMap[path];
 		content = <Component />;

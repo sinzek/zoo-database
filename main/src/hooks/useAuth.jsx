@@ -8,6 +8,7 @@ export function useAuth() {
 		setUserInfo,
 		setUserEntityData,
 		setUserEntityType,
+		setMembership,
 		navigate
 	) => {
 		console.log('Attempting login for email:', email);
@@ -23,13 +24,14 @@ export function useAuth() {
 			return result; // { success: false, error: '...'}
 		}
 
-		const { user, relatedInfo } = result.data;
+		const { user, relatedInfo, membership } = result.data;
 
 		console.log('Login data received:', result.data);
 
 		setUserInfo(user);
 		setUserEntityData(relatedInfo.data);
 		setUserEntityType(relatedInfo.type);
+		setMembership(membership);
 
 		console.log('Login successful:', result.data);
 		navigate('/portal', { replace: true });
@@ -42,8 +44,16 @@ export function useAuth() {
 		setUserEntityData,
 		setUserEntityType,
 		navigate,
-		setAuthLoading
+		setAuthLoading,
+		isClockedIn
 	) => {
+		if (isClockedIn) {
+			showToast(
+				'Warning: You are currently clocked in. Please clock out before logging out.'
+			);
+			return { success: false, error: 'User is clocked in' };
+		}
+
 		setAuthLoading(true);
 		const result = await api('/api/auth/logout', 'POST');
 
@@ -68,21 +78,26 @@ export function useAuth() {
 		setUserInfo,
 		setUserEntityData,
 		setUserEntityType,
+		setMembership,
 		setAuthLoading
 	) => {
 		setAuthLoading(true);
 		const result = await api('/api/auth/me', 'GET');
 
-		if (!result.success && result.error === 'Unauthorized') {
+		if (!result.success) {
 			setAuthLoading(false);
 			return; // not logged in, no action needed
 		}
 
-		const { user, relatedInfo } = result.data;
+		if (!result.data.user)
+			return { success: false, error: 'No user data returned' };
+
+		const { user, relatedInfo, membership } = result.data;
 
 		setUserInfo(user);
 		setUserEntityData(relatedInfo.data);
 		setUserEntityType(relatedInfo.type);
+		setMembership(membership);
 		setAuthLoading(false);
 		return { success: true, data: result.data };
 	};
