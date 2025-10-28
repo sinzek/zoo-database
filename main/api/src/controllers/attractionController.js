@@ -2,6 +2,7 @@ import { db } from '../db/mysql.js';
 import crypto from 'crypto';
 import {
 	createOneQuery,
+	getAllQuery,
 	getNByKeyQuery,
 	updateOneQuery,
 } from '../utils/query-utils.js';
@@ -50,7 +51,7 @@ async function createOne(req, _res){
 		endDate: endingDay
 	});
 
-	//create the hours tuple
+	//create the hours tuple only if provided
 	const {mondayOpen, mondayClose,	tuesdayOpen, tuesdayClose,	wednesdayOpen,	wednesdayClose,	thursdayOpen,	thursdayClose,
 		fridayOpen,	fridayClose,	saturdayOpen,	saturdayClose,	sundayOpen,	sundayClose} = newAttraction;
 
@@ -64,13 +65,18 @@ async function createOne(req, _res){
 			['Saturday', saturdayOpen, saturdayClose]
 		];
 
+		// Only create hours if both open and close times are provided for a day
 		for (const [dayOfWeek, openTime, closeTime] of hours){
-			await createOneQuery('AttractionHoursDay', {
-				attractionId: newAttractionID,
-				dayOfWeek,
-				openTime,
-				closeTime
-			});
+			if (openTime && closeTime) {
+				const hoursId = crypto.randomUUID();
+				await createOneQuery('AttractionHoursDay', {
+					attractionHoursDayId: hoursId,
+					attractionId: newAttractionID,
+					dayOfWeek,
+					openTime,
+					closeTime
+				});
+			}
 		}
 }
 
@@ -93,8 +99,20 @@ async function updateOneInfo(req, _res){
 		throw new Error('Missing attraction data or attractionId');
 	}
 
-	const {attractionId, name, description, location, uiImage, startingDay, endingDay} = updatedAttraction;
+	const {attractionId, name, description, location, uiImage, startingDay, endingDay, mondayOpen, mondayClose, tuesdayOpen, tuesdayClose, wednesdayOpen, wednesdayClose, thursdayOpen, thursdayClose,
+		fridayOpen, fridayClose, saturdayOpen, saturdayClose, sundayOpen, sundayClose} = updatedAttraction;
 
+	console.log('Received hours data:', {
+		mondayOpen, mondayClose,
+		tuesdayOpen, tuesdayClose,
+		wednesdayOpen, wednesdayClose,
+		thursdayOpen, thursdayClose,
+		fridayOpen, fridayClose,
+		saturdayOpen, saturdayClose,
+		sundayOpen, sundayClose
+	});
+
+	// Update basic attraction info
 	await updateOneQuery('Attraction', {
 		attractionId,
 		name,
@@ -104,6 +122,78 @@ async function updateOneInfo(req, _res){
 		startDate: startingDay,
 		endDate: endingDay
 	}, 'attractionId');
+
+	// Handle operating hours - update existing or create new
+	if (mondayOpen !== undefined || mondayClose !== undefined || tuesdayOpen !== undefined || tuesdayClose !== undefined 
+		|| wednesdayOpen !== undefined || wednesdayClose !== undefined || thursdayOpen !== undefined || thursdayClose !== undefined
+		|| fridayOpen !== undefined || fridayClose !== undefined || saturdayOpen !== undefined || saturdayClose !== undefined
+		|| sundayOpen !== undefined || sundayClose !== undefined) {
+		
+		const hours = [
+			['Sunday', sundayOpen, sundayClose],
+			['Monday', mondayOpen, mondayClose],
+			['Tuesday', tuesdayOpen, tuesdayClose],
+			['Wednesday', wednesdayOpen, wednesdayClose],
+			['Thursday', thursdayOpen, thursdayClose],
+			['Friday', fridayOpen, fridayClose],
+			['Saturday', saturdayOpen, saturdayClose]
+		];
+
+		// Helper to normalize "HH:MM" -> "HH:MM:00"
+		const normalizeTime = (t) => {
+			if (t === null || t === undefined) return t;
+			if (typeof t !== 'string') return t;
+			const trimmed = t.trim();
+			if (/^\d{2}:\d{2}$/.test(trimmed)) return `${trimmed}:00`;
+			return trimmed;
+		};
+
+		for (const [dayOfWeek, rawOpen, rawClose] of hours){
+			const openTime = normalizeTime(rawOpen);
+			const closeTime = normalizeTime(rawClose);
+			const isEmpty = (v) => v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
+
+			console.log(`${dayOfWeek}:`, { rawOpen, rawClose, openTime, closeTime, openEmpty: isEmpty(openTime), closeEmpty: isEmpty(closeTime) });
+
+			// If both times provided and non-empty -> UPSERT (update if exists, else insert)
+			if (!isEmpty(openTime) && !isEmpty(closeTime)) {
+				try {
+					// Try UPDATE first
+					const updateResult = await db.query(
+						`UPDATE AttractionHoursDay SET openTime = ?, closeTime = ? WHERE attractionId = ? AND dayOfWeek = ?`,
+						[openTime, closeTime, attractionId, dayOfWeek]
+					);
+					const affected = updateResult?.affectedRows ?? updateResult?.[0]?.affectedRows;
+					console.log(`Attempted update for ${dayOfWeek}, affected rows:`, affected);
+
+					if (!affected || affected === 0) {
+						// No row to update -> INSERT
+						const hoursId = crypto.randomUUID();
+						const insertResult = await db.query(
+							`INSERT INTO AttractionHoursDay (attractionHoursDayId, attractionId, dayOfWeek, openTime, closeTime) VALUES (?, ?, ?, ?, ?)`,
+							[hoursId, attractionId, dayOfWeek, openTime, closeTime]
+						);
+						console.log(`Inserted new hours for ${dayOfWeek}`, insertResult?.affectedRows ?? insertResult);
+					} else {
+						console.log(`Updated existing hours for ${dayOfWeek}`);
+					}
+				} catch (err) {
+					console.error(`Failed to upsert hours for ${dayOfWeek}:`, { openTime, closeTime, err: err?.message || err });
+				}
+			} else {
+				// If any field is empty/undefined/null -> DELETE existing hours for this day
+				try {
+					const deleteResult = await db.query(
+						`DELETE FROM AttractionHoursDay WHERE attractionId = ? AND dayOfWeek = ?`,
+						[attractionId, dayOfWeek]
+					);
+					console.log(`Deleted hours for ${dayOfWeek}, affected rows:`, deleteResult.affectedRows);
+				} catch (err) {
+					console.error(`Failed to delete hours for ${dayOfWeek}:`, err?.message || err);
+				}
+			}
+		}
+	}
 
 	return [updatedAttraction];
 }
@@ -222,4 +312,30 @@ async function getOneHours(req, _res){
 	return rows;
 }
 
-export default {createOne, updateOneInfo, updateOneHours, deleteOne, getOne, getOneHours};
+/**
+ * Retrieves all non-deleted attractions from the database with their operating hours.
+ * @returns {Promise<Array>} Array of all attraction objects with operating hours
+ */
+async function getAll(_req, _res) {
+	try {
+		const attractions = await getAllQuery('Attraction');
+		
+		// For each attraction, get its operating hours
+		for (const attraction of attractions) {
+			try {
+				const hours = await getNByKeyQuery('AttractionHoursDay', 'attractionId', attraction.attractionId, false);
+				attraction.hours = hours || [];
+			} catch {
+				// No hours found for this attraction
+				attraction.hours = [];
+			}
+		}
+		
+		return [attractions];
+	} catch {
+		// Return empty array if no attractions found
+		return [[]];
+	}
+}
+
+export default {createOne, updateOneInfo, updateOneHours, deleteOne, getOne, getOneHours, getAll};

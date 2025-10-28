@@ -122,6 +122,7 @@ CREATE TABLE Attraction (
     startDate DATE NULL DEFAULT (CURDATE()), -- defaults to current date if not provided
     endDate DATE NULL, -- must be after startDate or null if ongoing
     location VARCHAR(200) NOT NULL CHECK (LENGTH(location) >= 1), -- at least 1 char, max 200
+    uiImage VARCHAR(200) NULL, -- image URL for UI
     deletedAt DATETIME NULL, -- soft delete (null if not deleted)
 
     CHECK (endDate IS NULL OR endDate > startDate)

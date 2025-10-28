@@ -188,6 +188,31 @@
 .attractions-page .text-link:hover {
   border-bottom-style: solid;
 }
+.attractions-page .operating-hours {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+.attractions-page .operating-hours strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #9be15d;
+}
+.attractions-page .hours-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.attractions-page .hours-item {
+  color: #c0d4b3;
+  font-size: 0.85rem;
+}
+.attractions-page .no-hours {
+  color: #888;
+  font-style: italic;
+}
 
 /* Switch cards to two-column internal layout on wider screens */
 @media (min-width: 860px) {

@@ -11,6 +11,7 @@ import {
 	Users,
 	BarChart,
 	ShieldBan,
+	Ticket,
 } from 'lucide-react';
 
 export function availableLinksForAccessLevel(uedata) {
