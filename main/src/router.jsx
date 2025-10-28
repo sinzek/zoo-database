@@ -25,6 +25,8 @@ import { FeedingSchedulesPage } from './pages/portal/feedingSchedules/feedingSch
 import { FeedingScheduleDetailPage } from './pages/portal/feedingSchedules/feedingScheduleDetail';
 import { ScheduleManagementPage } from './pages/portal/scheduleManagement/scheduleManagement';
 import { PortalAttractionsPage } from './pages/portal/attractions/portalAttractions';
+import { PortalReportsPage } from './pages/portal/reports/reports';
+import { PortalRevenueReportPage } from './pages/portal/reports/revenue';
 import { PortalHabitatsPage } from './pages/portal/habitats/portalHabitats';
 import { BusinessManagementPage } from './pages/portal/businessManagement/businessManagement';
 
@@ -62,6 +64,8 @@ export default function Router() {
 		'/portal/shop': ShopPage,
 		'/portal/shift-schedule': ShiftSchedulePage,
 		'/portal/schedule-management': ScheduleManagementPage,
+		'/portal/reports': PortalReportsPage,
+		'/portal/reports/revenue': PortalRevenueReportPage,
 		'/portal/business-management': () => <BusinessManagementPage />,
 
 		'/testing': TestingPage,

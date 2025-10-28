@@ -15,3 +15,25 @@
 	gap: 2rem;
 	width: 80%;
 }
+
+/* Multi-select styling */
+select[multiple] {
+	border-radius: 8px;
+	padding: 0.5rem;
+	background-color: var(--color-dbrown);
+	color: var(--color-foreground);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	font-size: 0.9rem;
+	line-height: 1.5;
+}
+
+select[multiple] option {
+	padding: 0.5rem;
+	background-color: var(--color-dbrown);
+	color: var(--color-foreground);
+}
+
+select[multiple] option:checked {
+	background-color: #3d7f50;
+	color: #fff;
+}
