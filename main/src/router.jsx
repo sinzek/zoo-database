@@ -32,6 +32,8 @@ import { MembershipsPage } from './pages/memberships/memberships';
 import { MembershipTransactionPage } from './pages/portal/membershipTransaction/membershipTransaction';
 
 import { PortalEmployeesPage } from './pages/portal/employees/employees';
+import { ShiftReportPage } from './pages/portal/reports/shiftReport/shiftReport';
+import { PortalReportsPage } from './pages/portal/reports/reports';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -40,8 +42,8 @@ export default function Router() {
 	const isAuthProtectedPage = path.startsWith('/portal');
 	const isLoginOrSignupPage = path === '/login' || path === '/signup';
 
-    const habitatMatch = match('/habitats/:id');
-    const attractionMatch = match('/attractions/:id');
+	const habitatMatch = match('/habitats/:id');
+	const attractionMatch = match('/attractions/:id');
 	const medicalRecordMatch = match('/portal/medical-records/:animalId');
 	const feedingScheduleMatch = match('/portal/feeding-schedules/:animalId');
 	const membershipTransactionMatch = match(
@@ -74,14 +76,18 @@ export default function Router() {
 		'/portal/schedule-management': ScheduleManagementPage,
 		'/portal/business-management': BusinessManagementPage,
 		'/portal/notifications': NotificationsPage,
+		'/portal/reports': PortalReportsPage,
+		'/portal/reports/shifts': ShiftReportPage,
+		'/portal/reports/revenue': <div>Revenue report</div>,
+		'/portal/reports/animals': <div>Animals & Medical report</div>,
 
 		'/testing': TestingPage,
 	};
 
-    if (habitatMatch) {
+	if (habitatMatch) {
 		content = <HabitatDetailsPage id={habitatMatch.id} />;
-    } else if (attractionMatch) {
-        content = <AttractionDetailPage id={attractionMatch.id} />;
+	} else if (attractionMatch) {
+		content = <AttractionDetailPage id={attractionMatch.id} />;
 	} else if (medicalRecordMatch) {
 		content = (
 			<MedicalRecordDetailPage animalId={medicalRecordMatch.animalId} />
