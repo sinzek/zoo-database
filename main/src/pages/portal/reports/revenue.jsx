@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useUserData } from '../../../context/userDataContext';
 import { api } from '../../../utils/client-api-utils';
 import { Loader } from '../../../components/loader/loader';
+import { Button } from '../../../components/button';
+import './revenue.css';
 
 export function PortalRevenueReportPage() {
   const { userEntityData, userEntityType } = useUserData();
@@ -40,19 +42,24 @@ export function PortalRevenueReportPage() {
     setError('');
     try {
       const body = {};
-      if (startDate) body.startDate = startDate;
-      if (endDate) body.endDate = endDate;
       
-      // If specific businesses are selected, filter by type within those businesses
-      if (selectedBusinessIds.length > 0 && businessType) {
-        // Filter selected businesses by type
-        const filtered = businesses
-          .filter(b => selectedBusinessIds.includes(b.businessId) && b.type === businessType)
-          .map(b => b.businessId);
-        body.businessIds = filtered;
-      } else if (selectedBusinessIds.length > 0) {
+      // Always send dates if provided
+      if (startDate) {
+        // Ensure startDate includes time to capture full day
+        body.startDate = startDate + ' 00:00:00';
+      }
+      if (endDate) {
+        // Ensure endDate includes time to capture full day
+        body.endDate = endDate + ' 23:59:59';
+      }
+      
+      // Send business IDs if any are selected
+      if (selectedBusinessIds.length > 0) {
         body.businessIds = selectedBusinessIds;
-      } else if (businessType) {
+      }
+      
+      // Send business type if selected (applies in addition to business IDs)
+      if (businessType) {
         body.businessType = businessType;
       }
       
@@ -98,19 +105,21 @@ export function PortalRevenueReportPage() {
 
   if (!isAuthorized) {
     return (
-      <div className='portal-attractions-page' style={{ paddingTop: '80px' }}>
+      <div className='portal-revenue-page'>
         <p className='error-message'>Reports are available to managers and above.</p>
       </div>
     );
   }
 
   return (
-    <div className='portal-attractions-page' style={{ paddingTop: '80px' }}>
-      <div className='attractions-header'>
+    <div className='portal-revenue-page'>
+      <div className='revenue-header'>
         <h1>Revenue Report</h1>
       </div>
 
-      <div className='attraction-form' style={{ marginBottom: '1rem' }}>
+      <div className='revenue-form-container'>
+        <h2>Filter Options</h2>
+        <div className='revenue-form'>
         <div className='form-group'>
           <label>Start Date</label>
           <input type='date' value={startDate} onChange={(e) => setStartDate(e.target.value)} />
@@ -131,16 +140,9 @@ export function PortalRevenueReportPage() {
         </div>
         <div className='form-group'>
           <label>Specific Businesses</label>
-          <div style={{ 
-            maxHeight: '150px', 
-            overflowY: 'auto', 
-            border: '1px solid rgba(255, 255, 255, 0.1)', 
-            borderRadius: '8px', 
-            padding: '0.5rem',
-            backgroundColor: 'var(--color-dbrown)'
-          }}>
+          <div className='business-checkbox-container'>
             {businesses.map(b => (
-              <label key={b.businessId} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', cursor: 'pointer' }}>
+              <label key={b.businessId} className='business-checkbox-item'>
                 <input 
                   type='checkbox' 
                   value={b.businessId}
@@ -159,13 +161,16 @@ export function PortalRevenueReportPage() {
           </div>
         </div>
         <div className='form-group'>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <label className='checkbox-group'>
             <input type='checkbox' checked={useSummary} onChange={(e) => setUseSummary(e.target.checked)} />
             <span>Show Summary Only</span>
           </label>
         </div>
-        <div className='form-actions'>
-          <button type='button' className='save-button' onClick={loadReport}>Load Report</button>
+        <div className='revenue-form-actions'>
+          <Button onClick={loadReport} loading={loading} variant='green' className='save-button'>
+            Load Report
+          </Button>
+        </div>
         </div>
       </div>
 
@@ -174,15 +179,15 @@ export function PortalRevenueReportPage() {
       ) : error ? (
         <div className='error-message'>{error}</div>
       ) : (
-        <div className='attractions-list'>
+        <div className='revenue-list'>
           <h2>Per Business</h2>
           {reports.length === 0 ? (
             <p>No data available.</p>
           ) : (
-            <div className='attractions-grid'>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {reports.map((r) => (
-                <div key={r.businessId} className='attraction-card'>
-                  <div className='attraction-info'>
+                <div key={r.businessId} className='revenue-card' style={{ width: '100%' }}>
+                  <div className='revenue-info'>
                     <h3>{r.businessName}</h3>
                     <p><strong>Type:</strong> {r.businessType}</p>
                     <p><strong>Total Revenue:</strong> ${r.totalRevenue?.toFixed(2)}</p>
@@ -190,29 +195,59 @@ export function PortalRevenueReportPage() {
                     <p><strong>Net Profit:</strong> ${r.netProfit?.toFixed(2)}</p>
                     
                     {!useSummary && r.transactions && r.transactions.length > 0 && (
-                      <div style={{ marginTop: '1rem' }}>
+                      <div className='table-section'>
                         <h4>Transactions ({r.transactions.length})</h4>
-                        <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                          {r.transactions.map((t, idx) => (
-                            <div key={idx} style={{ borderBottom: '1px solid #555', padding: '0.25rem 0' }}>
-                              <p style={{ margin: 0, fontSize: '0.85rem' }}>
-                                <strong>{t.customerName}</strong> - {t.description || 'No description'}: ${parseFloat(t.amount || 0).toFixed(2)}
-                              </p>
-                            </div>
-                          ))}
+                        <div className='table-container'>
+                          <table className='transactions-table'>
+                            <thead>
+                              <tr>
+                                <th style={{ minWidth: '150px' }}>Customer</th>
+                                <th style={{ minWidth: '200px' }}>Description</th>
+                                <th style={{ minWidth: '150px' }}>Item/Membership</th>
+                                <th style={{ minWidth: '150px' }}>Date</th>
+                                <th style={{ minWidth: '100px' }}>Amount</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {r.transactions.map((t, idx) => (
+                                <tr key={idx}>
+                                  <td>{t.customerName}</td>
+                                  <td style={{ wordBreak: 'break-word' }}>{t.description || 'No description'}</td>
+                                  <td>
+                                    {t.itemName && <span>Item: {t.itemName}</span>}
+                                    {t.membershipId && <span>Membership: {t.membershipId}</span>}
+                                    {!t.itemName && !t.membershipId && <span>-</span>}
+                                  </td>
+                                  <td>{t.purchaseDate ? new Date(t.purchaseDate).toLocaleDateString() : '-'}</td>
+                                  <td>${parseFloat(t.amount || 0).toFixed(2)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
                       </div>
                     )}
                     
                     {!useSummary && r.expenses && r.expenses.length > 0 && (
-                      <div style={{ marginTop: '1rem' }}>
+                      <div className='table-section'>
                         <h4>Expenses ({r.expenses.length})</h4>
-                        <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                          {r.expenses.map((e, idx) => (
-                            <div key={idx} style={{ borderBottom: '1px solid #555', padding: '0.25rem 0' }}>
-                              <p style={{ margin: 0 }}>{e.expenseDescription}: ${parseFloat(e.cost || 0).toFixed(2)}</p>
-                            </div>
-                          ))}
+                        <div className='table-container'>
+                          <table className='expenses-table'>
+                            <thead>
+                              <tr>
+                                <th>Description</th>
+                                <th style={{ minWidth: '100px' }}>Cost</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {r.expenses.map((e, idx) => (
+                                <tr key={idx}>
+                                  <td style={{ wordBreak: 'break-word' }}>{e.expenseDescription}</td>
+                                  <td>${parseFloat(e.cost || 0).toFixed(2)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
                       </div>
                     )}
@@ -223,8 +258,8 @@ export function PortalRevenueReportPage() {
           )}
 
           <h2 style={{ marginTop: '1rem' }}>Grand Totals</h2>
-          <div className='attraction-card'>
-            <div className='attraction-info'>
+          <div className='revenue-card'>
+            <div className='revenue-info'>
               <p>Total Revenue: ${totals.revenue.toFixed(2)}</p>
               <p>Total Expenses: ${totals.expenses.toFixed(2)}</p>
               <p>Net Profit: ${totals.profit.toFixed(2)}</p>

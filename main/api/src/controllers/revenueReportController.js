@@ -30,12 +30,13 @@ async function getRevenueReport(req, _res) {
 		const placeholders = businessIds.map(() => '?').join(', ');
 		businessWhereClause += ` AND b.businessId IN (${placeholders})`;
 		businessParams = [...businessIds];
-	} else if (businessType) {
-		// Filter by business type otherwise if businessType was given in request body
-		businessWhereClause += ' AND b.type = ?';
-		businessParams = [businessType];
 	}
-	//otherwise if neither it just gets all of them cause no WHERE clause.
+	
+	// Apply business type filter in addition to (or instead of) business IDs
+	if (businessType) {
+		businessWhereClause += ' AND b.type = ?';
+		businessParams.push(businessType);
+	}
 
 	// Main query to get businesses
 	const businessQuery = `
@@ -63,18 +64,29 @@ async function getRevenueReport(req, _res) {
 		businessArray.map(async (business) => {
 			console.log('Processing business:', typeof business, JSON.stringify(business));
 			// Get transactions for this business with customer names
+			// Priority: Membership customer > PurchasedItem customer > PurchasedItem employee
 			let transactionsQuery = `
-				SELECT 
+				SELECT DISTINCT
 					t.transactionId,
 					t.description,
 					t.amount,
 					t.businessId,
 					t.purchaseDate,
-					COALESCE(CONCAT(c.firstName, ' ', c.lastName), CONCAT(e.firstName, ' ', e.lastName), 'Unknown') as customerName
+					COALESCE(
+						NULLIF(CONCAT(mc.firstName, ' ', mc.lastName), ' '),
+						NULLIF(CONCAT(ic.firstName, ' ', ic.lastName), ' '),
+						NULLIF(CONCAT(ie.firstName, ' ', ie.lastName), ' '),
+						'Unknown'
+					) as customerName,
+					m.membershipId,
+					i.name as itemName
 				FROM Transaction t
+				LEFT JOIN Membership m ON t.transactionId = m.transactionId
+				LEFT JOIN Customer mc ON m.customerId = mc.customerId AND mc.deletedAt IS NULL
 				LEFT JOIN PurchasedItem pi ON t.transactionId = pi.transactionId
-				LEFT JOIN Customer c ON pi.customerId = c.customerId
-				LEFT JOIN Employee e ON pi.customerId = e.employeeId
+				LEFT JOIN Item i ON pi.itemId = i.itemId AND i.deletedAt IS NULL
+				LEFT JOIN Customer ic ON pi.customerId = ic.customerId AND ic.deletedAt IS NULL
+				LEFT JOIN Employee ie ON pi.customerId = ie.employeeId
 				WHERE t.businessId = ? AND t.deletedAt IS NULL
 			`;
 			const transactionParams = [business.businessId];
