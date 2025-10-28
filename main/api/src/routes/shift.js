@@ -1,4 +1,5 @@
 import shiftController from '../controllers/shiftController.js';
+import { withAccessLevel } from '../utils/auth-utils.js';
 
 export function registerShiftRoutes(app) {
 	app.post('/api/shifts/create', shiftController.createOne);
@@ -25,5 +26,9 @@ export function registerShiftRoutes(app) {
 	app.post(
 		'/api/shifts/remove-employee-from-shift',
 		shiftController.removeOneEmployeeFromShift
+	);
+	app.post(
+		'/api/shifts/clockOut',
+		withAccessLevel('worker', shiftController.clockOutEmployee)
 	);
 }

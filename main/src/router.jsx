@@ -25,6 +25,8 @@ import { FeedingSchedulesPage } from './pages/portal/feedingSchedules/feedingSch
 import { FeedingScheduleDetailPage } from './pages/portal/feedingSchedules/feedingScheduleDetail';
 import { ScheduleManagementPage } from './pages/portal/scheduleManagement/scheduleManagement';
 import { PortalAttractionsPage } from './pages/portal/attractions/portalAttractions';
+import { PortalHabitatsPage } from './pages/portal/habitats/portalHabitats';
+import { BusinessManagementPage } from './pages/portal/businessManagement/businessManagement';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -54,11 +56,13 @@ export default function Router() {
 		'/portal/medical-records': MedicalRecordsPage,
 		'/portal/feeding-schedules': FeedingSchedulesPage,
 		'/portal/attractions': PortalAttractionsPage,
+		'/portal/habitats': PortalHabitatsPage,
 		'/portal/buy-tickets': BuyTicketsPage,
 		'/portal/cart': CartPage,
 		'/portal/shop': ShopPage,
 		'/portal/shift-schedule': ShiftSchedulePage,
 		'/portal/schedule-management': ScheduleManagementPage,
+		'/portal/business-management': () => <BusinessManagementPage />,
 
 		'/testing': TestingPage,
 	};
@@ -68,9 +72,15 @@ export default function Router() {
     } else if (attractionMatch) {
         content = <AttractionDetailPage id={attractionMatch.id} />;
 	} else if (medicalRecordMatch) {
-		content = <MedicalRecordDetailPage animalId={medicalRecordMatch.animalId} />;
+		content = (
+			<MedicalRecordDetailPage animalId={medicalRecordMatch.animalId} />
+		);
 	} else if (feedingScheduleMatch) {
-		content = <FeedingScheduleDetailPage animalId={feedingScheduleMatch.animalId} />;
+		content = (
+			<FeedingScheduleDetailPage
+				animalId={feedingScheduleMatch.animalId}
+			/>
+		);
 	} else if (pathMap[path]) {
 		const Component = pathMap[path];
 		content = <Component />;

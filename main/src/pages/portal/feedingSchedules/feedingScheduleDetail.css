@@ -105,13 +105,6 @@
 	margin-bottom: 1rem;
 }
 
-.form-group label {
-	display: block;
-	margin-bottom: 0.5rem;
-	color: var(--color-lgreen);
-	font-weight: 600;
-}
-
 .form-actions {
 	display: flex;
 	gap: 1rem;

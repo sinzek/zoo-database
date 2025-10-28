@@ -171,11 +171,11 @@ CREATE TABLE EmployeeTakesShift(
 
 CREATE TABLE EmployeeClockTime(
 	clockTimeId CHAR(36) PRIMARY KEY,
-	shiftId CHAR(36) NOT NULL,
 	startTime DATETIME NOT NULL,
 	endTime DATETIME NOT NULL,
+    employeeId CHAR(36) NOT NULL,
 
-	FOREIGN KEY (shiftId) REFERENCES Shift(shiftId) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (employeeId) REFERENCES Employee(employeeId) ON DELETE CASCADE ON UPDATE CASCADE,
     CHECK(endTime > startTime)
 );
 
@@ -183,6 +183,10 @@ CREATE TABLE Habitat(
 	habitatId CHAR(36) PRIMARY KEY,
 	name VARCHAR(100) NOT NULL CHECK(LENGTH(name) > 3),
 	description VARCHAR(500) NOT NULL,
+	imageUrl VARCHAR(200) DEFAULT NULL,
+	extraDetails VARCHAR(1000) DEFAULT NULL,
+	climate VARCHAR(500) DEFAULT NULL,
+	funFact VARCHAR(500) DEFAULT NULL,
 	deletedAt DATE NULL
 );
 

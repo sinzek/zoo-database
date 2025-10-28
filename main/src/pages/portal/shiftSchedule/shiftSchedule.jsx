@@ -12,10 +12,12 @@ import { Button } from '../../../components/button';
 import './shiftSchedule.css';
 import { cn } from '../../../utils/cn';
 import { Loader } from '../../../components/loader/loader';
+import { dateIsWithin6Hours } from './utils';
 
 export function ShiftSchedulePage() {
 	const { userEntityData, userEntityType } = useUserData();
 	const [shiftSchedule, setShiftSchedule] = useState([]);
+	const [clockTimes, setClockTimes] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const hasFetchedShifts = useRef(false);
@@ -37,20 +39,22 @@ export function ShiftSchedulePage() {
 
 	useEffect(() => {
 		const loadShiftSchedule = async () => {
-			if (!userEntityData?.employeeId || hasFetchedShifts.current) return;
+			if (!userEntityData?.employeeId) return;
 
 			setIsLoading(true);
 			setError(null);
+			hasFetchedShifts.current = false;
 			try {
-				const shifts = await fetchShiftSchedule(
+				const { shifts, clockTimes } = await fetchShiftSchedule(
 					userEntityData.employeeId,
 					dateRange
 				);
-				console.log('Loaded shifts:', shifts);
 
 				setShiftSchedule(shifts);
+				setClockTimes(clockTimes);
 				hasFetchedShifts.current = true;
 			} catch (err) {
+				console.error('Error fetching shifts:', err);
 				setError(
 					err.message ||
 						'An unexpected error occurred while fetching shifts.'
@@ -76,28 +80,61 @@ export function ShiftSchedulePage() {
 		});
 	};
 
-	const groupedShifts = useMemo(() => {
-		const groups = {};
+	const calendarData = useMemo(() => {
+		const data = {};
 		for (
 			let d = new Date(dateRange.startDate);
 			d <= dateRange.endDate;
 			d.setDate(d.getDate() + 1)
 		) {
 			const dateStr = d.toISOString().split('T')[0];
-			groups[dateStr] = [];
+			data[dateStr] = { shifts: [], clockTimes: [] };
 		}
 
-		shiftSchedule.forEach((shift) => {
+		shiftSchedule?.forEach((shift) => {
 			const shiftDateStr = new Date(shift.start)
 				.toISOString()
 				.split('T')[0];
-			if (groups[shiftDateStr]) {
-				groups[shiftDateStr].push(shift);
+			if (data[shiftDateStr]) {
+				data[shiftDateStr].shifts.push(shift);
 			}
 		});
 
-		return groups;
-	}, [shiftSchedule, dateRange]);
+		clockTimes?.forEach((clockTime) => {
+			const clockTimeDateStr = new Date(clockTime.startTime)
+				.toISOString()
+				.split('T')[0];
+			if (data[clockTimeDateStr]) {
+				data[clockTimeDateStr].clockTimes.push(clockTime);
+			}
+		});
+
+		return data;
+	}, [shiftSchedule, clockTimes, dateRange]);
+
+	const totalHoursWorked = useMemo(() => {
+		return clockTimes.reduce((acc, ct) => {
+			if (ct.startTime && ct.endTime) {
+				const start = new Date(ct.startTime);
+				const end = new Date(ct.endTime);
+				const duration = (end - start) / (1000 * 60 * 60); // duration in hours
+				return acc + duration;
+			}
+			return acc;
+		}, 0);
+	}, [clockTimes]);
+
+	const totalHours = useMemo(() => {
+		return shiftSchedule.reduce((acc, shift) => {
+			if (shift.start && shift.end) {
+				const start = new Date(shift.start);
+				const end = new Date(shift.end);
+				const duration = (end - start) / (1000 * 60 * 60); // duration in hours
+				return acc + duration;
+			}
+			return acc;
+		}, 0);
+	}, [shiftSchedule]);
 
 	const formatDate = (date) => {
 		return date.toLocaleDateString('en-US', {
@@ -117,7 +154,12 @@ export function ShiftSchedulePage() {
 	const getShiftStatusIcon = (shift) => {
 		const now = new Date();
 		const shiftEnd = new Date(shift.end);
-		const hasClockTimes = shift.clockTimes && shift.clockTimes.length > 0;
+
+		let hasClockTimes = false;
+
+		hasClockTimes = (clockTimes || []).some((ct) =>
+			dateIsWithin6Hours(ct.startTime, shift.start)
+		);
 
 		if (shiftEnd < now) {
 			if (hasClockTimes) {
@@ -143,6 +185,11 @@ export function ShiftSchedulePage() {
 			/>
 		);
 	};
+
+	useEffect(() => {
+		console.log('Isloading:', isLoading);
+		console.log('Error:', error);
+	}, [isLoading, error]);
 
 	if (!userEntityData || userEntityType !== 'employee') {
 		return (
@@ -225,78 +272,113 @@ export function ShiftSchedulePage() {
 			)}
 			{!isLoading && !error && (
 				<div className='schedule-grid'>
-					{Object.entries(groupedShifts).map(([dateStr, shifts]) => (
-						<div
-							key={dateStr}
-							className={cn(
-								'day-column',
-								new Date(dateStr) < new Date() && 'past-day'
-							)}
-						>
-							<div className='day-header'>
-								<span className='day-name'>
-									{new Date(dateStr).toLocaleDateString(
-										'en-US',
-										{
-											weekday: 'short',
-										}
-									)}
-								</span>
-
-								<span className='day-date'>
-									{formatDate(new Date(dateStr))}
-								</span>
-							</div>
-							<div className='shifts-list'>
-								{shifts.length > 0 ? (
-									shifts.map((shift) => (
-										<div
-											key={shift.shiftId}
-											className={cn(
-												'shift-card',
-												shift.end < new Date() &&
-													'past-shift'
-											)}
-										>
-											<div className='shift-time'>
-												{getShiftStatusIcon(shift)}
-												<span>
-													{formatTime(shift.start)} -{' '}
-													{formatTime(shift.end)}
-												</span>
-											</div>
-											{shift.clockTimes &&
-												shift.clockTimes.length > 0 && (
-													<div className='clock-times'>
-														{shift.clockTimes.map(
-															(ct) => (
-																<div
-																	key={
-																		ct.clockTimeId
-																	}
-																>
-																	<strong>
-																		{ct.type ===
-																		'in'
-																			? 'In: '
-																			: 'Out: '}
-																	</strong>
-																	{formatTime(
-																		ct.time
-																	)}
-																</div>
-															)
-														)}
-													</div>
-												)}
-										</div>
-									))
-								) : (
-									<div className='no-shifts'>No shifts</div>
+					{Object.entries(calendarData).map(
+						([dateStr, { shifts, clockTimes: dayClockTimes }]) => (
+							<div
+								key={dateStr}
+								className={cn(
+									'day-column',
+									new Date(dateStr) < new Date() && 'past-day'
 								)}
+							>
+								<div className='day-header'>
+									<span className='day-name'>
+										{new Date(dateStr).toLocaleDateString(
+											'en-US',
+											{
+												weekday: 'short',
+											}
+										)}
+									</span>
+
+									<span className='day-date'>
+										{formatDate(new Date(dateStr))}
+									</span>
+								</div>
+								<div className='shifts-list'>
+									{shifts.length > 0 && (
+										<div className='day-section'>
+											<h4 className='day-section-header'>
+												Shifts
+											</h4>
+											{shifts.map((shift) => (
+												<div
+													key={shift.shiftId}
+													className={cn(
+														'shift-card',
+														new Date(shift.end) <
+															new Date() &&
+															'past-shift'
+													)}
+												>
+													<div className='shift-time'>
+														{getShiftStatusIcon(
+															shift
+														)}
+														<span>
+															{formatTime(
+																shift.start
+															)}{' '}
+															-{' '}
+															{formatTime(
+																shift.end
+															)}
+														</span>
+													</div>
+												</div>
+											))}
+										</div>
+									)}
+									{dayClockTimes.length > 0 && (
+										<div className='day-section'>
+											<h4 className='day-section-header'>
+												Clock Times
+											</h4>
+											{dayClockTimes.map((ct) => (
+												<div
+													key={ct.clockTimeId}
+													className='clock-time-card'
+												>
+													<div className='shift-time'>
+														<Clock
+															className='status-icon'
+															aria-label='Clock Time'
+														/>
+														<span>
+															{formatTime(
+																ct.startTime
+															)}{' '}
+															-{' '}
+															{formatTime(
+																ct.endTime
+															)}
+														</span>
+													</div>
+												</div>
+											))}
+										</div>
+									)}
+									{shifts.length === 0 &&
+										dayClockTimes.length === 0 && (
+											<div className='no-shifts'>
+												No activity
+											</div>
+										)}
+								</div>
 							</div>
-						</div>
-					))}
+						)
+					)}
+				</div>
+			)}
+			{!isLoading && !error && (
+				<div className='total-hours-display'>
+					Total hrs worked between {formatDate(dateRange.startDate)}{' '}
+					and {formatDate(dateRange.endDate)}:{' '}
+					<strong>
+						{totalHoursWorked.toFixed(2)}
+						{' / '}
+						{totalHours.toFixed(2)}
+					</strong>
 				</div>
 			)}
 		</div>
