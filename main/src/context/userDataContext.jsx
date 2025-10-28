@@ -144,6 +144,7 @@ export function UserDataProvider({ children }) {
 						setUserInfo,
 						setUserEntityData,
 						setUserEntityType,
+						setMembership,
 						navigate
 					),
 				logout: async () =>

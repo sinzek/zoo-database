@@ -19,6 +19,8 @@ async function purchaseItems(req, _res) {
 
 	const transactions = [];
 	const purchasedItems = [];
+	console.log('Purchasing items:', items);
+
 	for (const item of items) {
 		const newTransaction = {
 			transactionId: crypto.randomUUID(),
@@ -44,7 +46,7 @@ async function purchaseItems(req, _res) {
 	}
 
 	await sendNotificationToUser(
-		req.user.data.userId,
+		req.user.data.id,
 		`Thank you for your purchase totalling $${total.toFixed(
 			2
 		)}! Your items have been thrown into the void.`
@@ -55,7 +57,7 @@ async function purchaseItems(req, _res) {
 
 async function purchaseMembership(req, _res) {
 	const { newMembership } = req.body;
-	const userId = req.user.data.userId;
+	const userId = req.user.data.id;
 
 	if (!newMembership) throw new Error('Missing membership data');
 	if (!newMembership.customerId)
@@ -99,7 +101,7 @@ async function purchaseMembership(req, _res) {
 	} catch (err) {
 		if (err.code === 'ER_DUP_ENTRY') {
 			throw new Error(
-				'You already have an active membership. Head to /portal/membership to manage it.'
+				'You already have an active membership. Head to /portal to view it.'
 			);
 		}
 		throw err;

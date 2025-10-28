@@ -26,6 +26,12 @@ async function login(req, _res) {
 
 	if (!relatedInfo) throw new Error('No user found for given credentials'); // should not happen
 
+	let membership = null;
+
+	if (relatedInfo.type === 'customer') {
+		membership = await getMembershipByCustomerId(user.userId);
+	}
+
 	const token = signJWT({ id: user.userId });
 
 	const cookie = {
@@ -41,7 +47,11 @@ async function login(req, _res) {
 	};
 
 	return [
-		{ user: { userId: user.userId, email: user.email }, relatedInfo },
+		{
+			user: { userId: user.userId, email: user.email },
+			relatedInfo,
+			membership,
+		},
 		[cookie],
 	]; // omit passwordHash
 }

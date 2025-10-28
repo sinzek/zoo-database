@@ -73,10 +73,18 @@ export function MembershipsPage() {
 		});
 
 		if (result.success) {
-			showToast(`Congratulations! You are now a ${tier.name} member.`);
+			console.log(result.data);
+			showToast(
+				`Congratulations! You are now a(n) ${tier.name} member for 1 year.`
+			);
+			navigate(
+				'/portal/membership-transaction/' +
+					result.data.transaction.transactionId
+			);
 		} else {
 			showToast(result.error || 'Failed to purchase membership.');
 		}
+
 		setLoading(false);
 	};
 

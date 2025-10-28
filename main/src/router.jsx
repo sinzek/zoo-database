@@ -27,6 +27,7 @@ import { PortalHabitatsPage } from './pages/portal/habitats/portalHabitats';
 import { BusinessManagementPage } from './pages/portal/businessManagement/businessManagement';
 import { NotificationsPage } from './pages/portal/notifications/notifications';
 import { MembershipsPage } from './pages/memberships/memberships';
+import { MembershipTransactionPage } from './pages/portal/membershipTransaction/membershipTransaction';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -38,6 +39,9 @@ export default function Router() {
 	const habitatMatch = match('/habitats/:id');
 	const medicalRecordMatch = match('/portal/medical-records/:animalId');
 	const feedingScheduleMatch = match('/portal/feeding-schedules/:animalId');
+	const membershipTransactionMatch = match(
+		'/portal/membership-transaction/:transactionId'
+	);
 
 	let content = null;
 
@@ -79,6 +83,8 @@ export default function Router() {
 				animalId={feedingScheduleMatch.animalId}
 			/>
 		);
+	} else if (membershipTransactionMatch) {
+		content = <MembershipTransactionPage />;
 	} else if (pathMap[path]) {
 		const Component = pathMap[path];
 		content = <Component />;
