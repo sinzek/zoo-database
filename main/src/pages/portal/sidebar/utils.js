@@ -49,14 +49,22 @@ export function availableLinksForAccessLevel(uedata) {
 				icon: CalendarCog,
 			},
 			{
-				to: '/portal/business-management',
-				label: 'Business Management',
+				to: '/portal/attractions',
+				label: 'Attractions',
 				icon: Building,
 			},
 			{ to: '/portal/employees', label: 'Employees', icon: Users },
 			{ to: '/portal/reports', label: 'Reports', icon: BarChart },
 			{ to: '/portal/habitats', label: 'Manage Habitats', icon: TreePalm }
 		);
+	}
+
+	if (hasMinAccessLvl('executive', uedata)) {
+		links.push({
+			to: '/portal/business-management',
+			label: 'Business Management',
+			icon: Building,
+		});
 	}
 
 	if (hasMinAccessLvl('db_admin', uedata)) {

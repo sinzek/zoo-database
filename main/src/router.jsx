@@ -24,6 +24,7 @@ import { FeedingSchedulesPage } from './pages/portal/feedingSchedules/feedingSch
 import { FeedingScheduleDetailPage } from './pages/portal/feedingSchedules/feedingScheduleDetail';
 import { ScheduleManagementPage } from './pages/portal/scheduleManagement/scheduleManagement';
 import { PortalHabitatsPage } from './pages/portal/habitats/portalHabitats';
+import { BusinessManagementPage } from './pages/portal/businessManagement/businessManagement';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -57,6 +58,7 @@ export default function Router() {
 		'/portal/shop': ShopPage,
 		'/portal/shift-schedule': ShiftSchedulePage,
 		'/portal/schedule-management': ScheduleManagementPage,
+		'/portal/business-management': () => <BusinessManagementPage />,
 
 		'/testing': TestingPage,
 	};
@@ -64,9 +66,15 @@ export default function Router() {
 	if (habitatMatch) {
 		content = <HabitatDetailsPage id={habitatMatch.id} />;
 	} else if (medicalRecordMatch) {
-		content = <MedicalRecordDetailPage animalId={medicalRecordMatch.animalId} />;
+		content = (
+			<MedicalRecordDetailPage animalId={medicalRecordMatch.animalId} />
+		);
 	} else if (feedingScheduleMatch) {
-		content = <FeedingScheduleDetailPage animalId={feedingScheduleMatch.animalId} />;
+		content = (
+			<FeedingScheduleDetailPage
+				animalId={feedingScheduleMatch.animalId}
+			/>
+		);
 	} else if (pathMap[path]) {
 		const Component = pathMap[path];
 		content = <Component />;

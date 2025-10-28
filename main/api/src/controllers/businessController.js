@@ -1,4 +1,4 @@
-import { db } from '../db/mysql.js';
+import { query } from '../db/mysql.js';
 import crypto from 'crypto';
 import {
 	createOneQuery,
@@ -115,8 +115,8 @@ async function deleteOne(req, _res) {
 
 	if (!deleteBusinessID) throw new Error('Missing businessID');
 
-	// using db.query for soft delete
-	await db.query(
+	// using query for soft delete
+	await query(
 		`
 		UPDATE Business
 		SET deletedAt = CURRENT_DATE()
@@ -223,9 +223,9 @@ async function updateOneHours(req, _res) {
 		['Saturday', saturdayOpen, saturdayClose],
 	];
 
-	// using db.query for composite key update
+	// using query for composite key update
 	for (const [dayOfWeek, openTime, closeTime] of hours) {
-		await db.query(
+		await query(
 			`
 			UPDATE BusinessHoursDay
 			SET openTime = ?, closeTime = ?
@@ -251,10 +251,134 @@ async function getOneById(req, _res) {
 	return [business];
 }
 
+/**
+ * Retrieves all non-deleted businesses from the database.
+ * @returns {Promise<Array>} Array of all business objects
+ */
+async function getAll(_req, _res) {
+	const businesses = await query(
+		'SELECT * FROM Business WHERE deletedAt IS NULL'
+	);
+	return [businesses];
+}
+
+/**
+ * Retrieves all non-deleted businesses along with their operating hours.
+ * @returns {Promise<Array>} Array of business objects, each with an 'hours' property.
+ */
+async function getAllWithHours(_req, _res) {
+	const businesses = await query(
+		'SELECT * FROM Business WHERE deletedAt IS NULL'
+	);
+
+	const businessIds = businesses.map((b) => b.businessId);
+
+	if (businessIds.length === 0) {
+		return [[]];
+	}
+
+	const hoursQuery = `
+        SELECT * FROM BusinessHoursDay 
+        WHERE businessId IN (?)
+        ORDER BY FIELD(dayOfWeek, 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday')
+    `;
+	const hours = await query(hoursQuery, [businessIds]);
+
+	const businessesWithHours = businesses.map((business) => {
+		const businessHours = hours.filter(
+			(h) => h.businessId === business.businessId
+		);
+		return {
+			...business,
+			hours: businessHours,
+		};
+	});
+
+	return [businessesWithHours];
+}
+
+async function updateOne(req, _res) {
+	const businessData = req.body;
+
+	if (!businessData || !businessData.businessId) {
+		throw new Error('Missing business data or businessId');
+	}
+
+	const {
+		businessId,
+		name,
+		address,
+		phone,
+		email,
+		uiDescription,
+		ownerId,
+		hours,
+	} = businessData;
+
+	// 1. Update Business table information
+	await updateOneQuery(
+		'Business',
+		{
+			businessId,
+			name,
+			address,
+			phone,
+			email,
+			uiDescription,
+			ownerId,
+		},
+		'businessId'
+	);
+
+	// 2. Intelligently update, create, or delete BusinessHoursDay records
+	if (hours) {
+		for (const [dayOfWeek, time] of Object.entries(hours)) {
+			const { openTime, closeTime } = time;
+
+			// If openTime/closeTime are missing, it means the business is closed on this day.
+			// Delete the record for this day if it exists.
+			if (!openTime || !closeTime) {
+				await query(
+					'DELETE FROM BusinessHoursDay WHERE businessId = ? AND dayOfWeek = ?',
+					[businessId, dayOfWeek]
+				);
+				continue;
+			}
+
+			// Try to update the record first.
+			const updateResult = await query(
+				`
+                UPDATE BusinessHoursDay
+                SET openTime = ?, closeTime = ?
+                WHERE businessId = ? AND dayOfWeek = ?
+                `,
+				[openTime, closeTime, businessId, dayOfWeek]
+			);
+
+			// If no rows were affected by the update, it means the record doesn't exist.
+			// Create a new one.
+			if (updateResult.affectedRows === 0) {
+				await createOneQuery('BusinessHoursDay', {
+					businessHoursDayId: crypto.randomUUID(),
+					businessId,
+					dayOfWeek,
+					openTime,
+					closeTime,
+				});
+			}
+		}
+	}
+
+	return [{ ...businessData }];
+}
+
 export default {
 	createOne,
 	updateOneInfo,
 	updateOneHours,
 	deleteOne,
 	getOneById,
+	getAll,
+	getAllWithHours,
+	updateOne,
 };
