@@ -300,23 +300,34 @@ export function ShiftReportPage() {
 				</select>
 			</div>
 
-			<div style={{ gridColumn: 'span 2' }}>
-				<label className='label'>Start</label>
-				<input
-					type='datetime-local'
-					className='input'
-					value={startDate}
-					onChange={(e) => setStartDate(e.target.value)}
-				/>
-			</div>
-			<div style={{ gridColumn: 'span 2' }}>
-				<label className='label'>End</label>
-				<input
-					type='datetime-local'
-					className='input'
-					value={endDate}
-					onChange={(e) => setEndDate(e.target.value)}
-				/>
+			<div style={{ gridColumn: 'span 4' }}>
+				<div
+					style={{ display: 'flex', gap: 8, flexDirection: 'column' }}
+				>
+					<label className='label'>Start</label>
+					<input
+						type='datetime-local'
+						className='input'
+						value={startDate}
+						onChange={(e) => setStartDate(e.target.value)}
+					/>
+				</div>
+				<div
+					style={{
+						marginTop: '10px',
+						display: 'flex',
+						gap: 8,
+						flexDirection: 'column',
+					}}
+				>
+					<label className='label'>End</label>
+					<input
+						type='datetime-local'
+						className='input'
+						value={endDate}
+						onChange={(e) => setEndDate(e.target.value)}
+					/>
+				</div>
 			</div>
 
 			<div style={{ gridColumn: 'span 12', display: 'flex', gap: 8 }}>

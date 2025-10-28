@@ -15,10 +15,12 @@ import {
 	ChevronLeft,
 } from 'lucide-react';
 import './feedingScheduleDetail.css';
+import { Button } from '../../../components/button';
 
+// eslint-disable-next-line react/prop-types
 export function FeedingScheduleDetailPage({ animalId }) {
 	const { navigate } = useRouter();
-	const { userEntityData, userEntityType } = useUserData();
+	const { userEntityData } = useUserData();
 	const [animal, setAnimal] = useState(null);
 	const [diet, setDiet] = useState(null);
 	const [loading, setLoading] = useState(true);
@@ -43,8 +45,16 @@ export function FeedingScheduleDetailPage({ animalId }) {
 	useEffect(() => {
 		// Check if user can edit (zookeeper+)
 		if (userEntityData?.accessLevel) {
-			const zookeeperLevels = ['zookeeper', 'veterinarian', 'manager', 'executive', 'db_admin'];
-			setIsZookeeperPlus(zookeeperLevels.includes(userEntityData.accessLevel));
+			const zookeeperLevels = [
+				'zookeeper',
+				'veterinarian',
+				'manager',
+				'executive',
+				'db_admin',
+			];
+			setIsZookeeperPlus(
+				zookeeperLevels.includes(userEntityData.accessLevel)
+			);
 		}
 
 		if (animalId) {
@@ -54,7 +64,7 @@ export function FeedingScheduleDetailPage({ animalId }) {
 
 	const loadData = async () => {
 		setLoading(true);
-		
+
 		// Get animal details
 		const animalResult = await api('/api/animal/get-one-by-id', 'POST', {
 			animalId,
@@ -64,13 +74,21 @@ export function FeedingScheduleDetailPage({ animalId }) {
 			setAnimal(animalResult.data);
 
 			// Get diet for this animal by animalId
-			const dietResult = await api('/api/diet/get-by-animal-with-schedule', 'POST', {
-				animalId: animalResult.data.animalId,
-			});
+			const dietResult = await api(
+				'/api/diet/get-by-animal-with-schedule',
+				'POST',
+				{
+					animalId: animalResult.data.animalId,
+				}
+			);
 
 			console.log('Diet result:', dietResult);
-			
-			if (dietResult.success && dietResult.data && dietResult.data.length > 0) {
+
+			if (
+				dietResult.success &&
+				dietResult.data &&
+				dietResult.data.length > 0
+			) {
 				console.log('Setting diet:', dietResult.data[0]);
 				setDiet(dietResult.data[0]);
 			} else {
@@ -84,7 +102,7 @@ export function FeedingScheduleDetailPage({ animalId }) {
 
 	const handleNewDaySubmit = async (e) => {
 		e.preventDefault();
-		
+
 		if (!diet?.dietId) {
 			showToast('Animal does not have a diet assigned', 'error');
 			return;
@@ -143,7 +161,11 @@ export function FeedingScheduleDetailPage({ animalId }) {
 	};
 
 	const handleDelete = async (dietScheduleDayId) => {
-		if (!confirm('Are you sure you want to delete this feeding schedule day?')) {
+		if (
+			!confirm(
+				'Are you sure you want to delete this feeding schedule day?'
+			)
+		) {
 			return;
 		}
 
@@ -161,7 +183,7 @@ export function FeedingScheduleDetailPage({ animalId }) {
 
 	const handleCreateDiet = async (e) => {
 		e.preventDefault();
-		
+
 		const result = await api('/api/diet/create', 'POST', {
 			animalId,
 			...newDietFormData,
@@ -185,7 +207,15 @@ export function FeedingScheduleDetailPage({ animalId }) {
 		navigate('/portal/feeding-schedules');
 	};
 
-	const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+	const DAYS_OF_WEEK = [
+		'Monday',
+		'Tuesday',
+		'Wednesday',
+		'Thursday',
+		'Friday',
+		'Saturday',
+		'Sunday',
+	];
 
 	if (loading) {
 		return (
@@ -199,10 +229,14 @@ export function FeedingScheduleDetailPage({ animalId }) {
 
 	return (
 		<div className='feeding-schedule-detail-page'>
-			<button onClick={goBack} className='back-button'>
+			<Button
+				onClick={goBack}
+				className='back-button'
+				style={{ marginBottom: '1rem' }}
+			>
 				<ChevronLeft size={20} />
 				Back to Feeding Schedules
-			</button>
+			</Button>
 
 			{animal && (
 				<div className='animal-header'>
@@ -227,16 +261,19 @@ export function FeedingScheduleDetailPage({ animalId }) {
 				{isZookeeperPlus && diet && (
 					<div className='schedule-actions'>
 						{!showNewForm && (
-							<button
+							<Button
 								onClick={() => setShowNewForm(true)}
 								className='add-day-button'
 							>
 								<Plus size={16} />
 								Add Feeding Schedule Day
-							</button>
+							</Button>
 						)}
 						{showNewForm && (
-							<form onSubmit={handleNewDaySubmit} className='new-day-form'>
+							<form
+								onSubmit={handleNewDaySubmit}
+								className='new-day-form'
+							>
 								<div className='form-row'>
 									<div className='form-group'>
 										<label>Day of Week</label>
@@ -250,7 +287,10 @@ export function FeedingScheduleDetailPage({ animalId }) {
 											}
 										>
 											{DAYS_OF_WEEK.map((day) => (
-												<option key={day} value={day}>
+												<option
+													key={day}
+													value={day}
+												>
 													{day}
 												</option>
 											))}
@@ -286,11 +326,15 @@ export function FeedingScheduleDetailPage({ animalId }) {
 									</div>
 								</div>
 								<div className='form-actions'>
-									<button type='submit' className='save-button'>
+									<Button
+										type='submit'
+										className='save-button'
+										variant='green'
+									>
 										<Save size={16} />
 										Add
-									</button>
-									<button
+									</Button>
+									<Button
 										type='button'
 										onClick={() => {
 											setShowNewForm(false);
@@ -300,11 +344,12 @@ export function FeedingScheduleDetailPage({ animalId }) {
 												food: '',
 											});
 										}}
+										variant='outline'
 										className='cancel-button'
 									>
 										<X size={16} />
 										Cancel
-									</button>
+									</Button>
 								</div>
 							</form>
 						)}
@@ -313,28 +358,38 @@ export function FeedingScheduleDetailPage({ animalId }) {
 
 				{!diet ? (
 					<div className='no-diet-container'>
-						<p className='no-diet'>No feeding schedule assigned to this animal.</p>
+						<p className='no-diet'>
+							No feeding schedule assigned to this animal.
+						</p>
 						{isZookeeperPlus && (
 							<>
 								{!showCreateDietForm ? (
-									<button
-										onClick={() => setShowCreateDietForm(true)}
+									<Button
+										onClick={() =>
+											setShowCreateDietForm(true)
+										}
 										className='create-diet-button'
 									>
 										<Plus size={16} />
 										Create Diet for This Animal
-									</button>
+									</Button>
 								) : (
-									<form onSubmit={handleCreateDiet} className='create-diet-form'>
+									<form
+										onSubmit={handleCreateDiet}
+										className='create-diet-form'
+									>
 										<h3>Create Diet</h3>
 										<div className='form-group'>
 											<label>Special Notes</label>
 											<textarea
-												value={newDietFormData.specialNotes}
+												value={
+													newDietFormData.specialNotes
+												}
 												onChange={(e) =>
 													setNewDietFormData({
 														...newDietFormData,
-														specialNotes: e.target.value,
+														specialNotes:
+															e.target.value,
 													})
 												}
 												rows={3}
@@ -342,23 +397,30 @@ export function FeedingScheduleDetailPage({ animalId }) {
 											/>
 										</div>
 										<div className='form-actions'>
-											<button type='submit' className='save-button'>
+											<Button
+												type='submit'
+												className='save-button'
+												variant='green'
+											>
 												<Save size={16} />
 												Create Diet
-											</button>
-											<button
+											</Button>
+											<Button
 												type='button'
 												onClick={() => {
-													setShowCreateDietForm(false);
+													setShowCreateDietForm(
+														false
+													);
 													setNewDietFormData({
 														specialNotes: '',
 													});
 												}}
 												className='cancel-button'
+												variant='outline'
 											>
 												<X size={16} />
 												Cancel
-											</button>
+											</Button>
 										</div>
 									</form>
 								)}
@@ -366,43 +428,62 @@ export function FeedingScheduleDetailPage({ animalId }) {
 						)}
 					</div>
 				) : diet.scheduleDays && diet.scheduleDays.length === 0 ? (
-					<p className='no-schedule'>No feeding schedule days configured.</p>
+					<p className='no-schedule'>
+						No feeding schedule days configured.
+					</p>
 				) : (
 					<div className='schedule-days'>
 						{diet.scheduleDays.map((day) => {
-							const isEditing = editingDayId === day.dietScheduleDayId;
+							const isEditing =
+								editingDayId === day.dietScheduleDayId;
 							return (
-								<div key={day.dietScheduleDayId} className='schedule-day-card'>
+								<div
+									key={day.dietScheduleDayId}
+									className='schedule-day-card'
+								>
 									{isEditing ? (
 										<div className='edit-form'>
 											<div className='form-row'>
 												<div className='form-group'>
 													<label>Day of Week</label>
 													<select
-														value={editingFormData.dayOfWeek}
+														value={
+															editingFormData.dayOfWeek
+														}
 														onChange={(e) =>
 															setEditingFormData({
 																...editingFormData,
-																dayOfWeek: e.target.value,
+																dayOfWeek:
+																	e.target
+																		.value,
 															})
 														}
 													>
-														{DAYS_OF_WEEK.map((d) => (
-															<option key={d} value={d}>
-																{d}
-															</option>
-														))}
+														{DAYS_OF_WEEK.map(
+															(d) => (
+																<option
+																	key={d}
+																	value={d}
+																>
+																	{d}
+																</option>
+															)
+														)}
 													</select>
 												</div>
 												<div className='form-group'>
 													<label>Feed Time</label>
 													<input
 														type='time'
-														value={editingFormData.feedTime}
+														value={
+															editingFormData.feedTime
+														}
 														onChange={(e) =>
 															setEditingFormData({
 																...editingFormData,
-																feedTime: e.target.value,
+																feedTime:
+																	e.target
+																		.value,
 															})
 														}
 													/>
@@ -411,28 +492,40 @@ export function FeedingScheduleDetailPage({ animalId }) {
 													<label>Food</label>
 													<input
 														type='text'
-														value={editingFormData.food}
+														value={
+															editingFormData.food
+														}
 														onChange={(e) =>
 															setEditingFormData({
 																...editingFormData,
-																food: e.target.value,
+																food: e.target
+																	.value,
 															})
 														}
 													/>
 												</div>
 											</div>
 											<div className='form-actions'>
-												<button
-													onClick={() => handleSave(day.dietScheduleDayId)}
+												<Button
+													onClick={() =>
+														handleSave(
+															day.dietScheduleDayId
+														)
+													}
 													className='save-button'
+													variant='green'
 												>
 													<Save size={16} />
 													Save
-												</button>
-												<button onClick={handleCancel} className='cancel-button'>
+												</Button>
+												<Button
+													onClick={handleCancel}
+													className='cancel-button'
+													variant='green'
+												>
 													<X size={16} />
 													Cancel
-												</button>
+												</Button>
 											</div>
 										</div>
 									) : (
@@ -444,27 +537,37 @@ export function FeedingScheduleDetailPage({ animalId }) {
 												</h3>
 												{isZookeeperPlus && (
 													<div className='action-buttons'>
-														<button
-															onClick={() => handleEdit(day)}
+														<Button
+															onClick={() =>
+																handleEdit(day)
+															}
 															className='edit-button'
+															variant='green'
 														>
 															<Edit size={16} />
-														</button>
-														<button
-															onClick={() => handleDelete(day.dietScheduleDayId)}
+														</Button>
+														<Button
+															onClick={() =>
+																handleDelete(
+																	day.dietScheduleDayId
+																)
+															}
 															className='delete-button'
+															variant='outline'
 														>
 															<Trash2 size={16} />
-														</button>
+														</Button>
 													</div>
 												)}
 											</div>
 											<div className='schedule-day-info'>
 												<div className='info-item'>
-													<strong>Feed Time:</strong> {day.feedTime}
+													<strong>Feed Time:</strong>{' '}
+													{day.feedTime}
 												</div>
 												<div className='info-item'>
-													<strong>Food:</strong> {day.food}
+													<strong>Food:</strong>{' '}
+													{day.food}
 												</div>
 											</div>
 										</>
@@ -478,4 +581,3 @@ export function FeedingScheduleDetailPage({ animalId }) {
 		</div>
 	);
 }
-

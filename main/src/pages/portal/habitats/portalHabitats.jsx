@@ -5,6 +5,7 @@ import { Loader } from '../../../components/loader/loader';
 import { api } from '../../../utils/client-api-utils';
 import { Plus, Edit2, Save, X, Trash2 } from 'lucide-react';
 import './portalHabitats.css';
+import { Button } from '../../../components/button';
 
 export function PortalHabitatsPage() {
 	const { userEntityData, userEntityType } = useUserData();
@@ -26,7 +27,9 @@ export function PortalHabitatsPage() {
 		// Check if user is manager or above
 		if (userEntityData?.accessLevel) {
 			const managerLevels = ['manager', 'executive', 'db_admin'];
-			setIsManagerPlus(managerLevels.includes(userEntityData.accessLevel));
+			setIsManagerPlus(
+				managerLevels.includes(userEntityData.accessLevel)
+			);
 		}
 
 		loadData();
@@ -56,13 +59,18 @@ export function PortalHabitatsPage() {
 			: await api('/api/habitat/create', 'POST', formData);
 
 		if (result.success) {
-			showToast(`Habitat ${editingId ? 'updated' : 'created'} successfully!`);
+			showToast(
+				`Habitat ${editingId ? 'updated' : 'created'} successfully!`
+			);
 			setShowAddForm(false);
 			setEditingId(null);
 			resetForm();
 			loadData();
 		} else {
-			showToast(`Failed to ${editingId ? 'update' : 'create'} habitat`, 'error');
+			showToast(
+				`Failed to ${editingId ? 'update' : 'create'} habitat`,
+				'error'
+			);
 		}
 	};
 
@@ -90,9 +98,14 @@ export function PortalHabitatsPage() {
 		setShowAddForm(true);
 		// Scroll to form
 		setTimeout(() => {
-			const formElement = document.querySelector('.habitat-form-container');
+			const formElement = document.querySelector(
+				'.habitat-form-container'
+			);
 			if (formElement) {
-				formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				formElement.scrollIntoView({
+					behavior: 'smooth',
+					block: 'start',
+				});
 			}
 		}, 100);
 	};
@@ -104,7 +117,11 @@ export function PortalHabitatsPage() {
 	};
 
 	const handleDelete = async (habitat) => {
-		if (!confirm(`Are you sure you want to archive "${habitat.name}"?\n\nThis habitat will be archived. Animals in this habitat will remain but will be marked as being in an archived habitat. You can reassign them to active habitats from the Animals page.`)) {
+		if (
+			!confirm(
+				`Are you sure you want to archive "${habitat.name}"?\n\nThis habitat will be archived. Animals in this habitat will remain but will be marked as being in an archived habitat. You can reassign them to active habitats from the Animals page.`
+			)
+		) {
 			return;
 		}
 
@@ -114,7 +131,10 @@ export function PortalHabitatsPage() {
 			});
 
 			if (result.success) {
-				showToast(result.data.message || 'Habitat archived successfully', 'success');
+				showToast(
+					result.data.message || 'Habitat archived successfully',
+					'success'
+				);
 				loadData();
 			} else {
 				showToast(result.error || 'Failed to archive habitat', 'error');
@@ -137,7 +157,9 @@ export function PortalHabitatsPage() {
 	if (!userEntityData || userEntityType !== 'employee') {
 		return (
 			<div className='portal-habitats-page'>
-				<p className='error-message'>This page is only available for employees.</p>
+				<p className='error-message'>
+					This page is only available for employees.
+				</p>
 			</div>
 		);
 	}
@@ -147,7 +169,7 @@ export function PortalHabitatsPage() {
 			<div className='habitats-header'>
 				<h1>Manage Habitats</h1>
 				{isManagerPlus && (
-					<button
+					<Button
 						onClick={() => {
 							setShowAddForm(!showAddForm);
 							if (showAddForm) {
@@ -158,21 +180,31 @@ export function PortalHabitatsPage() {
 					>
 						<Plus size={20} />
 						{showAddForm ? 'Cancel' : 'Add Habitat'}
-					</button>
+					</Button>
 				)}
 			</div>
 
 			{showAddForm && (
 				<div className='habitat-form-container'>
-					<form onSubmit={handleSubmit} className='habitat-form'>
-						<h2>{editingId ? 'Edit Habitat' : 'Add New Habitat'}</h2>
+					<form
+						onSubmit={handleSubmit}
+						className='habitat-form'
+					>
+						<h2>
+							{editingId ? 'Edit Habitat' : 'Add New Habitat'}
+						</h2>
 
 						<div className='form-group'>
 							<label>Name *</label>
 							<input
 								type='text'
 								value={formData.name}
-								onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										name: e.target.value,
+									})
+								}
 								required
 								minLength={4}
 							/>
@@ -184,7 +216,10 @@ export function PortalHabitatsPage() {
 							<textarea
 								value={formData.description}
 								onChange={(e) =>
-									setFormData({ ...formData, description: e.target.value })
+									setFormData({
+										...formData,
+										description: e.target.value,
+									})
 								}
 								required
 								rows={5}
@@ -196,7 +231,12 @@ export function PortalHabitatsPage() {
 							<input
 								type='url'
 								value={formData.imageUrl}
-								onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										imageUrl: e.target.value,
+									})
+								}
 								placeholder='https://example.com/image.jpg'
 							/>
 						</div>
@@ -205,7 +245,12 @@ export function PortalHabitatsPage() {
 							<label>Climate</label>
 							<textarea
 								value={formData.climate}
-								onChange={(e) => setFormData({ ...formData, climate: e.target.value })}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										climate: e.target.value,
+									})
+								}
 								rows={3}
 								placeholder='Temperature, humidity, weather patterns...'
 							/>
@@ -215,7 +260,12 @@ export function PortalHabitatsPage() {
 							<label>Extra Details</label>
 							<textarea
 								value={formData.extraDetails}
-								onChange={(e) => setFormData({ ...formData, extraDetails: e.target.value })}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										extraDetails: e.target.value,
+									})
+								}
 								rows={3}
 								placeholder='Additional habitat information...'
 							/>
@@ -225,21 +275,35 @@ export function PortalHabitatsPage() {
 							<label>Fun Fact</label>
 							<textarea
 								value={formData.funFact}
-								onChange={(e) => setFormData({ ...formData, funFact: e.target.value })}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										funFact: e.target.value,
+									})
+								}
 								rows={2}
 								placeholder='Interesting fact about this habitat...'
 							/>
 						</div>
 
 						<div className='form-actions'>
-							<button type='submit' className='save-button'>
+							<Button
+								type='submit'
+								className='save-button'
+								variant='green'
+							>
 								<Save size={16} />
 								{editingId ? 'Update' : 'Create'} Habitat
-							</button>
-							<button type='button' onClick={handleCancel} className='cancel-button'>
+							</Button>
+							<Button
+								type='button'
+								onClick={handleCancel}
+								className='cancel-button'
+								variant='outline'
+							>
 								<X size={16} />
 								Cancel
-							</button>
+							</Button>
 						</div>
 					</form>
 				</div>
@@ -252,7 +316,15 @@ export function PortalHabitatsPage() {
 				) : (
 					<div className='habitats-grid'>
 						{habitats.map((habitat) => (
-							<div key={habitat.habitatId} className='habitat-card'>
+							<div
+								key={habitat.habitatId}
+								className='habitat-card'
+								style={{
+									display: 'flex',
+									flexDirection: 'column',
+									justifyContent: 'space-between',
+								}}
+							>
 								<div className='habitat-header'>
 									<h3>{habitat.name}</h3>
 								</div>
@@ -260,15 +332,28 @@ export function PortalHabitatsPage() {
 									<p>{habitat.description}</p>
 								</div>
 								{isManagerPlus && (
-									<div className='habitat-actions'>
-										<button onClick={() => handleEdit(habitat)} className='edit-button'>
+									<div
+										className='habitat-actions'
+										style={{ marginTop: '2rem' }}
+									>
+										<Button
+											onClick={() => handleEdit(habitat)}
+											className='edit-button'
+											variant='green'
+										>
 											<Edit2 size={16} />
 											Edit
-										</button>
-										<button onClick={() => handleDelete(habitat)} className='delete-button'>
+										</Button>
+										<Button
+											onClick={() =>
+												handleDelete(habitat)
+											}
+											className='delete-button'
+											variant='outline'
+										>
 											<Trash2 size={16} />
 											Delete
-										</button>
+										</Button>
 									</div>
 								)}
 							</div>
@@ -279,4 +364,3 @@ export function PortalHabitatsPage() {
 		</div>
 	);
 }
-

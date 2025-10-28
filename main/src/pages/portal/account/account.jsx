@@ -29,12 +29,14 @@ export function AccountPage() {
 		setIsSubmitting(true);
 		const endpoint =
 			userEntityType === 'employee'
-				? '/api/employee/update'
-				: '/api/customer/update';
+				? '/api/employee/update-one'
+				: '/api/customer/update-one';
 
 		const result = await api(endpoint, 'PUT', formData);
 
 		if (result.success) {
+			console.log('Update result data:', result.data);
+
 			setUserEntityData(formData);
 			setIsEditing(false);
 			showToast('Account updated successfully!');

@@ -15,8 +15,8 @@ export function registerEmployeeRoutes(app) {
 		withAccessLevel('manager', employeeController.getNByBusiness)
 	);
 	app.put(
-		'/api/employee/update',
-		withAccessLevel('executive', employeeController.updateOne)
+		'/api/employee/update-one',
+		withAccessLevel('worker', employeeController.updateOne)
 	);
 	app.post(
 		'/api/employee/get-n-by-animal',

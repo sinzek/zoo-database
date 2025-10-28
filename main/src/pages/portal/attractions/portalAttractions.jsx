@@ -5,6 +5,7 @@ import { Loader } from '../../../components/loader/loader';
 import { api } from '../../../utils/client-api-utils';
 import { Plus, Edit2, Save, X, Trash2 } from 'lucide-react';
 import './portalAttractions.css';
+import { Button } from '../../../components/button';
 
 export function PortalAttractionsPage() {
 	const { userEntityData, userEntityType } = useUserData();
@@ -41,7 +42,9 @@ export function PortalAttractionsPage() {
 		// Check if user is manager or above
 		if (userEntityData?.accessLevel) {
 			const managerLevels = ['manager', 'executive', 'db_admin'];
-			setIsManagerPlus(managerLevels.includes(userEntityData.accessLevel));
+			setIsManagerPlus(
+				managerLevels.includes(userEntityData.accessLevel)
+			);
 		}
 
 		loadData();
@@ -64,20 +67,35 @@ export function PortalAttractionsPage() {
 		e.preventDefault();
 
 		// Validate operating hours - close time must be after open time
-		const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+		const days = [
+			'monday',
+			'tuesday',
+			'wednesday',
+			'thursday',
+			'friday',
+			'saturday',
+			'sunday',
+		];
 		for (const day of days) {
 			const openTime = formData[`${day}Open`];
 			const closeTime = formData[`${day}Close`];
-			
+
 			if (openTime && closeTime) {
 				// Convert HH:MM to minutes for comparison
-				const [openHours, openMinutes] = openTime.split(':').map(Number);
-				const [closeHours, closeMinutes] = closeTime.split(':').map(Number);
+				const [openHours, openMinutes] = openTime
+					.split(':')
+					.map(Number);
+				const [closeHours, closeMinutes] = closeTime
+					.split(':')
+					.map(Number);
 				const openTotal = openHours * 60 + openMinutes;
 				const closeTotal = closeHours * 60 + closeMinutes;
-				
+
 				if (closeTotal <= openTotal) {
-					showToast(`Invalid hours for ${day.charAt(0).toUpperCase() + day.slice(1)}: closing time must be after opening time`, 'error');
+					showToast(
+						`Invalid hours for ${day.charAt(0).toUpperCase() + day.slice(1)}: closing time must be after opening time`,
+						'error'
+					);
 					return;
 				}
 			}
@@ -116,13 +134,18 @@ export function PortalAttractionsPage() {
 			: await api('/api/attraction/create', 'POST', attractionData);
 
 		if (result.success) {
-			showToast(`Attraction ${editingId ? 'updated' : 'created'} successfully!`);
+			showToast(
+				`Attraction ${editingId ? 'updated' : 'created'} successfully!`
+			);
 			setShowAddForm(false);
 			setEditingId(null);
 			resetForm();
 			loadData();
 		} else {
-			showToast(`Failed to ${editingId ? 'update' : 'create'} attraction`, 'error');
+			showToast(
+				`Failed to ${editingId ? 'update' : 'create'} attraction`,
+				'error'
+			);
 		}
 	};
 
@@ -171,7 +194,7 @@ export function PortalAttractionsPage() {
 		// Extract hours from the hours array
 		const hoursMap = {};
 		if (attraction.hours && Array.isArray(attraction.hours)) {
-			attraction.hours.forEach(hour => {
+			attraction.hours.forEach((hour) => {
 				const dayLower = hour.dayOfWeek.toLowerCase();
 				// Create keys with proper capitalization (e.g., 'monday' -> 'mondayOpen', 'mondayClose')
 				const openKey = `${dayLower}Open`;
@@ -207,9 +230,14 @@ export function PortalAttractionsPage() {
 		setShowAddForm(true);
 		// Scroll to form
 		setTimeout(() => {
-			const formElement = document.querySelector('.attraction-form-container');
+			const formElement = document.querySelector(
+				'.attraction-form-container'
+			);
 			if (formElement) {
-				formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				formElement.scrollIntoView({
+					behavior: 'smooth',
+					block: 'start',
+				});
 			}
 		}, 100);
 	};
@@ -234,7 +262,10 @@ export function PortalAttractionsPage() {
 				showToast('Attraction deleted successfully', 'success');
 				loadData();
 			} else {
-				showToast(result.error || 'Failed to delete attraction', 'error');
+				showToast(
+					result.error || 'Failed to delete attraction',
+					'error'
+				);
 			}
 		} catch (error) {
 			showToast(error.message || 'Failed to delete attraction.', 'error');
@@ -254,17 +285,22 @@ export function PortalAttractionsPage() {
 	if (!userEntityData || userEntityType !== 'employee') {
 		return (
 			<div className='portal-attractions-page'>
-				<p className='error-message'>This page is only available for employees.</p>
+				<p className='error-message'>
+					This page is only available for employees.
+				</p>
 			</div>
 		);
 	}
 
 	return (
 		<div className='portal-attractions-page'>
-			<div className='attractions-header'>
+			<div
+				className='attractions-header'
+				style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}
+			>
 				<h1>Manage Attractions</h1>
 				{isManagerPlus && (
-					<button
+					<Button
 						onClick={() => {
 							setShowAddForm(!showAddForm);
 							if (showAddForm) {
@@ -272,24 +308,38 @@ export function PortalAttractionsPage() {
 							}
 						}}
 						className='add-button'
+						variant='green'
+						size='lg'
 					>
 						<Plus size={20} />
 						{showAddForm ? 'Cancel' : 'Add Attraction'}
-					</button>
+					</Button>
 				)}
 			</div>
 
 			{showAddForm && (
 				<div className='attraction-form-container'>
-					<form onSubmit={handleSubmit} className='attraction-form'>
-						<h2>{editingId ? 'Edit Attraction' : 'Add New Attraction'}</h2>
+					<form
+						onSubmit={handleSubmit}
+						className='attraction-form'
+					>
+						<h2>
+							{editingId
+								? 'Edit Attraction'
+								: 'Add New Attraction'}
+						</h2>
 
 						<div className='form-group'>
 							<label>Name *</label>
 							<input
 								type='text'
 								value={formData.name}
-								onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										name: e.target.value,
+									})
+								}
 								required
 							/>
 						</div>
@@ -299,7 +349,12 @@ export function PortalAttractionsPage() {
 							<input
 								type='text'
 								value={formData.location}
-								onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										location: e.target.value,
+									})
+								}
 								required
 							/>
 						</div>
@@ -309,7 +364,10 @@ export function PortalAttractionsPage() {
 							<textarea
 								value={formData.uiDescription}
 								onChange={(e) =>
-									setFormData({ ...formData, uiDescription: e.target.value })
+									setFormData({
+										...formData,
+										uiDescription: e.target.value,
+									})
 								}
 								rows={5}
 							/>
@@ -320,7 +378,12 @@ export function PortalAttractionsPage() {
 							<input
 								type='url'
 								value={formData.uiImage}
-								onChange={(e) => setFormData({ ...formData, uiImage: e.target.value })}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										uiImage: e.target.value,
+									})
+								}
 								placeholder='https://example.com/image.jpg'
 							/>
 						</div>
@@ -330,7 +393,12 @@ export function PortalAttractionsPage() {
 							<input
 								type='date'
 								value={formData.startDate}
-								onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										startDate: e.target.value,
+									})
+								}
 							/>
 						</div>
 
@@ -339,36 +407,103 @@ export function PortalAttractionsPage() {
 							<input
 								type='date'
 								value={formData.endDate}
-								onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+								onChange={(e) =>
+									setFormData({
+										...formData,
+										endDate: e.target.value,
+									})
+								}
 							/>
 						</div>
 
 						<div className='form-group'>
 							<label>Operating Hours (Time format: HH:MM)</label>
-							<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+							<div
+								style={{
+									display: 'grid',
+									gridTemplateColumns: '1fr 1fr 1fr',
+									gap: '1rem',
+								}}
+							>
 								{[
-									{ key: 'monday', label: 'Monday', open: 'mondayOpen', close: 'mondayClose' },
-									{ key: 'tuesday', label: 'Tuesday', open: 'tuesdayOpen', close: 'tuesdayClose' },
-									{ key: 'wednesday', label: 'Wednesday', open: 'wednesdayOpen', close: 'wednesdayClose' },
-									{ key: 'thursday', label: 'Thursday', open: 'thursdayOpen', close: 'thursdayClose' },
-									{ key: 'friday', label: 'Friday', open: 'fridayOpen', close: 'fridayClose' },
-									{ key: 'saturday', label: 'Saturday', open: 'saturdayOpen', close: 'saturdayClose' },
-									{ key: 'sunday', label: 'Sunday', open: 'sundayOpen', close: 'sundayClose' },
+									{
+										key: 'monday',
+										label: 'Monday',
+										open: 'mondayOpen',
+										close: 'mondayClose',
+									},
+									{
+										key: 'tuesday',
+										label: 'Tuesday',
+										open: 'tuesdayOpen',
+										close: 'tuesdayClose',
+									},
+									{
+										key: 'wednesday',
+										label: 'Wednesday',
+										open: 'wednesdayOpen',
+										close: 'wednesdayClose',
+									},
+									{
+										key: 'thursday',
+										label: 'Thursday',
+										open: 'thursdayOpen',
+										close: 'thursdayClose',
+									},
+									{
+										key: 'friday',
+										label: 'Friday',
+										open: 'fridayOpen',
+										close: 'fridayClose',
+									},
+									{
+										key: 'saturday',
+										label: 'Saturday',
+										open: 'saturdayOpen',
+										close: 'saturdayClose',
+									},
+									{
+										key: 'sunday',
+										label: 'Sunday',
+										open: 'sundayOpen',
+										close: 'sundayClose',
+									},
 								].map((day) => (
 									<div key={day.key}>
-										<label style={{ fontSize: '0.85rem', display: 'block', marginBottom: '0.5rem' }}>{day.label}</label>
+										<label
+											style={{
+												fontSize: '0.85rem',
+												display: 'block',
+												marginBottom: '0.5rem',
+											}}
+										>
+											{day.label}
+										</label>
 										<input
 											type='time'
 											placeholder='Open'
 											value={formData[day.open]}
-											onChange={(e) => setFormData({ ...formData, [day.open]: e.target.value })}
-											style={{ width: '100%', marginBottom: '0.5rem' }}
+											onChange={(e) =>
+												setFormData({
+													...formData,
+													[day.open]: e.target.value,
+												})
+											}
+											style={{
+												width: '100%',
+												marginBottom: '0.5rem',
+											}}
 										/>
 										<input
 											type='time'
 											placeholder='Close'
 											value={formData[day.close]}
-											onChange={(e) => setFormData({ ...formData, [day.close]: e.target.value })}
+											onChange={(e) =>
+												setFormData({
+													...formData,
+													[day.close]: e.target.value,
+												})
+											}
 											style={{ width: '100%' }}
 										/>
 									</div>
@@ -377,14 +512,22 @@ export function PortalAttractionsPage() {
 						</div>
 
 						<div className='form-actions'>
-							<button type='submit' className='save-button'>
+							<Button
+								type='submit'
+								variant='green'
+								size='lg'
+							>
 								<Save size={16} />
 								{editingId ? 'Update' : 'Create'} Attraction
-							</button>
-							<button type='button' onClick={handleCancel} className='cancel-button'>
+							</Button>
+							<Button
+								type='button'
+								onClick={handleCancel}
+								variant='outline'
+							>
 								<X size={16} />
 								Cancel
-							</button>
+							</Button>
 						</div>
 					</form>
 				</div>
@@ -397,30 +540,61 @@ export function PortalAttractionsPage() {
 				) : (
 					<div className='attractions-grid'>
 						{attractions.map((attraction) => (
-							<div key={attraction.attractionId} className='attraction-card'>
+							<div
+								key={attraction.attractionId}
+								className='attraction-card'
+							>
 								<div className='attraction-header'>
 									<h3>{attraction.name}</h3>
 								</div>
 								<div className='attraction-info'>
-									<p><strong>Location:</strong> {attraction.location}</p>
-									{attraction.uiDescription && <p>{attraction.uiDescription}</p>}
+									<p>
+										<strong>Location:</strong>{' '}
+										{attraction.location}
+									</p>
+									{attraction.uiDescription && (
+										<p>{attraction.uiDescription}</p>
+									)}
 									{attraction.startDate && (
-										<p><strong>Start Date:</strong> {new Date(attraction.startDate).toLocaleDateString()}</p>
+										<p>
+											<strong>Start Date:</strong>{' '}
+											{new Date(
+												attraction.startDate
+											).toLocaleDateString()}
+										</p>
 									)}
 									{attraction.endDate && (
-										<p><strong>End Date:</strong> {new Date(attraction.endDate).toLocaleDateString()}</p>
+										<p>
+											<strong>End Date:</strong>{' '}
+											{new Date(
+												attraction.endDate
+											).toLocaleDateString()}
+										</p>
 									)}
 								</div>
 								{isManagerPlus && (
 									<div className='attraction-actions'>
-										<button onClick={() => handleEdit(attraction)} className='edit-button'>
+										<Button
+											onClick={() =>
+												handleEdit(attraction)
+											}
+											className='edit-button'
+											size='sm'
+											variant='green'
+										>
 											<Edit2 size={16} />
 											Edit
-										</button>
-										<button onClick={() => handleDelete(attraction)} className='delete-button'>
+										</Button>
+										<Button
+											onClick={() =>
+												handleDelete(attraction)
+											}
+											className='delete-button'
+											variant='outline'
+										>
 											<Trash2 size={16} />
 											Delete
-										</button>
+										</Button>
 									</div>
 								)}
 							</div>
@@ -431,4 +605,3 @@ export function PortalAttractionsPage() {
 		</div>
 	);
 }
-
