@@ -153,7 +153,8 @@ export function UserDataProvider({ children }) {
 						setUserEntityData,
 						setUserEntityType,
 						navigate,
-						setAuthLoading
+						setAuthLoading,
+						!!clockedInSince
 					),
 				authLoading: authLoading || businessLoading,
 				businessEmployeeWorksFor,

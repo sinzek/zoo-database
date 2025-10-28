@@ -44,8 +44,16 @@ export function useAuth() {
 		setUserEntityData,
 		setUserEntityType,
 		navigate,
-		setAuthLoading
+		setAuthLoading,
+		isClockedIn
 	) => {
+		if (isClockedIn) {
+			showToast(
+				'Warning: You are currently clocked in. Please clock out before logging out.'
+			);
+			return { success: false, error: 'User is clocked in' };
+		}
+
 		setAuthLoading(true);
 		const result = await api('/api/auth/logout', 'POST');
 
