@@ -1,6 +1,6 @@
 import React from 'react';
 import './membership.css'; 
-import memberships from "../../data/membership";
+import membershipData from "../../data/membership"; 
 import { Link } from "../../components/link";
 
 
@@ -22,32 +22,27 @@ const MembershipCard = ({ title, price, details, bestValue = false, image, link 
 
 
 const MembershipPage = () => {
-  const memberships = [
-    { title: "Family & Friends Premium", price: "349", details: "3 adults + guests", bestValue: true, image: "/images/capybara.jpg", link: "/membership/premium" },
-    { title: "Family", price: "239", details: "2 adults + 3 children", bestValue: false, image: "/images/penguin.jpg", link: "/membership/family" },
-    { title: "Individual Plus", price: "169", details: "1 adult + 1 guest", bestValue: false, image: "/images/jaguar.jpg", link: "/membership/individualplus" },
-    { title: "Senior 65+", price: "189", details: "2 adults + 5 children", bestValue: false, image: "/images/quail.jpg", link: "/membership/senior" },
-  ];
+  
 
-  const donorClubs = [
-    { title: "Flock", price: "190+", details: "For 21+ and Young Professionals", bestValue: false, image: "/images/flamingos.jpg", link: "/membership/flock" },
-    { title: "Asante Society", price: "1,500+", details: "Exclusive Events Private Animal Tour", bestValue: false, image: "/images/tiger.jpg", link: "/membership/asante" },
-  ];
+  const memberships = membershipData.filter(m => m.id !== 'flock' && m.id !== 'asante');
+  const donorClubs = membershipData.filter(m => m.id === 'flock' || m.id === 'asante');
 
   return (
     <div className="membership-page">
       <h1 className="page-title">CHOOSE THE MEMBERSHIP LEVEL THAT'S RIGHT FOR YOU</h1>
 
       <div className="membership-grid">
-        {memberships.map((mem, index) => (
-          <MembershipCard key={index} {...mem} />
+
+        {memberships.map((mem) => (
+          <MembershipCard key={mem.id} {...mem} />
         ))}
       </div>
 
-  
+ 
       <div className="donor-club-section">
-        {donorClubs.map((club, index) => (
-          <MembershipCard key={index} {...club} />
+
+        {donorClubs.map((club) => (
+          <MembershipCard key={club.id} {...club} />
         ))}
       </div>
 

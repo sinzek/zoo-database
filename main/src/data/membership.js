@@ -1,4 +1,4 @@
-export const MEMBERSHIPS_DATA = [
+const membershipData = [
   {
     title: "Family & Friends Premium",
     price: "349",
@@ -41,7 +41,7 @@ export const MEMBERSHIPS_DATA = [
     price: "169",
     details: "1 adult + 1 guest",
     bestValue: false,
-    image: "/images/leopard.jpg",
+    image: "/images/jaguar.jpg",
     link: "/membership/individualplus",
     id: "individualplus",
 
@@ -114,3 +114,6 @@ export const MEMBERSHIPS_DATA = [
     }
   }
 ];
+
+
+export default membershipData;

@@ -25,6 +25,9 @@ import { FeedingScheduleDetailPage } from './pages/portal/feedingSchedules/feedi
 import { ScheduleManagementPage } from './pages/portal/scheduleManagement/scheduleManagement';
 import { PortalHabitatsPage } from './pages/portal/habitats/portalHabitats';
 
+import MembershipPage from './pages/membership/membership';
+import MembershipDetailPage from './pages/membership/membershipDetails';
+
 export default function Router() {
 	const { path, match } = useRouter();
 	const { userEntityType, userEntityData } = useUserData();
@@ -36,6 +39,8 @@ export default function Router() {
 	const medicalRecordMatch = match('/portal/medical-records/:animalId');
 	const feedingScheduleMatch = match('/portal/feeding-schedules/:animalId');
 
+	const membershipMatch = match('/membership/:id');
+
 	let content = null;
 
 	const pathMap = {
@@ -45,6 +50,8 @@ export default function Router() {
 		'/habitats': HabitatsPage,
 		'/attractions': AttractionsPage,
 		'/animals': AnimalsPage,
+
+		'/membership': MembershipPage,
 
 		'/portal': PortalPage,
 		'/portal/account': AccountPage,
@@ -61,37 +68,35 @@ export default function Router() {
 		'/testing': TestingPage,
 	};
 
-	if (habitatMatch) {
-		content = <HabitatDetailsPage id={habitatMatch.id} />;
-	} else if (medicalRecordMatch) {
-		content = <MedicalRecordDetailPage animalId={medicalRecordMatch.animalId} />;
-	} else if (feedingScheduleMatch) {
-		content = <FeedingScheduleDetailPage animalId={feedingScheduleMatch.animalId} />;
-	} else if (pathMap[path]) {
-		const Component = pathMap[path];
-		content = <Component />;
+if (habitatMatch) {
+        content = <HabitatDetailsPage id={habitatMatch.id} />;
+    } else if (medicalRecordMatch) {
+        content = <MedicalRecordDetailPage animalId={medicalRecordMatch.animalId} />;
+    } else if (feedingScheduleMatch) {
+        content = <FeedingScheduleDetailPage animalId={feedingScheduleMatch.animalId} />;
+    } else if (membershipMatch) {
+        content = <MembershipDetailPage id={membershipMatch.id} />;
+    } else if (pathMap[path]) {
+        const Component = pathMap[path];
+        content = <Component />;
+    } else {
+        content = <NotFoundPage />;
+    }
 
-	else if (membershipMatch) content = <MembershipDetailPage id={membershipMatch.id} />; 
-	else if (path === '/membership') content = <MembershipPage />;   
-
-	} else {
-		content = <NotFoundPage />;
-	}
-
-	return (
-		<div className='router-container'>
-			{!isAuthProtectedPage && !isLoginOrSignupPage && <Navbar />}
-			<TopMenu />
-			<Sidebar
-				ueType={userEntityType}
-				uedata={userEntityData}
-			/>
-			<div
-				className='content-container'
-				id='main-content'
-			>
-				{content}
-			</div>
-		</div>
-	);
+    return (
+        <div className='router-container'>
+            {!isAuthProtectedPage && !isLoginOrSignupPage && <Navbar />}
+            <TopMenu />
+            <Sidebar
+                ueType={userEntityType}
+                uedata={userEntityData}
+            />
+            <div
+                className='content-container'
+                id='main-content'
+            >
+                {content}
+            </div>
+        </div>
+    );
 }
