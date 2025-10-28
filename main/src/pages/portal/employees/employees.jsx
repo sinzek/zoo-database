@@ -119,9 +119,9 @@ export function PortalEmployeesPage() {
             supervisorId: formData.supervisorId || null, //Allow null supervisor
             terminationDate: formData.terminationDate || null,
             // Only include sensitive data if necessary and handled securely by API
-            // ssn: formData.ssn, 
-            // payInfoAccountNum: formData.payInfoAccountNum || null,
-            // payInfoRoutingNum: formData.payInfoRoutingNum || null,
+            ssn: formData.ssn, 
+            payInfoAccountNum: formData.payInfoAccountNum || null,
+            payInfoRoutingNum: formData.payInfoRoutingNum || null,
             userId: formData.userId || null, 
 		};
         if (!editingId) {
@@ -165,7 +165,7 @@ export function PortalEmployeesPage() {
             jobTitle: employee.jobTitle || '',
             accessLevel: employee.accessLevel || 'worker',
             hourlyWage: employee.hourlyWage || '',
-            ssn: employee.ssn || '', // 
+            ssn: employee.ssn || '', //Sensitive
             sex: employee.sex || 'male',
             addressStreet: employee.addressStreet || '',
             addressCity: employee.addressCity || '',
@@ -273,10 +273,10 @@ export function PortalEmployeesPage() {
 									<input id="birthDate" type='date' value={formData.birthDate} onChange={(e) => setFormData({...formData, birthDate: e.target.value})} required />
 								</div>
                                 {/* SSN */}
-                                {/* <div className='form-group'>
+                                <div className='form-group'>
 									<label htmlFor="ssn">SSN *</label>
 									<input id="ssn" type='text' pattern="\d{9}" title="SSN must be 9 digits" value={formData.ssn} onChange={(e) => setFormData({...formData, ssn: e.target.value})} required />
-								</div> */}
+								</div> 
 
                                 {/* Job Info */}
 								<div className='form-group'>
