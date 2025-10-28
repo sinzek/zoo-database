@@ -11,6 +11,7 @@ import {
 	Users,
 	BarChart,
 	ShieldBan,
+	Ticket,
 } from 'lucide-react';
 
 export function availableLinksForAccessLevel(uedata) {
@@ -27,7 +28,11 @@ export function availableLinksForAccessLevel(uedata) {
 	if (hasMinAccessLvl('zookeeper', uedata)) {
 		links.push(
 			{ to: '/portal/animals', label: 'Animals', icon: PawPrint },
-			{ to: '/habitats', label: 'Habitats', icon: TreePalm },
+			{
+				to: '/portal/attractions',
+				label: 'Attractions',
+				icon: Ticket,
+			},
 			{
 				to: '/portal/medical-records',
 				label: 'Medical Records',
@@ -55,7 +60,8 @@ export function availableLinksForAccessLevel(uedata) {
 				icon: Building,
 			},
 			{ to: '/portal/employees', label: 'Employees', icon: Users },
-			{ to: '/portal/reports', label: 'Reports', icon: BarChart }
+			{ to: '/portal/reports', label: 'Reports', icon: BarChart },
+			{ to: '/portal/habitats', label: 'Manage Habitats', icon: TreePalm }
 		);
 	}
 
