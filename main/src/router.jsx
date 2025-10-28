@@ -35,7 +35,6 @@ import { MembershipTransactionPage } from './pages/portal/membershipTransaction/
 
 import { PortalEmployeesPage } from './pages/portal/employees/employees';
 import { ShiftReportPage } from './pages/portal/reports/shiftReport/shiftReport';
-import { PortalReportsPage } from './pages/portal/reports/reports';
 
 export default function Router() {
 	const { path, match } = useRouter();
