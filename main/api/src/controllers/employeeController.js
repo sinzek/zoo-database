@@ -7,6 +7,7 @@ import {
 } from '../utils/query-utils.js';
 import { ACCESS_LEVELS } from '../constants/accessLevels.js';
 import { query } from '../db/mysql.js';
+import { incrementNumEmployees } from '../utils/other-utils.js';
 
 async function createOne(req, _res) {
 	const newEmp = req.body;
@@ -50,6 +51,9 @@ async function createOne(req, _res) {
 
 	// now create employee record
 	await createOneQuery('Employee', employeeData);
+
+	// ! TRIGGER: UPDATE NUM EMPLOYEES
+	await incrementNumEmployees(newEmp.businessId);
 
 	// return created employee data
 	return [employeeData];

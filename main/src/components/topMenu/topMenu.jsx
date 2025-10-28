@@ -39,7 +39,7 @@ export function TopMenu() {
 
 	const { cartItemCount } = useShoppingCart();
 
-	const mouseLeaveDebounceTime = 500; // milliseconds
+	const mouseLeaveDebounceTime = 1000; // milliseconds
 
 	const handleFade = (direction) => {
 		const userMenu = document.querySelector('.user-menu');

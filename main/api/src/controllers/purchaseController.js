@@ -1,7 +1,10 @@
 import { createOneQuery } from '../utils/query-utils.js';
 import { MEMBERSHIP_LEVELS } from '../constants/membershipLevels.js';
 import crypto from 'crypto';
-import { getZooBusinessId } from '../utils/other-utils.js';
+import {
+	getGenAdmissionItemId,
+	getZooBusinessId,
+} from '../utils/other-utils.js';
 import { sendNotificationToUser } from '../utils/notif-utils.js';
 
 // takes in customerId and array of items to purchase
@@ -19,13 +22,33 @@ async function purchaseItems(req, _res) {
 
 	const transactions = [];
 	const purchasedItems = [];
-	console.log('Purchasing items:', items);
+
+	console.log('Items to purchase:', items);
 
 	for (const item of items) {
+		let businessId = item.businessId;
+		let itemId = item.itemId;
+
+		if (itemId === 'general-admission') {
+			businessId = await getZooBusinessId();
+
+			if (!businessId) {
+				throw new Error('Zoo business not found for general admission');
+			}
+
+			itemId = await getGenAdmissionItemId();
+
+			if (!itemId) {
+				throw new Error(
+					'General Admission item not found in the database'
+				);
+			}
+		}
+
 		const newTransaction = {
 			transactionId: crypto.randomUUID(),
 			description: `Purchase by customer ${customerId}`,
-			businessId: item.businessId,
+			businessId,
 			amount: item.price,
 			deletedAt: null,
 			purchaseDate: new Date(),
@@ -38,7 +61,7 @@ async function purchaseItems(req, _res) {
 			purchasedItemId: crypto.randomUUID(),
 			customerId,
 			transactionId: newTransaction.transactionId,
-			itemId: item.itemId,
+			itemId: itemId,
 		};
 
 		await createOneQuery('PurchasedItem', purchasedItemData);

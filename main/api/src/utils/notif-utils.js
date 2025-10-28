@@ -51,6 +51,7 @@ export async function checkIfUserHasExpiredMembership(userId) {
 		const expirationDate = new Date(membership.expiresDate);
 
 		if (currentDate > expirationDate) {
+			// ! TRIGGER: SEND NOTIFICATION
 			await sendNotificationToUser(
 				userId,
 				`Your ${membership.level} membership has expired. Please renew to continue enjoying member benefits.`

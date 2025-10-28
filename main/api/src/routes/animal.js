@@ -18,5 +18,12 @@ export function registerAnimalRoutes(app) {
 		'/api/animal/get-all-grouped-by-habitat',
 		animalController.getAllGroupedByHabitat
 	);
-   app.post('/api/animal/report', withAccessLevel('zookeeper', animalReportController.getAnimalReport));
+	app.post(
+		'/api/animal/report',
+		withAccessLevel('zookeeper', animalReportController.getAnimalReport)
+	);
+	app.post(
+		'/api/animal/delete-one',
+		withAccessLevel('zookeeper', animalController.deleteOne)
+	);
 }

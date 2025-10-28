@@ -32,6 +32,17 @@ export function NotificationsPage() {
 		fetchNotifications();
 	}, [userInfo]);
 
+	const formatDateTime = (dateString) => {
+		const options = {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
+		};
+		return new Date(dateString).toLocaleDateString(undefined, options);
+	};
+
 	if (loading) {
 		return (
 			<div
@@ -77,6 +88,7 @@ export function NotificationsPage() {
 					width: '100%',
 					backgroundColor: 'var(--color-brown)',
 					marginTop: '0rem',
+					marginBottom: '1.75rem',
 				}}
 			/>
 
@@ -86,27 +98,30 @@ export function NotificationsPage() {
 				</i>
 			)}
 			{notis.length > 0 &&
-				notis.map((noti) => (
-					<div
-						key={noti.notificationId}
-						style={{
-							marginBottom: '1.5rem',
-							display: 'grid',
-							gridTemplateColumns: '1fr 1fr',
-							columnGap: '1rem',
-							alignItems: 'center',
-							borderBottom: '2px solid var(--color-brown)',
-							paddingBottom: '1rem',
-							paddingTop: '1rem',
-							color: 'var(--color-lgreen)',
-						}}
-					>
-						<h3>
-							{new Date(noti.sentAt).toISOString().split('T')[0]}
-						</h3>
-						<p>{noti.content}</p>
-					</div>
-				))}
+				notis
+					.sort(
+						(a, b) =>
+							new Date(b.sentAt).getTime() -
+							new Date(a.sentAt).getTime()
+					)
+					.map((noti) => (
+						<div
+							key={noti.notificationId}
+							style={{
+								marginBottom: '1.5rem',
+								display: 'grid',
+								gridTemplateColumns: '1fr 1fr',
+								columnGap: '1rem',
+								alignItems: 'center',
+								borderBottom: '2px solid var(--color-brown)',
+								paddingBottom: '1.75rem',
+								color: 'var(--color-lgreen)',
+							}}
+						>
+							<h3>{formatDateTime(noti.sentAt)}</h3>
+							<p>{noti.content}</p>
+						</div>
+					))}
 		</div>
 	);
 }
