@@ -1,16 +1,14 @@
-
-
-.portal-employees-page { 
+.portal-employees-page {
 	max-width: 90%;
-	margin: auto auto;
+	margin-top: 120px;
 	padding: 24px;
 	color: var(--color-lgreen);
 	display: grid;
-	grid-template-columns: 1fr 3fr; 
+	grid-template-columns: 1fr 3fr;
 	gap: 4rem;
 }
 
-.employees-header { 
+.employees-header {
 	display: flex;
 	align-items: start;
 	margin-bottom: 2rem;
@@ -18,18 +16,17 @@
 	gap: 1rem;
 }
 
-.employees-header h1 { 
+.employees-header h1 {
 	color: var(--color-green);
 	margin: 0;
 }
-
 
 .centered-loader {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	height: 400px;
-    grid-column: 1 / -1; 
+	grid-column: 1 / -1;
 }
 
 .error-message {
@@ -38,11 +35,10 @@
 	font-size: 1.2rem;
 	text-align: center;
 	margin-top: 2rem;
-    grid-column: 1 / -1; 
+	grid-column: 1 / -1;
 }
 
-
-.employee-form-container { 
+.employee-form-container {
 	background-color: rgba(37, 31, 26, 0.8);
 	border-radius: 12px;
 	border: 2px solid var(--color-brown);
@@ -50,7 +46,7 @@
 	margin-bottom: 2rem;
 }
 
-.employee-form h2 { 
+.employee-form h2 {
 	color: var(--color-green);
 	margin-bottom: 1.5rem;
 }
@@ -65,72 +61,26 @@
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
-    color: var(--color-lgreen); 
+	color: var(--color-lgreen);
 }
 .form-group label {
-    font-weight: 500;
-    font-size: 0.9rem;
+	font-weight: 500;
+	font-size: 0.9rem;
 }
-
 
 .form-group.full-width {
 	grid-column: 1 / -1;
 }
 
-
-.form-group input[type='text'],
-.form-group input[type='email'],
-.form-group input[type='tel'],
-.form-group input[type='date'],
-.form-group input[type='number'],
-.form-group select,
-.form-group textarea {
-	background-color: var(--color-dbrown);
-	border: 2px solid var(--color-lbrown);
-	padding: 0.75rem; 
-	color: var(--color-foreground);
-	font-size: 0.9rem;
-	transition: all 0.15s;
-    border-radius: 8px; 
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-	outline: none;
-	border-color: var(--color-green);
-    box-shadow: 0 0 0 2px rgba(85, 136, 108, 0.3);
-}
-
-.form-group input:hover,
-.form-group select:hover,
-.form-group textarea:hover {
-	border-color: var(--color-green);
-}
-
-.form-group textarea {
-	resize: vertical;
-	font-family: inherit;
-    min-height: 80px;
-}
-
-.form-actions {
-	display: flex;
-	gap: 1rem;
-	justify-content: flex-end;
-	margin-top: 1.5rem;
-}
-
-
-.employees-list h2 { 
+.employees-list h2 {
 	color: var(--color-green);
 	margin-bottom: 1rem;
-    font-weight: 500;
-    margin-left: 1rem; 
+	font-weight: 500;
+	margin-left: 1rem;
 }
 
-.employees-list { 
-	max-height: 80vh; 
+.employees-list {
+	max-height: 80vh;
 }
 
 .no-employees {
@@ -140,30 +90,29 @@
 	font-size: 1.1rem;
 }
 
-.employees-grid { 
+.employees-grid {
 	display: grid;
-    
-	grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
+
+	grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
 	gap: 1rem;
-	max-height: calc(80vh - 50px); 
+	max-height: calc(80vh - 50px);
 	overflow-y: auto;
 	padding: 1rem;
 	background-color: rgba(37, 31, 26, 0.3);
 	border-radius: 8px;
 }
 
-
-.employee-card { 
+.employee-card {
 	background-color: rgba(37, 31, 26, 0.8);
 	border-radius: 12px;
 	border: 2px solid var(--color-brown);
-	padding: 1.5rem; 
+	padding: 1.5rem;
 	transition:
 		transform 0.2s,
 		box-shadow 0.2s;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem; 
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
 }
 
 .employee-card:hover {
@@ -171,91 +120,91 @@
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.employee-header { 
+.employee-header {
 	display: flex;
 	justify-content: space-between;
-	align-items: flex-start; 
-	
+	align-items: flex-start;
 }
 
-.employee-actions { 
+.employee-actions {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-    flex-shrink: 0; 
+	flex-shrink: 0;
 }
-
 
 .status-badge {
 	display: flex;
 	align-items: center;
 	gap: 0.25rem;
 	padding: 0.25rem 0.6rem;
-	border-radius: 99px; 
+	border-radius: 99px;
 	font-size: 0.8rem;
 	font-weight: 600;
-    text-transform: capitalize;
+	text-transform: capitalize;
 }
 
-.status-badge.terminated { 
+.status-badge svg {
+	margin-bottom: -2px;
+	margin-right: 4px;
+}
+
+.status-badge.terminated {
 	background-color: rgba(139, 0, 0, 0.3);
-	color: #e57373; 
-    border: 1px solid #8b0000;
+	color: #e57373;
+	border: 1px solid #8b0000;
 }
-.status-badge.active { 
+.status-badge.active {
 	background-color: rgba(76, 175, 80, 0.2);
-	color: #a5d6a7; 
-    border: 1px solid #4caf50;
+	color: #a5d6a7;
+	border: 1px solid #4caf50;
 }
 
-
-.employee-header h3 { 
+.employee-header h3 {
 	color: var(--color-lgreen);
 	margin: 0;
-	font-size: 1.2rem; 
-    line-height: 1.3;
+	font-size: 1.2rem;
+	line-height: 1.3;
 }
-.employee-header span { 
-    display: block;
-    font-size: 0.9rem;
-    color: var(--color-lbrown);
-    font-weight: 400;
+.employee-header span {
+	display: block;
+	font-size: 0.9rem;
+	color: var(--color-lbrown);
+	font-weight: 400;
 }
-
 
 .btn-icon {
-	padding: 0.4rem; 
+	padding: 0.4rem;
 	min-width: auto;
-    line-height: 0; 
+	line-height: 0;
 }
 
-
-.employee-info { 
-	display: grid; 
-    grid-template-columns: auto 1fr; 
-	gap: 0.6rem; 
+.employee-info {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 0.6rem;
 }
 
-.employee-info p { 
+.employee-info p {
 	margin: 0;
 	font-size: 0.9rem;
 	color: var(--color-lbrown);
-    grid-column: 2 / 3; 
-    word-break: break-word; 
+	grid-column: 2 / 3;
+	word-break: break-word;
 }
 
-.employee-info strong { 
+.employee-info strong {
 	color: var(--color-lgreen);
 	font-weight: 600;
-    grid-column: 1 / 2; 
-    text-align: right; 
-    white-space: nowrap; 
+	grid-column: 1 / 2;
+	text-align: right;
+	white-space: nowrap;
 }
 
-.termination-date-info { 
+.termination-date-info {
 	color: #cc6666 !important;
 }
-.termination-date-info strong { 
+.termination-date-info strong {
 	color: #cc6666 !important;
 }
 

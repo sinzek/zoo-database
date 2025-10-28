@@ -29,4 +29,8 @@ export function registerEmployeeRoutes(app) {
 			employeeController.getNByBusinessAndAccessLevel
 		)
 	);
+	app.post(
+		'/api/employee/get-all',
+		withAccessLevel('manager', employeeController.getAll)
+	);
 }

@@ -172,6 +172,16 @@ async function getNByBusinessAndAccessLevel(req, _res) {
 	return [employees];
 }
 
+async function getAll(_req, _res) {
+	const employees = await query(`SELECT * FROM Employee`);
+
+	if (!employees) {
+		throw new Error('No employees found');
+	}
+
+	return [employees];
+}
+
 //Create Employee
 //Get Employee by ID
 //Get Employees by Business
@@ -185,4 +195,5 @@ export default {
 	updateOne,
 	getNByAnimal,
 	getNByBusinessAndAccessLevel,
+	getAll,
 };
