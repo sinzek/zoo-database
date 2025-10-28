@@ -1,10 +1,12 @@
 import crypto from 'crypto';
 import {
 	createOneQuery,
+	deleteOneQuery,
 	getNByKeyQuery,
 	updateOneQuery,
 } from '../utils/query-utils.js';
 import { query } from '../db/mysql.js';
+import { notifyAndUpdateAssignedZookeepersOfAnimalDeletion } from '../utils/other-utils.js';
 
 /**
  * Creates a new animal record.
@@ -81,7 +83,7 @@ async function updateOne(req, _res) {
 		habitatId: updatedAnimal.habitatId,
 		imageUrl: updatedAnimal.imageUrl || null,
 	};
-	
+
 	await updateOneQuery('Animal', animalUpdateData, 'animalId');
 
 	return [animalUpdateData];
@@ -204,6 +206,26 @@ async function getAllGroupedByHabitat(_req, _res) {
 	return [Array.from(habitatMap.values())];
 }
 
+async function deleteOne(req, _res) {
+	const { animalId } = req.body;
+
+	if (!animalId) {
+		throw new Error('Missing animalId');
+	}
+
+	const [animal] = await getNByKeyQuery('Animal', 'animalId', animalId);
+	if (!animal) {
+		throw new Error('Animal not found');
+	}
+
+	await deleteOneQuery('Animal', 'animalId', animalId);
+
+	// notify all zookeepers assigned to this animal
+	await notifyAndUpdateAssignedZookeepersOfAnimalDeletion(animalId);
+
+	return [{ message: 'Animal successfully deleted' }];
+}
+
 export default {
 	createOne,
 	updateOne,
@@ -211,4 +233,5 @@ export default {
 	getNByHabitat,
 	getNByHandler,
 	getAllGroupedByHabitat,
+	deleteOne,
 };

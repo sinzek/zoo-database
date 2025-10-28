@@ -9,6 +9,10 @@ import { registerShiftRoutes } from './src/routes/shift.js';
 import { registerBusinessRoutes } from './src/routes/business.js';
 import { registerMedicalRecordRoutes } from './src/routes/medicalRecord.js';
 import { registerDietRoutes } from './src/routes/diet.js';
+import { registerNotificationRoutes } from './src/routes/notification.js';
+import { registerPurchaseRoutes } from './src/routes/purchase.js';
+import { registerTransactionRoutes } from './src/routes/transaction.js';
+import { registerItemRoutes } from './src/routes/item.js';
 import { registerAttractionRoutes } from './src/routes/attraction.js';
 
 /**
@@ -32,7 +36,11 @@ export default async function handler(req, res) {
 	registerBusinessRoutes(app);
 	registerMedicalRecordRoutes(app);
 	registerDietRoutes(app);
-	registerAttractionRoutes(app);
+	registerNotificationRoutes(app);
+	registerPurchaseRoutes(app);
+	registerTransactionRoutes(app);
+	registerItemRoutes(app);
+  registerAttractionRoutes(app);
 	// !--- end route registration ---!
 
 	return await app.handleVercel(req, res);

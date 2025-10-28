@@ -27,6 +27,9 @@ import { ScheduleManagementPage } from './pages/portal/scheduleManagement/schedu
 import { PortalAttractionsPage } from './pages/portal/attractions/portalAttractions';
 import { PortalHabitatsPage } from './pages/portal/habitats/portalHabitats';
 import { BusinessManagementPage } from './pages/portal/businessManagement/businessManagement';
+import { NotificationsPage } from './pages/portal/notifications/notifications';
+import { MembershipsPage } from './pages/memberships/memberships';
+import { MembershipTransactionPage } from './pages/portal/membershipTransaction/membershipTransaction';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -39,6 +42,9 @@ export default function Router() {
     const attractionMatch = match('/attractions/:id');
 	const medicalRecordMatch = match('/portal/medical-records/:animalId');
 	const feedingScheduleMatch = match('/portal/feeding-schedules/:animalId');
+	const membershipTransactionMatch = match(
+		'/portal/membership-transaction/:transactionId'
+	);
 
 	let content = null;
 
@@ -49,6 +55,7 @@ export default function Router() {
 		'/habitats': HabitatsPage,
 		'/attractions': AttractionsPage,
 		'/animals': AnimalsPage,
+		'/memberships': MembershipsPage,
 
 		'/portal': PortalPage,
 		'/portal/account': AccountPage,
@@ -62,7 +69,8 @@ export default function Router() {
 		'/portal/shop': ShopPage,
 		'/portal/shift-schedule': ShiftSchedulePage,
 		'/portal/schedule-management': ScheduleManagementPage,
-		'/portal/business-management': () => <BusinessManagementPage />,
+		'/portal/business-management': BusinessManagementPage,
+		'/portal/notifications': NotificationsPage,
 
 		'/testing': TestingPage,
 	};
@@ -81,6 +89,8 @@ export default function Router() {
 				animalId={feedingScheduleMatch.animalId}
 			/>
 		);
+	} else if (membershipTransactionMatch) {
+		content = <MembershipTransactionPage />;
 	} else if (pathMap[path]) {
 		const Component = pathMap[path];
 		content = <Component />;

@@ -6,16 +6,14 @@ import { Button } from '../../../components/button';
 import { Link } from '../../../components/link';
 import { Check } from 'lucide-react';
 
-const zooBusinessId = '9d924bce-2e2a-4a9a-8de0-1f4458a2d8a4'; // temp
-
 const EXAMPLE_TICKET = {
-	itemId: 'c3af22f3-0f23-4fef-82c3-6e729a0a0f01',
+	itemId: 'general-admission',
 	name: 'General Admission',
 	description: 'Full-day access to all habitats, vendors, and attractions.',
 	price: 24.95,
 	uiPhotoUrl:
 		'https://media.istockphoto.com/id/1013497326/vector/zoo-park-tickets-with-african-and-forest-animals.jpg?s=612x612&w=0&k=20&c=N0l2c_QViTOst5L2a25E6nmQj6BVCnxSj7nuTup83D4=',
-	businessId: zooBusinessId,
+	businessId: '-1',
 };
 
 export function BuyTicketsPage() {
@@ -145,8 +143,8 @@ export function BuyTicketsPage() {
 							color: 'var(--color-lgreen)',
 						}}
 					>
-						Choose tickets for your perfect day at the zoo, then add
-						them to your cart for a quick checkout.
+						Buy tickets!!! Please!!!! Buy now!!! Your money -&gt;
+						our pockets!
 					</p>
 				</header>
 

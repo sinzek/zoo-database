@@ -8,6 +8,7 @@ export function useAuth() {
 		setUserInfo,
 		setUserEntityData,
 		setUserEntityType,
+		setMembership,
 		navigate
 	) => {
 		console.log('Attempting login for email:', email);
@@ -23,13 +24,14 @@ export function useAuth() {
 			return result; // { success: false, error: '...'}
 		}
 
-		const { user, relatedInfo } = result.data;
+		const { user, relatedInfo, membership } = result.data;
 
 		console.log('Login data received:', result.data);
 
 		setUserInfo(user);
 		setUserEntityData(relatedInfo.data);
 		setUserEntityType(relatedInfo.type);
+		setMembership(membership);
 
 		console.log('Login successful:', result.data);
 		navigate('/portal', { replace: true });
@@ -68,6 +70,7 @@ export function useAuth() {
 		setUserInfo,
 		setUserEntityData,
 		setUserEntityType,
+		setMembership,
 		setAuthLoading
 	) => {
 		setAuthLoading(true);
@@ -78,11 +81,12 @@ export function useAuth() {
 			return; // not logged in, no action needed
 		}
 
-		const { user, relatedInfo } = result.data;
+		const { user, relatedInfo, membership } = result.data;
 
 		setUserInfo(user);
 		setUserEntityData(relatedInfo.data);
 		setUserEntityType(relatedInfo.type);
+		setMembership(membership);
 		setAuthLoading(false);
 		return { success: true, data: result.data };
 	};

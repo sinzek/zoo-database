@@ -16,6 +16,7 @@ const UserDataContext = createContext({
 	businessEmployeeWorksFor: null, // { businessId, name, ... } | null
 	clockedInSince: null,
 	clock: (_inStatus) => {},
+	membership: null, // membership data for customers (if any)
 });
 
 export function UserDataProvider({ children }) {
@@ -25,6 +26,7 @@ export function UserDataProvider({ children }) {
 	const [userInfo, setUserInfo] = useState(null);
 	const [userEntityData, setUserEntityData] = useState(null);
 	const [userEntityType, setUserEntityType] = useState(null);
+	const [membership, setMembership] = useState(null);
 	const [businessEmployeeWorksFor, setBusinessEmployeeWorksFor] =
 		useState(null);
 	const [businessLoading, setBusinessLoading] = useState(false);
@@ -75,6 +77,7 @@ export function UserDataProvider({ children }) {
 				setUserInfo,
 				setUserEntityData,
 				setUserEntityType,
+				setMembership,
 				setAuthLoading
 			);
 
@@ -141,6 +144,7 @@ export function UserDataProvider({ children }) {
 						setUserInfo,
 						setUserEntityData,
 						setUserEntityType,
+						setMembership,
 						navigate
 					),
 				logout: async () =>
@@ -155,6 +159,7 @@ export function UserDataProvider({ children }) {
 				businessEmployeeWorksFor,
 				clockedInSince,
 				clock,
+				membership,
 			}}
 		>
 			{children}

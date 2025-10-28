@@ -1,0 +1,78 @@
+.membership-transaction-page {
+	min-height: 100%;
+	min-width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.receipt-container {
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	padding: 2rem;
+	min-height: 100vh;
+	font-family: sans-serif;
+	margin-top: 120px;
+}
+
+.receipt-card {
+	background-color: var(--color-lbrown);
+	border-radius: 20px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	padding: 2rem 3rem;
+	max-width: 600px;
+	width: 100%;
+	border-top: 10px solid var(--color-dgreen);
+}
+
+.receipt-header {
+	text-align: center;
+	color: var(--color-dbrown);
+	margin-bottom: 0.5rem;
+}
+
+.receipt-subheader {
+	text-align: center;
+	color: var(--color-brown);
+	margin-bottom: 2rem;
+}
+
+.receipt-section {
+	margin-bottom: 1.5rem;
+	border-bottom: 1px solid var(--color-brown);
+	padding-bottom: 1.5rem;
+}
+
+.receipt-section:last-of-type {
+	border-bottom: none;
+}
+
+.receipt-section h2 {
+	color: var(--color-dbrown);
+	margin-bottom: 1rem;
+	font-size: 1.2rem;
+}
+
+.receipt-section p {
+	margin: 0.5rem 0;
+	color: var(--color-dbrown);
+	line-height: 1.6;
+}
+
+.receipt-section p strong {
+	color: var(--color-dbrown);
+	min-width: 150px;
+	display: inline-block;
+}
+
+.receipt-footer {
+	text-align: center;
+	margin-top: 2rem;
+	color: var(--color-brown);
+	font-size: 0.9rem;
+}
+
+.capitalize {
+	text-transform: capitalize;
+}

@@ -4,6 +4,9 @@ import { Button } from '../../../components/button';
 import { Link } from '../../../components/link';
 import { Trash2 } from 'lucide-react';
 import { Frown } from 'lucide-react';
+import { api } from '../../../utils/client-api-utils';
+import { useUserData } from '../../../context/userDataContext';
+import { showToast } from '../../../components/toast/showToast';
 
 export function CartPage() {
 	const {
@@ -13,6 +16,8 @@ export function CartPage() {
 		clearCart,
 		cartItemCount,
 	} = useShoppingCart();
+
+	const { userEntityData, userEntityType } = useUserData();
 
 	const currencyFormatter = useMemo(
 		() =>
@@ -29,16 +34,36 @@ export function CartPage() {
 		[cart]
 	);
 
-	const handleCheckout = () => {
-		// Dummy function
-		console.log('Proceeding to checkout with cart:', cart);
-		alert(
-			`Checkout is not implemented. Total: ${currencyFormatter.format(
-				cartTotal
-			)}`
-		);
+	const handleCheckout = async () => {
+		const result = await api('/api/purchase/items', 'POST', {
+			customerId: userEntityData.customerId,
+			items: cart.flatMap((item) =>
+				Array.from({ length: item.quantity }, () => ({
+					itemId: item.itemId,
+					name: item.name,
+					description: item.description,
+					price: item.price,
+					uiPhotoUrl: item.uiPhotoUrl,
+					businessId: item.businessId,
+				}))
+			),
+		});
+
+		if (!result.success) {
+			console.error('Error during checkout:', result.error);
+			showToast(
+				`Error: ${result.error || 'Failed to complete purchase.'}`
+			);
+			return;
+		}
+
+		showToast('Purchase completed successfully!');
 		clearCart();
 	};
+
+	if (userEntityType !== 'customer') {
+		return null;
+	}
 
 	if (cart.length === 0) {
 		return (

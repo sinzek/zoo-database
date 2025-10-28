@@ -1,6 +1,11 @@
-import { createOneQuery } from "../utils/query-utils";
-import { MEMBERSHIP_LEVELS } from "../constants/membershipLevels";
-import crypto from "crypto";
+import { createOneQuery } from '../utils/query-utils.js';
+import { MEMBERSHIP_LEVELS } from '../constants/membershipLevels.js';
+import crypto from 'crypto';
+import {
+	getGenAdmissionItemId,
+	getZooBusinessId,
+} from '../utils/other-utils.js';
+import { sendNotificationToUser } from '../utils/notif-utils.js';
 
 // takes in customerId and array of items to purchase
 async function purchaseItems(req, _res) {
@@ -13,43 +18,71 @@ async function purchaseItems(req, _res) {
 	const businessId = items[0].businessId;
 	if (!businessId) throw new Error('Missing businessId in items');
 
-	const totalAmount = items.reduce((sum, item) => sum + (item.price || 0), 0);
-	if (totalAmount <= 0) {
-		throw new Error('Total amount must be greater than zero');
-	}
+	const total = items.reduce((sum, item) => sum + item.price, 0);
 
-	const newTransaction = {
-		transactionId: crypto.randomUUID(),
-		description: `Purchase by customer ${customerId}`,
-		businessId,
-		amount: totalAmount,
-		deletedAt: null,
-		purchaseDate: new Date(), // ! ADD PURCHASE DATE TO TRANSACTION TABLE
-	};
-
-	await createOneQuery('Transaction', newTransaction);
-
+	const transactions = [];
 	const purchasedItems = [];
+
+	console.log('Items to purchase:', items);
+
 	for (const item of items) {
+		let businessId = item.businessId;
+		let itemId = item.itemId;
+
+		if (itemId === 'general-admission') {
+			businessId = await getZooBusinessId();
+
+			if (!businessId) {
+				throw new Error('Zoo business not found for general admission');
+			}
+
+			itemId = await getGenAdmissionItemId();
+
+			if (!itemId) {
+				throw new Error(
+					'General Admission item not found in the database'
+				);
+			}
+		}
+
+		const newTransaction = {
+			transactionId: crypto.randomUUID(),
+			description: `Purchase by customer ${customerId}`,
+			businessId,
+			amount: item.price,
+			deletedAt: null,
+			purchaseDate: new Date(),
+		};
+
+		await createOneQuery('Transaction', newTransaction);
+		transactions.push(newTransaction);
+
 		const purchasedItemData = {
 			purchasedItemId: crypto.randomUUID(),
 			customerId,
 			transactionId: newTransaction.transactionId,
-			itemId: item.itemId,
+			itemId: itemId,
 		};
 
 		await createOneQuery('PurchasedItem', purchasedItemData);
 		purchasedItems.push(purchasedItemData);
 	}
 
-	return [{ transaction: newTransaction, purchasedItems }];
+	await sendNotificationToUser(
+		req.user.data.id,
+		`Thank you for your purchase totalling $${total.toFixed(
+			2
+		)}! Your items have been thrown into the void.`
+	);
+
+	return [{ transactions, purchasedItems }];
 }
 
 async function purchaseMembership(req, _res) {
-	const { newMembership, businessId } = req.body;
+	const { newMembership } = req.body;
+	const userId = req.user.data.id;
 
 	if (!newMembership) throw new Error('Missing membership data');
-	if (!businessId) throw new Error('Missing businessId');
 	if (!newMembership.customerId)
 		throw new Error('Missing purchaser (customerId)');
 
@@ -57,14 +90,19 @@ async function purchaseMembership(req, _res) {
 		throw new Error('Invalid membership level');
 	}
 
+	const zooBusinessId = await getZooBusinessId();
+	if (!zooBusinessId) {
+		throw new Error('Zoo business not found');
+	}
+
 	// create transaction for membership purchase
 	const newTransaction = {
 		transactionId: crypto.randomUUID(),
 		description: `Membership purchase by customer ${newMembership.customerId}`,
-		businessId,
+		businessId: zooBusinessId,
 		amount: MEMBERSHIP_LEVELS[newMembership.level].price,
 		deletedAt: null,
-		purchaseDate: new Date(), // ! ADD PURCHASE DATE TO TRANSACTION TABLE
+		purchaseDate: new Date(),
 	};
 
 	await createOneQuery('Transaction', newTransaction);
@@ -81,7 +119,21 @@ async function purchaseMembership(req, _res) {
 		transactionId: newTransaction.transactionId,
 	};
 
-	await createOneQuery('Membership', newMembershipData);
+	try {
+		await createOneQuery('Membership', newMembershipData);
+	} catch (err) {
+		if (err.code === 'ER_DUP_ENTRY') {
+			throw new Error(
+				'You already have an active membership. Head to /portal to view it.'
+			);
+		}
+		throw err;
+	}
+
+	await sendNotificationToUser(
+		userId,
+		`Thank you for purchasing the ${newMembershipData.level} membership! Your membership is valid until ${newMembershipData.expireDate}. Enjoy your benefits at The Zoo™! No refunds. Lol.`
+	);
 
 	return [{ transaction: newTransaction, membership: newMembershipData }];
 }
