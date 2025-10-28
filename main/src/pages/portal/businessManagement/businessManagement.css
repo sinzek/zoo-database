@@ -1,0 +1,203 @@
+.business-management-page {
+	padding: 2rem;
+	max-width: 1200px;
+	margin-top: 80px;
+	display: grid;
+	gap: 2rem;
+}
+
+.business-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 2rem;
+	padding-bottom: 1rem;
+	border-bottom: 2px solid var(--color-green);
+}
+
+.business-header h1 {
+	margin: 0;
+	color: var(--color-lgreen);
+}
+
+.businesses-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+	gap: 1.5rem;
+}
+
+.business-card {
+	background-color: var(--color-brown);
+	border-radius: 8px;
+	padding: 1.5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.business-card-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 0.5rem;
+}
+
+.business-card-header h3 {
+	margin: 0;
+	color: var(--color-lgreen);
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.business-type {
+	background-color: var(--color-green);
+	color: var(--color-dbrown);
+	font-weight: 600;
+	text-transform: uppercase;
+	padding: 0.25rem 0.5rem;
+	border-radius: 4px;
+	font-size: 0.8rem;
+}
+
+.business-card p {
+	margin: 0;
+	color: var(--color-foreground);
+	font-size: 0.9rem;
+}
+
+.business-card .description {
+	font-style: italic;
+	color: var(--color-lbrown);
+}
+
+.card-actions {
+	margin-top: 1rem;
+	display: flex;
+	gap: 0.5rem;
+	border-top: 2px solid var(--color-lbrown);
+	padding-top: 1rem;
+}
+
+/* Modal Styles */
+.business-modal {
+	min-width: 600px;
+	max-width: 90%;
+	max-height: 90vh;
+	overflow-y: auto;
+}
+
+.business-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.form-section {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	background-color: var(--color-brown);
+	padding: 1rem;
+	border-radius: 6px;
+}
+
+.form-section h3 {
+	margin: 0 0 0.5rem 0;
+	color: var(--color-lgreen);
+	border-bottom: 2px solid var(--color-green);
+	padding-bottom: 0.5rem;
+}
+
+.business-form select,
+.business-form textarea {
+	width: 100%;
+	padding: 0.75rem;
+	border-radius: 15px;
+	border: 2px solid var(--color-lbrown);
+	background-color: var(--color-dbrown);
+	color: var(--color-lgreen);
+	box-sizing: border-box;
+}
+
+.business-form select:hover,
+.business-form textarea:hover,
+.business-form select:focus,
+.business-form textarea:focus {
+	outline: none;
+	border-color: var(--color-green);
+}
+
+.business-form textarea {
+	min-height: 80px;
+	resize: vertical;
+}
+
+.hours-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 0.75rem;
+}
+
+.hour-row {
+	display: grid;
+	grid-template-columns: 100px 1fr 1fr 1fr;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.hour-row label {
+	font-weight: 500;
+}
+
+.form-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 1rem;
+	margin-top: 1rem;
+}
+
+.form-section label {
+	font-weight: 600;
+	color: var(--color-lgreen);
+	padding-bottom: 5px;
+}
+
+.checkbox {
+	width: 20px;
+	height: 20px;
+	border: 2px solid var(--color-lbrown);
+	border-radius: 10px;
+	background-color: var(--color-dbrown);
+	cursor: pointer;
+}
+
+.checkbox:active,
+.checkbox:focus {
+	outline: none;
+	border-color: var(--color-green);
+}
+
+.checkbox.checked {
+	background-color: var(--color-green);
+	border-color: var(--color-green);
+}
+
+.hours-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.hour-row {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+
+.op-hours {
+	margin-bottom: 0;
+	margin-top: 1rem;
+	color: var(--color-lgreen);
+}

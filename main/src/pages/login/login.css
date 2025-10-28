@@ -53,12 +53,6 @@ h1 {
 	gap: 7px;
 }
 
-.form-group label {
-	font-size: 1em;
-	font-weight: 600;
-	color: var(--color-lgreen);
-}
-
 .pwd-row {
 	display: flex;
 	flex-direction: row;

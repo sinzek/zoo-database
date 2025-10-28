@@ -65,12 +65,6 @@
 	grid-column: 1 / -1;
 }
 
-.form-group label {
-	color: var(--color-lgreen);
-	font-weight: 600;
-	font-size: 0.9rem;
-}
-
 .form-group select,
 .form-group textarea {
 	background-color: var(--color-dbrown);

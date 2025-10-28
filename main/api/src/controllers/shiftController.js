@@ -210,6 +210,15 @@ async function getNByEmployee(req, _res) {
 
 	if (!employeeId) throw new Error('Missing employeeId');
 
+	const clockTimes = await query(
+		`
+		SELECT * FROM EmployeeClockTime
+		WHERE employeeId = ?
+		ORDER BY startTime ASC
+		`,
+		[employeeId]
+	);
+
 	// using db.query for join query
 	const shifts = await query(
 		`
@@ -222,38 +231,12 @@ async function getNByEmployee(req, _res) {
 	);
 
 	if (!shifts || shifts.length === 0) {
-		return [[]];
+		return [{ shifts: [], clockTimes }];
 	}
 
-	const shiftsWithClockTimes = await Promise.all(
-		shifts.map(async (shift) => {
-			// we do not want to throw an error if no clock times are found for a shift
-			try {
-				const clockTimes = await getNByKeyQuery(
-					'EmployeeClockTime',
-					'shiftId',
-					shift.shiftId,
-					false
-				);
+	// return shifts and clock times separately
 
-				return {
-					...shift,
-					clockTimes,
-				};
-			} catch (err) {
-				if (err.message.includes('No records found')) {
-					return {
-						...shift,
-						clockTimes: [],
-					};
-				}
-			}
-
-			return shift;
-		})
-	);
-
-	return [shiftsWithClockTimes];
+	return [{ shifts, clockTimes }];
 }
 
 /**
@@ -272,6 +255,26 @@ async function removeOneEmployeeFromShift(req, _res) {
 	return [{ message: 'Employee removed from shift successfully' }];
 }
 
+async function clockOutEmployee(req, _res) {
+	const { startTime, endTime } = req.body;
+	const employeeId = req.user.employeeData.employeeId;
+
+	if (!startTime || !endTime) {
+		throw new Error('Missing startTime or endTime');
+	}
+
+	const clockTimeId = crypto.randomUUID();
+
+	await createOneQuery('EmployeeClockTime', {
+		clockTimeId,
+		startTime: new Date(startTime),
+		endTime: new Date(endTime),
+		employeeId,
+	});
+
+	return;
+}
+
 export default {
 	createOne,
 	getOneById,
@@ -283,4 +286,5 @@ export default {
 	getNEmployeesByShift,
 	getNByEmployee,
 	removeOneEmployeeFromShift,
+	clockOutEmployee,
 };

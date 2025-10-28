@@ -94,9 +94,7 @@ export class App {
 			return res.end(JSON.stringify({ error: 'Not Found' }));
 		}
 
-		console.log(
-			`Handler found for ${method} ${pathname}, processing request...`
-		);
+		console.log(`Handler found for ${method} ${pathname}. Invoking...`);
 
 		req.query = Object.fromEntries(url.searchParams.entries());
 
@@ -115,9 +113,6 @@ export class App {
 				);
 			}
 		}
-
-		console.log('Available routes for method:', this.routes[method]);
-		console.log('Invoking handler function...');
 
 		await handlerWrapper(handler, req, res, {
 			logError: true,

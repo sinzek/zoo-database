@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUserData } from '../../context/userDataContext';
 import './topMenu.css';
 import { ChevronDown, ShoppingCart } from 'lucide-react';
@@ -7,10 +7,31 @@ import { useShoppingCart } from '../../context/shoppingCartContext';
 import { Button } from '../button';
 import { useRouter } from '../../context/routerContext';
 
+function formatDuration(ms) {
+	const totalSeconds = Math.floor(ms / 1000);
+	const hours = Math.floor(totalSeconds / 3600);
+	const minutes = Math.floor((totalSeconds % 3600) / 60);
+	const seconds = totalSeconds % 60;
+
+	const pad = (num) => num.toString().padStart(2, '0');
+
+	return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+}
+
 export function TopMenu() {
-	const { userEntityData, logout, userEntityType, businessEmployeeWorksFor } =
-		useUserData();
+	const {
+		userEntityData,
+		logout,
+		userEntityType,
+		businessEmployeeWorksFor,
+		clockedInSince,
+		clock,
+	} = useUserData();
 	const { path } = useRouter();
+
+	const [elapsedTime, setElapsedTime] = useState(
+		new Date() - new Date(clockedInSince)
+	);
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [mouseLeaveTimeout, setMouseLeaveTimeout] = useState(null);
@@ -47,6 +68,14 @@ export function TopMenu() {
 		);
 	};
 
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setElapsedTime(new Date() - new Date(clockedInSince));
+		}, 1000);
+
+		return () => clearInterval(interval);
+	}, [clockedInSince]);
+
 	if (!userEntityData || !path.startsWith('/portal')) {
 		return null;
 	}
@@ -62,25 +91,46 @@ export function TopMenu() {
 				</Link>
 			</div>
 			<div className='user-menu-container'>
+				{clockedInSince && (
+					<p className='topmenu-clock-text'>
+						Clocked in for {` ${formatDuration(elapsedTime)}`}
+					</p>
+				)}
+				{!clockedInSince && (
+					<p className='topmenu-clock-text'>
+						<Button
+							variant='green'
+							size='sm'
+							onClick={() => clock('in')}
+						>
+							Clock In
+						</Button>
+					</p>
+				)}
+				{clockedInSince && (
+					<p className='topmenu-clock-text'>
+						<Button
+							variant='green'
+							size='sm'
+							onClick={() => clock('out')}
+						>
+							Clock out
+						</Button>
+					</p>
+				)}
 				{userEntityType === 'employee' && businessEmployeeWorksFor && (
 					<p
 						style={{
 							color: 'var(--color-lbrown)',
 							marginRight: '1rem',
+							marginLeft: '1rem',
 						}}
 					>
 						<strong>{userEntityData.jobTitle}</strong> at{' '}
 						<strong>{businessEmployeeWorksFor.name}</strong>
 					</p>
 				)}
-				<p className='topmenu-clock-text'>
-					<Button
-						variant='green'
-						size='sm'
-					>
-						Clock In
-					</Button>
-				</p>
+
 				{userEntityType === 'customer' && (
 					<Link
 						to='/portal/cart'

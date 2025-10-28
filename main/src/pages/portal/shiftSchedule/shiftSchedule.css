@@ -96,6 +96,14 @@
 	font-size: 0.8rem;
 }
 
+.clock-time-card {
+	background-color: #3a322d; /* Slightly different from shift-card */
+	border: 1px solid var(--color-brown);
+	border-radius: 10px;
+	padding: 0.75rem;
+	font-size: 0.8rem;
+}
+
 .shift-card.past-shift {
 	opacity: 0.7;
 }
@@ -128,6 +136,21 @@
 	color: var(--color-lgreen);
 }
 
+.day-section {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.day-section-header {
+	font-size: 0.75rem;
+	font-weight: 700;
+	color: var(--color-lbrown);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin: 0.5rem 0 0.25rem 0.25rem;
+}
+
 .clock-times {
 	font-size: 0.8rem;
 	color: var(--color-lbrown);
@@ -136,6 +159,14 @@
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
+	text-align: center;
+	color: var(--color-lbrown) !important;
+	font-size: 0.9rem;
+	padding: 1rem 0;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .no-shifts {
@@ -147,6 +178,17 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+.total-hours-display {
+	text-align: center;
+	margin-top: 2rem;
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: var(--color-lgreen);
+	background-color: var(--color-brown);
+	padding: 1rem;
+	border-radius: 16px;
 }
 
 .error-message {
