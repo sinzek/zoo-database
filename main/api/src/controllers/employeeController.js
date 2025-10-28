@@ -115,7 +115,11 @@ async function updateOne(req, _res) {
 		throw new Error('Missing employee data or employeeId');
 	}
 
-	const newEmpData = { ...updatedEmployee };
+	const newEmpData = {
+		...updatedEmployee,
+		hireDate: new Date(updatedEmployee.hireDate),
+		birthDate: new Date(updatedEmployee.birthDate),
+	};
 	delete newEmpData.userId; // cannot update userId
 	delete newEmpData.ssn; // cannot update ssn
 

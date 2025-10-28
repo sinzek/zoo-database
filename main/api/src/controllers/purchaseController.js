@@ -18,7 +18,7 @@ async function purchaseItems(req, _res) {
 	const businessId = items[0].businessId;
 	if (!businessId) throw new Error('Missing businessId in items');
 
-	const total = items.reduce((sum, item) => sum + item.price, 0);
+	const total = items.reduce((sum, item) => sum + Number(item.price), 0);
 
 	const transactions = [];
 	const purchasedItems = [];
@@ -70,9 +70,9 @@ async function purchaseItems(req, _res) {
 
 	await sendNotificationToUser(
 		req.user.data.id,
-		`Thank you for your purchase totalling $${total.toFixed(
-			2
-		)}! Your items have been thrown into the void.`
+		`Thank you for your purchase totalling $${
+			total
+		}! Your items have been thrown into the void.`
 	);
 
 	return [{ transactions, purchasedItems }];

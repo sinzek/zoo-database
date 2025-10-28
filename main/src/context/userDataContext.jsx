@@ -17,6 +17,7 @@ const UserDataContext = createContext({
 	clockedInSince: null,
 	clock: (_inStatus) => {},
 	membership: null, // membership data for customers (if any)
+	setUserEntityData: (_data) => {},
 });
 
 export function UserDataProvider({ children }) {
@@ -161,6 +162,7 @@ export function UserDataProvider({ children }) {
 				clockedInSince,
 				clock,
 				membership,
+				setUserEntityData,
 			}}
 		>
 			{children}
