@@ -64,36 +64,6 @@
 	margin-bottom: 1.5rem;
 }
 
-.form-group {
-	margin-bottom: 1.5rem;
-}
-
-.form-group label {
-	display: block;
-	margin-bottom: 0.5rem;
-	color: var(--color-lgreen);
-	font-weight: 600;
-}
-
-.form-group input,
-.form-group textarea {
-	width: 100%;
-	padding: 0.75rem;
-	border: 2px solid var(--color-brown);
-	border-radius: 8px;
-	background-color: var(--color-dbrown);
-	color: var(--color-foreground);
-	font-size: 1rem;
-	font-family: inherit;
-	resize: vertical;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-	outline: none;
-	border-color: var(--color-green);
-}
-
 .form-hint {
 	font-size: 0.85rem;
 	color: var(--color-lbrown);
@@ -154,7 +124,9 @@
 	border-radius: 12px;
 	border: 2px solid var(--color-brown);
 	padding: 1.5rem;
-	transition: transform 0.2s, box-shadow 0.2s;
+	transition:
+		transform 0.2s,
+		box-shadow 0.2s;
 }
 
 .habitat-card:hover {
@@ -229,4 +201,3 @@
 	padding: 3rem;
 	font-size: 1.1rem;
 }
-

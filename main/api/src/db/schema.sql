@@ -170,11 +170,11 @@ CREATE TABLE EmployeeTakesShift(
 
 CREATE TABLE EmployeeClockTime(
 	clockTimeId CHAR(36) PRIMARY KEY,
-	shiftId CHAR(36) NOT NULL,
 	startTime DATETIME NOT NULL,
 	endTime DATETIME NOT NULL,
+    employeeId CHAR(36) NOT NULL,
 
-	FOREIGN KEY (shiftId) REFERENCES Shift(shiftId) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (employeeId) REFERENCES Employee(employeeId) ON DELETE CASCADE ON UPDATE CASCADE,
     CHECK(endTime > startTime)
 );
 
