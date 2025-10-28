@@ -5,6 +5,7 @@ import HomePage from './pages/home/home';
 import HabitatsPage from './pages/habitats/habitats';
 import LoginPage from './pages/login/login';
 import AttractionsPage from './pages/attractions/attractions';
+import AttractionDetailPage from './pages/attractions/attractionDetail';
 import HabitatDetailsPage from './pages/habitats/habitatDetails';
 import { TestingPage } from './pages/testing/testing';
 import AnimalsPage from './pages/animals/animals';
@@ -23,6 +24,7 @@ import { MedicalRecordDetailPage } from './pages/portal/medicalRecords/medicalRe
 import { FeedingSchedulesPage } from './pages/portal/feedingSchedules/feedingSchedules';
 import { FeedingScheduleDetailPage } from './pages/portal/feedingSchedules/feedingScheduleDetail';
 import { ScheduleManagementPage } from './pages/portal/scheduleManagement/scheduleManagement';
+import { PortalAttractionsPage } from './pages/portal/attractions/portalAttractions';
 import { PortalHabitatsPage } from './pages/portal/habitats/portalHabitats';
 import { BusinessManagementPage } from './pages/portal/businessManagement/businessManagement';
 import { NotificationsPage } from './pages/portal/notifications/notifications';
@@ -36,7 +38,8 @@ export default function Router() {
 	const isAuthProtectedPage = path.startsWith('/portal');
 	const isLoginOrSignupPage = path === '/login' || path === '/signup';
 
-	const habitatMatch = match('/habitats/:id');
+    const habitatMatch = match('/habitats/:id');
+    const attractionMatch = match('/attractions/:id');
 	const medicalRecordMatch = match('/portal/medical-records/:animalId');
 	const feedingScheduleMatch = match('/portal/feeding-schedules/:animalId');
 	const membershipTransactionMatch = match(
@@ -59,6 +62,7 @@ export default function Router() {
 		'/portal/animals': PortalAnimalsPage,
 		'/portal/medical-records': MedicalRecordsPage,
 		'/portal/feeding-schedules': FeedingSchedulesPage,
+		'/portal/attractions': PortalAttractionsPage,
 		'/portal/habitats': PortalHabitatsPage,
 		'/portal/buy-tickets': BuyTicketsPage,
 		'/portal/cart': CartPage,
@@ -71,8 +75,10 @@ export default function Router() {
 		'/testing': TestingPage,
 	};
 
-	if (habitatMatch) {
+    if (habitatMatch) {
 		content = <HabitatDetailsPage id={habitatMatch.id} />;
+    } else if (attractionMatch) {
+        content = <AttractionDetailPage id={attractionMatch.id} />;
 	} else if (medicalRecordMatch) {
 		content = (
 			<MedicalRecordDetailPage animalId={medicalRecordMatch.animalId} />
