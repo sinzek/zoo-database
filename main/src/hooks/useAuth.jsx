@@ -84,10 +84,13 @@ export function useAuth() {
 		setAuthLoading(true);
 		const result = await api('/api/auth/me', 'GET');
 
-		if (!result.success && result.error === 'Unauthorized') {
+		if (!result.success) {
 			setAuthLoading(false);
 			return; // not logged in, no action needed
 		}
+
+		if (!result.data.user)
+			return { success: false, error: 'No user data returned' };
 
 		const { user, relatedInfo, membership } = result.data;
 
