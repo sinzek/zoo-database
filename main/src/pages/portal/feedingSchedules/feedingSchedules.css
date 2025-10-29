@@ -1,6 +1,7 @@
 .portal-feeding-schedules-page {
 	max-width: 90%;
 	margin: auto auto;
+	margin-top: 100px;
 	padding: 24px;
 	color: var(--color-foreground);
 }
@@ -62,7 +63,9 @@
 	border-radius: 12px;
 	border: 2px solid var(--color-brown);
 	overflow: hidden;
-	transition: transform 0.2s, box-shadow 0.2s;
+	transition:
+		transform 0.2s,
+		box-shadow 0.2s;
 	cursor: default;
 	position: relative;
 }
@@ -121,4 +124,3 @@
 	padding: 2rem;
 	font-size: 1.1rem;
 }
-

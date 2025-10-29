@@ -47,6 +47,8 @@ async function createOne(req, _res) {
 async function getOneById(req, _res) {
 	const { medicalRecordId } = req.body;
 
+	console.log('CREATING NEW MEDICAL RECORD:', medicalRecordId);
+
 	if (!medicalRecordId) throw new Error('Missing medicalRecordId');
 
 	const [medicalRecord] = await getNByKeyQuery(
@@ -69,9 +71,15 @@ async function getNyByAnimal(req, _res) {
 
 	if (!animalId) throw new Error('Missing animalId');
 
-	let medicalRecords = await getNByKeyQuery('MedicalRecord', 'animalId', animalId);
+	let medicalRecords = await getNByKeyQuery(
+		'MedicalRecord',
+		'animalId',
+		animalId
+	);
 
-	medicalRecords = medicalRecords.sort((a, b) => new Date(b.visitDate) - new Date(a.visitDate));
+	medicalRecords = medicalRecords.sort(
+		(a, b) => new Date(b.visitDate) - new Date(a.visitDate)
+	);
 
 	return [medicalRecords];
 }
@@ -106,7 +114,7 @@ async function getNByDateRange(req, _res) {
 
 	const medicalRecords = await query(q, params);
 
-	if(!medicalRecords || medicalRecords.length === 0) {
+	if (!medicalRecords || medicalRecords.length === 0) {
 		return [[]]; // return empty array if no records found
 	}
 
@@ -179,8 +187,10 @@ async function deleteOne(req, _res) {
 		[medicalRecordId]
 	);
 
-	if(result.affectedRows === 0) {
-		throw new Error('No medical record found to delete or it is already deleted');
+	if (result.affectedRows === 0) {
+		throw new Error(
+			'No medical record found to delete or it is already deleted'
+		);
 	}
 
 	return [{ message: `Medical record deleted with ID ${medicalRecordId}` }];
@@ -241,7 +251,8 @@ async function getMedicationsByRecord(req, _res) {
 async function removePrescribedMedication(req, _res) {
 	const { prescribedMedicationId } = req.body;
 
-	if (!prescribedMedicationId) throw new Error('Missing prescribedMedicationId');
+	if (!prescribedMedicationId)
+		throw new Error('Missing prescribedMedicationId');
 
 	// using query for hard delete
 	await query(
@@ -252,7 +263,11 @@ async function removePrescribedMedication(req, _res) {
 		[prescribedMedicationId]
 	);
 
-	return [{ message: `Prescribed medication removed with ID ${prescribedMedicationId}` }];
+	return [
+		{
+			message: `Prescribed medication removed with ID ${prescribedMedicationId}`,
+		},
+	];
 }
 
 /**
@@ -279,7 +294,7 @@ async function assignVeterinarian(req, _res) {
 		vetName,
 		vetEmail,
 		vetOffice,
-	}
+	};
 
 	await createOneQuery('AssignedVeterinarian', assignedVet);
 

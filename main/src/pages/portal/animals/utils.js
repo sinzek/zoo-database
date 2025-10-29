@@ -2,10 +2,7 @@ import { api } from '../../../utils/client-api-utils';
 import { showToast } from '../../../components/toast/showToast';
 
 export async function fetchAnimals() {
-	const result = await api(
-		'/api/animal/get-all-grouped-by-habitat',
-		'POST'
-	);
+	const result = await api('/api/animal/get-all-grouped-by-habitat', 'POST');
 
 	if (!result.success) {
 		showToast(`Error: ${result.error || 'Failed to fetch animals.'}`);
@@ -47,6 +44,7 @@ export async function createAnimal(animalData) {
 		return { success: false };
 	}
 
+	showToast('Animal created successfully');
 	return { success: true, data: result.data };
 }
 
@@ -61,6 +59,18 @@ export async function updateAnimal(animalId, animalData) {
 		return { success: false };
 	}
 
+	showToast('Animal updated successfully');
 	return { success: true, data: result.data };
 }
 
+export async function deleteAnimal(animalId) {
+	const result = await api('/api/animal/delete', 'DELETE', { animalId });
+
+	if (!result.success) {
+		showToast(`Error: ${result.error || 'Failed to delete animal.'}`);
+		return { success: false };
+	}
+
+	showToast('Animal deleted successfully');
+	return { success: true };
+}

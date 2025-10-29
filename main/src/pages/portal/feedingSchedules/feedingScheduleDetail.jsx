@@ -253,6 +253,17 @@ export function FeedingScheduleDetailPage({ animalId }) {
 							{animal.firstName} {animal.lastName}
 						</h1>
 						<p className='common-name'>{animal.commonName}</p>
+						<u
+							style={{
+								color: 'var(--color-lgreen)',
+								marginTop: '0.5rem',
+							}}
+						>
+							Special notes:
+						</u>
+						<p style={{ fontStyle: 'italic' }}>
+							{diet && diet.specialNotes}
+						</p>
 					</div>
 				</div>
 			)}
@@ -433,148 +444,176 @@ export function FeedingScheduleDetailPage({ animalId }) {
 					</p>
 				) : (
 					<div className='schedule-days'>
-						{diet.scheduleDays.map((day) => {
-							const isEditing =
-								editingDayId === day.dietScheduleDayId;
-							return (
-								<div
-									key={day.dietScheduleDayId}
-									className='schedule-day-card'
-								>
-									{isEditing ? (
-										<div className='edit-form'>
-											<div className='form-row'>
-												<div className='form-group'>
-													<label>Day of Week</label>
-													<select
-														value={
-															editingFormData.dayOfWeek
-														}
-														onChange={(e) =>
-															setEditingFormData({
-																...editingFormData,
-																dayOfWeek:
-																	e.target
-																		.value,
-															})
-														}
-													>
-														{DAYS_OF_WEEK.map(
-															(d) => (
-																<option
-																	key={d}
-																	value={d}
-																>
-																	{d}
-																</option>
-															)
-														)}
-													</select>
-												</div>
-												<div className='form-group'>
-													<label>Feed Time</label>
-													<input
-														type='time'
-														value={
-															editingFormData.feedTime
-														}
-														onChange={(e) =>
-															setEditingFormData({
-																...editingFormData,
-																feedTime:
-																	e.target
-																		.value,
-															})
-														}
-													/>
-												</div>
-												<div className='form-group'>
-													<label>Food</label>
-													<input
-														type='text'
-														value={
-															editingFormData.food
-														}
-														onChange={(e) =>
-															setEditingFormData({
-																...editingFormData,
-																food: e.target
-																	.value,
-															})
-														}
-													/>
-												</div>
-											</div>
-											<div className='form-actions'>
-												<Button
-													onClick={() =>
-														handleSave(
-															day.dietScheduleDayId
-														)
-													}
-													className='save-button'
-													variant='green'
-												>
-													<Save size={16} />
-													Save
-												</Button>
-												<Button
-													onClick={handleCancel}
-													className='cancel-button'
-													variant='green'
-												>
-													<X size={16} />
-													Cancel
-												</Button>
-											</div>
-										</div>
-									) : (
-										<>
-											<div className='schedule-day-header'>
-												<h3>
-													<Calendar size={20} />
-													{day.dayOfWeek}
-												</h3>
-												{isZookeeperPlus && (
-													<div className='action-buttons'>
-														<Button
-															onClick={() =>
-																handleEdit(day)
+						{diet.scheduleDays
+							.sort((a, b) => {
+								return (
+									DAYS_OF_WEEK.indexOf(a.dayOfWeek) -
+									DAYS_OF_WEEK.indexOf(b.dayOfWeek)
+								);
+							})
+							.map((day) => {
+								const isEditing =
+									editingDayId === day.dietScheduleDayId;
+								return (
+									<div
+										key={day.dietScheduleDayId}
+										className='schedule-day-card'
+									>
+										{isEditing ? (
+											<div className='edit-form'>
+												<div className='form-row'>
+													<div className='form-group'>
+														<label>
+															Day of Week
+														</label>
+														<select
+															value={
+																editingFormData.dayOfWeek
 															}
-															className='edit-button'
-															variant='green'
-														>
-															<Edit size={16} />
-														</Button>
-														<Button
-															onClick={() =>
-																handleDelete(
-																	day.dietScheduleDayId
+															onChange={(e) =>
+																setEditingFormData(
+																	{
+																		...editingFormData,
+																		dayOfWeek:
+																			e
+																				.target
+																				.value,
+																	}
 																)
 															}
-															className='delete-button'
-															variant='outline'
 														>
-															<Trash2 size={16} />
-														</Button>
+															{DAYS_OF_WEEK.map(
+																(d) => (
+																	<option
+																		key={d}
+																		value={
+																			d
+																		}
+																	>
+																		{d}
+																	</option>
+																)
+															)}
+														</select>
 													</div>
-												)}
-											</div>
-											<div className='schedule-day-info'>
-												<div className='info-item'>
-													<strong>Feed Time:</strong>{' '}
-													{day.feedTime}
+													<div className='form-group'>
+														<label>Feed Time</label>
+														<input
+															type='time'
+															value={
+																editingFormData.feedTime
+															}
+															onChange={(e) =>
+																setEditingFormData(
+																	{
+																		...editingFormData,
+																		feedTime:
+																			e
+																				.target
+																				.value,
+																	}
+																)
+															}
+														/>
+													</div>
+													<div className='form-group'>
+														<label>Food</label>
+														<input
+															type='text'
+															value={
+																editingFormData.food
+															}
+															onChange={(e) =>
+																setEditingFormData(
+																	{
+																		...editingFormData,
+																		food: e
+																			.target
+																			.value,
+																	}
+																)
+															}
+														/>
+													</div>
 												</div>
-												<div className='info-item'>
-													<strong>Food:</strong>{' '}
-													{day.food}
+												<div className='form-actions'>
+													<Button
+														onClick={() =>
+															handleSave(
+																day.dietScheduleDayId
+															)
+														}
+														className='save-button'
+														variant='green'
+													>
+														<Save size={16} />
+														Save
+													</Button>
+													<Button
+														onClick={handleCancel}
+														className='cancel-button'
+														variant='green'
+													>
+														<X size={16} />
+														Cancel
+													</Button>
 												</div>
 											</div>
-										</>
-									)}
-								</div>
-							);
-						})}
+										) : (
+											<>
+												<div className='schedule-day-header'>
+													<h3>
+														<Calendar size={20} />
+														{day.dayOfWeek}
+													</h3>
+													{isZookeeperPlus && (
+														<div className='action-buttons'>
+															<Button
+																onClick={() =>
+																	handleEdit(
+																		day
+																	)
+																}
+																className='edit-button'
+																variant='green'
+															>
+																<Edit
+																	size={16}
+																/>
+															</Button>
+															<Button
+																onClick={() =>
+																	handleDelete(
+																		day.dietScheduleDayId
+																	)
+																}
+																className='delete-button'
+																variant='outline'
+															>
+																<Trash2
+																	size={16}
+																/>
+															</Button>
+														</div>
+													)}
+												</div>
+												<div className='schedule-day-info'>
+													<div className='info-item'>
+														<strong>
+															Feed Time:
+														</strong>{' '}
+														{day.feedTime}
+													</div>
+													<div className='info-item'>
+														<strong>Food:</strong>{' '}
+														{day.food}
+													</div>
+												</div>
+											</>
+										)}
+									</div>
+								);
+							})}
 					</div>
 				)}
 			</div>
