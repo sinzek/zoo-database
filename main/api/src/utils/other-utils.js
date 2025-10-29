@@ -50,10 +50,13 @@ export async function notifyAndUpdateAssignedZookeepersOfAnimalDeletion(
 	const takesCareOfRecords = await getNByKeyQuery(
 		'TakesCareOf',
 		'animalId',
-		animalId
+		animalId,
+		false
 	);
 
 	const employeeIds = takesCareOfRecords.map((record) => record.employeeId);
+
+	if (employeeIds.length === 0) return;
 
 	for (const empId of employeeIds) {
 		try {

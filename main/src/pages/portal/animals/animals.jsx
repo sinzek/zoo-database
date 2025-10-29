@@ -469,7 +469,9 @@ export function PortalAnimalsPage() {
 											<Edit2 size={16} />
 										</Button>
 										<Button
-											onClick={() => handleDelete(animal)}
+											onClick={() =>
+												handleDelete(animal.animalId)
+											}
 											className='btn-icon'
 											variant='outline'
 										>
