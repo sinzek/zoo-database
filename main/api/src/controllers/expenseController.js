@@ -8,17 +8,31 @@ import {
 
 /**
  * Creates a new expense record.
+ * Managers can only add expenses to their own business.
+ * Executives and above can add expenses to any business.
  * @param {string} req.body.expenseDescription - Description of the expense
  * @param {number} req.body.cost - Cost of the expense
  * @param {string} req.body.purchaseDate - Date/time of purchase
  * @param {string} req.body.businessId - UUID of the associated business
  * @returns {Promise<Array>} Array containing the created expense object with generated expenseId
- * @throws {Error} If expense data is missing
+ * @throws {Error} If expense data is missing or user doesn't have permission
  */
 async function createOne(req, _res) {
 	const newExpense = req.body;
 
 	if (!newExpense) throw new Error('Missing expense data');
+
+	// Get current employee data from req.user (set by withAccessLevel middleware)
+	const employee = req.user.employeeData;
+	const accessLevel = employee.accessLevel;
+
+	// Managers can only add expenses to their own business
+	if (accessLevel === 'manager') {
+		if (!newExpense.businessId || newExpense.businessId !== employee.businessId) {
+			throw new Error('Managers can only add expenses to their own business');
+		}
+	}
+	// Executive and db_admin can add to any business
 
 	const expenseId = crypto.randomUUID();
 
@@ -54,6 +68,8 @@ async function getOneById(req, _res) {
 
 /**
  * Retrieves all expenses for a specific business.
+ * Managers can only view expenses for their own business.
+ * Executives and above can view expenses for any business.
  * @param {string} req.body.businessId - UUID of the business
  * @returns {Promise<Array>} Array of expense objects
  * @throws {Error} If businessId is missing or no expenses are found
@@ -62,6 +78,15 @@ async function getManyByBusiness(req, _res) {
 	const { businessId } = req.body;
 
 	if (!businessId) throw new Error('Missing businessId');
+
+	// Get current employee data
+	const employee = req.user.employeeData;
+	const accessLevel = employee.accessLevel;
+
+	// For managers, verify they can only view expenses for their own business
+	if (accessLevel === 'manager' && businessId !== employee.businessId) {
+		throw new Error('Managers can only view expenses for their own business');
+	}
 
 	const rows = await getNByKeyQuery('Expense', 'businessId', businessId);
 
@@ -128,18 +153,32 @@ async function getTotalByBusiness(req, _res) {
 
 /**
  * Updates an existing expense record.
+ * Managers can only update expenses for their own business.
+ * Executives and above can update expenses for any business.
  * @param {string} req.body.expenseId - UUID of the expense to update
  * @param {string} [req.body.expenseDescription] - Updated description
  * @param {number} [req.body.cost] - Updated cost
  * @param {string} [req.body.purchaseDate] - Updated purchase date
  * @returns {Promise<Array>} Array containing the updated expense object
- * @throws {Error} If expense data or expenseId is missing
+ * @throws {Error} If expense data or expenseId is missing or user doesn't have permission
  */
 async function updateOne(req, _res) {
 	const updatedExpense = req.body;
 
 	if (!updatedExpense || !updatedExpense.expenseId) {
 		throw new Error('Missing expense data or expenseId');
+	}
+
+	// Get current employee data
+	const employee = req.user.employeeData;
+	const accessLevel = employee.accessLevel;
+
+	// For managers, verify they can only update expenses for their own business
+	if (accessLevel === 'manager') {
+		const [existingExpense] = await getNByKeyQuery('Expense', 'expenseId', updatedExpense.expenseId);
+		if (!existingExpense || existingExpense.businessId !== employee.businessId) {
+			throw new Error('Managers can only update expenses for their own business');
+		}
 	}
 
 	const newExpenseData = { ...updatedExpense };
@@ -151,14 +190,28 @@ async function updateOne(req, _res) {
 
 /**
  * Soft deletes an expense by setting its deletedAt timestamp.
+ * Managers can only delete expenses for their own business.
+ * Executives and above can delete expenses for any business.
  * @param {string} req.body.expenseId - UUID of the expense to delete
  * @returns {Promise<Array>} Array containing success message
- * @throws {Error} If expenseId is missing
+ * @throws {Error} If expenseId is missing or user doesn't have permission
  */
 async function deleteOne(req, _res) {
 	const { expenseId } = req.body;
 
 	if (!expenseId) throw new Error('Missing expenseId');
+
+	// Get current employee data
+	const employee = req.user.employeeData;
+	const accessLevel = employee.accessLevel;
+
+	// For managers, verify they can only delete expenses for their own business
+	if (accessLevel === 'manager') {
+		const [existingExpense] = await getNByKeyQuery('Expense', 'expenseId', expenseId);
+		if (!existingExpense || existingExpense.businessId !== employee.businessId) {
+			throw new Error('Managers can only delete expenses for their own business');
+		}
+	}
 
 	// using db.query for soft delete
 	await db.query(
