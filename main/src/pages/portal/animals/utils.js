@@ -64,7 +64,7 @@ export async function updateAnimal(animalId, animalData) {
 }
 
 export async function deleteAnimal(animalId) {
-	const result = await api('/api/animal/delete', 'DELETE', { animalId });
+	const result = await api('/api/animal/delete-one', 'POST', { animalId });
 
 	if (!result.success) {
 		showToast(`Error: ${result.error || 'Failed to delete animal.'}`);

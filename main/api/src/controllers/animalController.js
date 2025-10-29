@@ -30,7 +30,7 @@ async function createOne(req, _res) {
 		importDate: newAnimal.importDate || null,
 		sex: newAnimal.sex,
 		behavior: newAnimal.behavior || null,
-		habitatId: newAnimal.habitatId
+		habitatId: newAnimal.habitatId,
 	};
 
 	await createOneQuery('Animal', animalData);
