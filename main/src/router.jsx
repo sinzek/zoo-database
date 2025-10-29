@@ -35,6 +35,7 @@ import { MembershipTransactionPage } from './pages/portal/membershipTransaction/
 
 import { PortalEmployeesPage } from './pages/portal/employees/employees';
 import { ShiftReportPage } from './pages/portal/reports/shiftReport/shiftReport';
+import { PortalExpensesPage } from './pages/portal/expenses/portalExpenses';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -70,6 +71,7 @@ export default function Router() {
 		'/portal/feeding-schedules': FeedingSchedulesPage,
 		'/portal/attractions': PortalAttractionsPage,
 		'/portal/habitats': PortalHabitatsPage,
+		'/portal/expenses': PortalExpensesPage,
 		'/portal/buy-tickets': BuyTicketsPage,
 		'/portal/cart': CartPage,
 		'/portal/shop': ShopPage,

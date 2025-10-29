@@ -10,6 +10,7 @@ import {
 	Users,
 	BarChart,
 	ShieldBan,
+	DollarSign,
 } from 'lucide-react';
 
 export function availableLinksForAccessLevel(uedata) {
@@ -54,7 +55,8 @@ export function availableLinksForAccessLevel(uedata) {
 			},
 			{ to: '/portal/employees', label: 'Employees', icon: Users },
 			{ to: '/portal/reports', label: 'Reports', icon: BarChart },
-			{ to: '/portal/habitats', label: 'Manage Habitats', icon: TreePalm }
+			{ to: '/portal/habitats', label: 'Manage Habitats', icon: TreePalm },
+			{ to: '/portal/expenses', label: 'Expenses', icon: DollarSign }
 		);
 	}
 
