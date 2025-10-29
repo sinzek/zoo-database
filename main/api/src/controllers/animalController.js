@@ -18,20 +18,6 @@ async function createOne(req, _res) {
 	const newAnimal = req.body;
 	const animalId = crypto.randomUUID();
 
-	// Get a default diet if dietId is not provided
-	let dietId = newAnimal.dietId;
-	if (!dietId) {
-		// Get the first available diet or create a default one
-		const defaultDiets = await query(
-			`SELECT dietId FROM Diet WHERE deletedAt IS NULL LIMIT 1`
-		);
-		if (defaultDiets && defaultDiets.length > 0) {
-			dietId = defaultDiets[0].dietId;
-		} else {
-			throw new Error('No diet available. Please create a diet first.');
-		}
-	}
-
 	const animalData = {
 		animalId,
 		firstName: newAnimal.firstName,
@@ -44,8 +30,7 @@ async function createOne(req, _res) {
 		importDate: newAnimal.importDate || null,
 		sex: newAnimal.sex,
 		behavior: newAnimal.behavior || null,
-		habitatId: newAnimal.habitatId,
-		dietId: dietId,
+		habitatId: newAnimal.habitatId
 	};
 
 	await createOneQuery('Animal', animalData);
