@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useUserData } from '../../../context/userDataContext';
 import { useRouter } from '../../../context/routerContext';
-import { showToast } from '../../../components/toast/showToast';
+import { showToast } from '../../../components/toast/showToast.jsx';
 import { Loader } from '../../../components/loader/loader';
 import { api } from '../../../utils/client-api-utils';
 import {
@@ -44,7 +44,12 @@ export function MedicalRecordDetailPage({ animalId }) {
 	useEffect(() => {
 		// Check if user is a veterinarian or above
 		if (userEntityData?.accessLevel) {
-			const vetLevels = ['veterinarian', 'manager', 'executive', 'db_admin'];
+			const vetLevels = [
+				'veterinarian',
+				'manager',
+				'executive',
+				'db_admin',
+			];
 			const isVet = vetLevels.includes(userEntityData.accessLevel);
 			setIsVeterinarian(isVet);
 		}
@@ -104,35 +109,41 @@ export function MedicalRecordDetailPage({ animalId }) {
 	};
 
 	const handleSave = async (medicalRecordId) => {
+		setLoading(true);
 		const result = await api('/api/medical-record/update', 'PUT', {
 			medicalRecordId,
 			...editingFormData,
 		});
 
-		if (result.success) {
-			showToast('Medical record updated successfully', 'success');
-			setEditingId(null);
-			loadData();
-		} else {
-			showToast('Failed to update medical record', 'error');
+		if (!result.success) {
+			console.error('Update error:', result.error);
+			showToast('Failed to update medical record');
 		}
+
+		showToast('Medical record updated successfully', 'success');
+		setEditingId(null);
+		loadData();
+
+		setLoading(false);
 	};
 
 	const handleDelete = async (medicalRecordId) => {
 		if (!confirm('Are you sure you want to delete this medical record?')) {
 			return;
 		}
-
+		setLoading(true);
 		const result = await api('/api/medical-record/delete', 'POST', {
 			medicalRecordId,
 		});
 
 		if (result.success) {
-			showToast('Medical record deleted successfully', 'success');
+			showToast('Medical record deleted successfully');
 			loadData();
 		} else {
-			showToast('Failed to delete medical record', 'error');
+			showToast('Failed to delete medical record');
 		}
+
+		setLoading(false);
 	};
 
 	const handleCancel = () => {
@@ -146,14 +157,16 @@ export function MedicalRecordDetailPage({ animalId }) {
 
 	const handleNewRecordSubmit = async (e) => {
 		e.preventDefault();
-		
+
+		setLoading(true);
+
 		const result = await api('/api/medical-record/create', 'POST', {
 			animalId,
 			...newRecordFormData,
 		});
 
 		if (result.success) {
-			showToast('Medical record created successfully', 'success');
+			showToast('Medical record created successfully');
 			setShowNewRecordForm(false);
 			setNewRecordFormData({
 				veterinarianNotes: '',
@@ -163,8 +176,10 @@ export function MedicalRecordDetailPage({ animalId }) {
 			});
 			loadData();
 		} else {
-			showToast('Failed to create medical record', 'error');
+			showToast('Failed to create medical record');
 		}
+
+		setLoading(false);
 	};
 
 	const goBack = () => {
@@ -199,6 +214,7 @@ export function MedicalRecordDetailPage({ animalId }) {
 				variant='outline'
 				onClick={goBack}
 				size='lg'
+				style={{ marginBottom: '1rem' }}
 			>
 				<ChevronLeft size={20} />
 				Back to Medical Records
@@ -243,18 +259,27 @@ export function MedicalRecordDetailPage({ animalId }) {
 				<div className='records-section-header'>
 					<h2>Medical History</h2>
 					{isVeterinarian && (
-						<button
-							onClick={() => setShowNewRecordForm(!showNewRecordForm)}
+						<Button
+							onClick={() =>
+								setShowNewRecordForm(!showNewRecordForm)
+							}
 							className='add-record-button'
+							variant='green'
+							style={{ marginBottom: '1rem' }}
 						>
 							<Plus size={16} />
-							{showNewRecordForm ? 'Cancel' : 'Add Medical Record'}
-						</button>
+							{showNewRecordForm
+								? 'Cancel'
+								: 'Add Medical Record'}
+						</Button>
 					)}
 				</div>
 
 				{showNewRecordForm && (
-					<form onSubmit={handleNewRecordSubmit} className='new-record-form'>
+					<form
+						onSubmit={handleNewRecordSubmit}
+						className='new-record-form'
+					>
 						<h3>Create New Medical Record</h3>
 						<div className='form-group'>
 							<label>Reason for Visit *</label>
@@ -268,6 +293,7 @@ export function MedicalRecordDetailPage({ animalId }) {
 									})
 								}
 								required
+								placeholder="E.g., 'Annual Checkup'"
 							/>
 						</div>
 						<div className='form-group'>
@@ -296,7 +322,9 @@ export function MedicalRecordDetailPage({ animalId }) {
 									})
 								}
 							/>
-							<p className='form-hint'>Leave empty if animal is still in care</p>
+							<p className='form-hint'>
+								Leave empty if animal is still in care
+							</p>
 						</div>
 						<div className='form-group'>
 							<label>Veterinarian Notes</label>
@@ -309,14 +337,23 @@ export function MedicalRecordDetailPage({ animalId }) {
 									})
 								}
 								rows={4}
+								style={{
+									boxSizing: 'border-box',
+									width: '100%',
+								}}
+								placeholder='Enter any notes from the veterinarian here.'
 							/>
 						</div>
 						<div className='form-actions'>
-							<button type='submit' className='save-button'>
+							<Button
+								type='submit'
+								variant='green'
+								loading={loading}
+							>
 								<Save size={16} />
 								Create Record
-							</button>
-							<button
+							</Button>
+							<Button
 								type='button'
 								onClick={() => {
 									setShowNewRecordForm(false);
@@ -327,11 +364,11 @@ export function MedicalRecordDetailPage({ animalId }) {
 										checkoutDate: '',
 									});
 								}}
-								className='cancel-button'
+								variant='outline'
 							>
 								<X size={16} />
 								Cancel
-							</button>
+							</Button>
 						</div>
 					</form>
 				)}
@@ -366,6 +403,7 @@ export function MedicalRecordDetailPage({ animalId }) {
 																e.target.value,
 														})
 													}
+													placeholder="E.g., 'Annual Checkup'"
 												/>
 											</div>
 											<div className='form-group'>
@@ -384,6 +422,7 @@ export function MedicalRecordDetailPage({ animalId }) {
 														})
 													}
 													rows={4}
+													placeholder='Enter any notes from the veterinarian here'
 												/>
 											</div>
 											<div className='form-group'>
@@ -403,24 +442,24 @@ export function MedicalRecordDetailPage({ animalId }) {
 												/>
 											</div>
 											<div className='form-actions'>
-												<button
+												<Button
 													onClick={() =>
 														handleSave(
 															record.medicalRecordId
 														)
 													}
-													className='save-button'
+													variant='green'
 												>
 													<Save size={16} />
 													Save
-												</button>
-												<button
+												</Button>
+												<Button
 													onClick={handleCancel}
-													className='cancel-button'
+													variant='outline'
 												>
 													<X size={16} />
 													Cancel
-												</button>
+												</Button>
 											</div>
 										</div>
 									) : (
@@ -432,20 +471,34 @@ export function MedicalRecordDetailPage({ animalId }) {
 												</h3>
 												{isVeterinarian && (
 													<div className='record-actions'>
-														<button
-															onClick={() => handleEdit(record)}
-															className='edit-button'
+														<Button
+															onClick={() =>
+																handleEdit(
+																	record
+																)
+															}
+															variant='green'
+															size='sm'
 														>
 															<Edit size={16} />
 															Edit
-														</button>
-														<button
-															onClick={() => handleDelete(record.medicalRecordId)}
-															className='delete-button'
+														</Button>
+														<Button
+															onClick={() =>
+																handleDelete(
+																	record.medicalRecordId
+																)
+															}
+															style={{
+																marginTop:
+																	'10px',
+															}}
+															variant='outline'
+															size='sm'
 														>
 															<Trash2 size={16} />
 															Delete
-														</button>
+														</Button>
 													</div>
 												)}
 											</div>

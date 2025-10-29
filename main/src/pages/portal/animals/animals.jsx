@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useUserData } from '../../../context/userDataContext';
 import { Button } from '../../../components/button';
-import { showToast } from '../../../components/toast/showToast';
 import { Loader } from '../../../components/loader/loader';
 import {
 	fetchAnimals,
 	createAnimal,
 	updateAnimal,
 	fetchHabitats,
+	deleteAnimal,
 } from './utils';
-import { Plus, Edit2, Save, X, Skull } from 'lucide-react';
+import { Plus, Edit2, Save, X, Skull, Trash } from 'lucide-react';
 import './animals.css';
 
 export function PortalAnimalsPage() {
@@ -67,14 +67,23 @@ export function PortalAnimalsPage() {
 			: await createAnimal(animalData);
 
 		if (result.success) {
-			showToast(
-				`Animal ${editingId ? 'updated' : 'created'} successfully!`
-			);
 			setShowAddForm(false);
 			setEditingId(null);
 			resetForm();
 			loadData();
 		}
+	};
+
+	const handleDelete = async (animalId) => {
+		const ok = confirm(
+			'Are you sure you want to delete this animal? This action cannot be undone.'
+		);
+
+		if (!ok) return;
+
+		await deleteAnimal(animalId);
+
+		loadData();
 	};
 
 	const resetForm = () => {
@@ -122,7 +131,6 @@ export function PortalAnimalsPage() {
 		});
 		setShowAddForm(true);
 
-		// Scroll to the form after state updates
 		setTimeout(() => {
 			const formElement = document.querySelector(
 				'.animal-form-container'
@@ -456,8 +464,16 @@ export function PortalAnimalsPage() {
 										<Button
 											onClick={() => handleEdit(animal)}
 											className='btn-icon'
+											variant='green'
 										>
 											<Edit2 size={16} />
+										</Button>
+										<Button
+											onClick={() => handleDelete(animal)}
+											className='btn-icon'
+											variant='outline'
+										>
+											<Trash size={16} />
 										</Button>
 									</div>
 								</div>

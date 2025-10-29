@@ -1,6 +1,7 @@
 .medical-record-detail-page {
 	max-width: 1200px;
 	margin: auto;
+	margin-top: 100px;
 	padding: 24px;
 	color: var(--color-foreground);
 
@@ -208,10 +209,10 @@
 	.form-group textarea {
 		width: 100%;
 		padding: 0.75rem;
-		border: 2px solid var(--color-brown);
+		box-sizing: border-box;
+		border: 2px solid var(--color-lbrown);
 		border-radius: 6px;
-		background-color: var(--color-foreground);
-		color: var(--color-foreground-text);
+		background-color: var(--color-dbrown);
 		font-size: 1rem;
 		font-family: inherit;
 	}
@@ -219,6 +220,17 @@
 	.form-group textarea {
 		resize: vertical;
 		min-height: 100px;
+		color: var(--color-lgreen);
+	}
+
+	.form-group textarea:focus,
+	.form-group textarea:hover {
+		outline: none;
+		border-color: var(--color-green);
+	}
+
+	.form-group textarea:focus {
+		background-color: var(--color-brown);
 	}
 
 	.form-actions {

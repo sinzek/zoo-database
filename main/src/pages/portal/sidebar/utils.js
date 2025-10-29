@@ -5,7 +5,6 @@ import {
 	TreePalm,
 	BriefcaseMedical,
 	Apple,
-	Smile,
 	CalendarCog,
 	Building,
 	Users,
@@ -36,8 +35,8 @@ export function availableLinksForAccessLevel(uedata) {
 				to: '/portal/feeding-schedules',
 				label: 'Feeding Schedules',
 				icon: Apple,
-			},
-			{ to: '#', label: 'File Complaints', icon: Smile } // troll face moment
+			}
+			// { to: '#', label: 'File Complaints', icon: Smile } // troll face moment
 		);
 	}
 

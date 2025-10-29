@@ -289,7 +289,6 @@ export function PortalHabitatsPage() {
 						<div className='form-actions'>
 							<Button
 								type='submit'
-								className='save-button'
 								variant='green'
 							>
 								<Save size={16} />
@@ -298,7 +297,6 @@ export function PortalHabitatsPage() {
 							<Button
 								type='button'
 								onClick={handleCancel}
-								className='cancel-button'
 								variant='outline'
 							>
 								<X size={16} />

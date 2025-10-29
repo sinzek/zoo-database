@@ -1,5 +1,3 @@
-import { db } from '../db/mysql.js';
-import crypto from 'crypto';
 import {
 	deleteOneQuery,
 	getNByKeyQuery,
@@ -11,12 +9,16 @@ import {
  * @returns {Promise<Array>} Array containing the customer object
  * @throws {Error} If customerID is missing or no customer is found
  */
-async function getOne(req, _res){
+async function getOne(req, _res) {
 	const { customerId } = req.body;
 
 	if (!customerId) throw new Error('Missing customerId');
 
-	const [customer] = await getNByKeyQuery('Customer', 'customerId', customerId);
+	const [customer] = await getNByKeyQuery(
+		'Customer',
+		'customerId',
+		customerId
+	);
 
 	return [customer];
 }
@@ -27,23 +29,31 @@ async function getOne(req, _res){
  * @returns {Promise<Array>} Array containing success message
  * @throws {Error} If customerID is missing
  */
-async function deleteOne(req, _res){
+async function deleteOne(req, _res) {
 	const { customerId } = req.body;
 
 	if (!customerId) throw new Error('Missing customerId');
-	
+
 	// first, get userId associated with this customer
-	const [customer] = await getNByKeyQuery('Customer', 'customerId', customerId);
+	const [customer] = await getNByKeyQuery(
+		'Customer',
+		'customerId',
+		customerId
+	);
 
 	const userId = customer.userId;
 
-	if(!userId) throw new Error('No userId associated with this customer');
+	if (!userId) throw new Error('No userId associated with this customer');
 
 	await deleteOneQuery('Customer', 'customerId', customerId);
 
 	await deleteOneQuery('User', 'userId', userId);
 
-	return [{ message: `Successfully deleted customer ${customer.firstName} ${customer.lastName} [ID: ${customer.customerId}]` }];
+	return [
+		{
+			message: `Successfully deleted customer ${customer.firstName} ${customer.lastName} [ID: ${customer.customerId}]`,
+		},
+	];
 }
 
 async function updateOne(req, _res) {
@@ -53,7 +63,8 @@ async function updateOne(req, _res) {
 		throw new Error('Missing customer data');
 	}
 
-	if(!updatedCustomer.customerId) throw new Error('Missing customerId in customer data');
+	if (!updatedCustomer.customerId)
+		throw new Error('Missing customerId in customer data');
 
 	// making a copy to avoid mutating the original object
 	const updatedCustomerData = { ...updatedCustomer };
@@ -64,10 +75,10 @@ async function updateOne(req, _res) {
 	return [updatedCustomer];
 }
 
-async function getAll(req, _res) {
+async function getAll(_req, _res) {
 	const customers = await getNByKeyQuery('Customer', 'deletedAt', null);
-	
+
 	return [customers];
 }
 
-export default { getOne, deleteOne, updateOne, getAll};
+export default { getOne, deleteOne, updateOne, getAll };
