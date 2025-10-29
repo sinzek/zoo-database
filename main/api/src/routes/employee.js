@@ -33,4 +33,8 @@ export function registerEmployeeRoutes(app) {
 		'/api/employee/get-all',
 		withAccessLevel('manager', employeeController.getAll)
 	);
+	app.post(
+		'/api/employee/get-all-handlers',
+		employeeController.getAllHandlers
+	);
 }

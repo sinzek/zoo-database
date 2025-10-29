@@ -186,6 +186,25 @@ async function getAll(_req, _res) {
 	return [employees];
 }
 
+/**
+ * Retrieves all distinct employees who are handlers (in TakesCareOf table).
+ * Returns only unique employees, even if they take care of multiple animals.
+ * @returns {Promise<Array>} Array of distinct employee objects who handle animals
+ */
+async function getAllHandlers(_req, _res) {
+	const handlers = await query(
+		`
+		SELECT DISTINCT e.*
+		FROM Employee e
+		INNER JOIN TakesCareOf tco ON e.employeeId = tco.employeeId
+		WHERE e.deletedAt IS NULL
+		ORDER BY e.firstName, e.lastName
+		`
+	);
+
+	return [handlers];
+}
+
 //Create Employee
 //Get Employee by ID
 //Get Employees by Business
@@ -200,4 +219,5 @@ export default {
 	getNByAnimal,
 	getNByBusinessAndAccessLevel,
 	getAll,
+	getAllHandlers,
 };

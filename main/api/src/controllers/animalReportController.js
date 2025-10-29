@@ -1,227 +1,158 @@
-import { db } from '../db/mysql.js';
+import { query } from '../db/mysql.js';
 
 /**
- * Animal report
- *
- * Accepts filters in req.body:
- *  - animalIds: optional array of animal UUIDs
- *  - handlerIds: optional array of employee UUIDs (handlers)
- *  - habitatIds: optional array of habitat UUIDs
- *  - includeDead: optional boolean - include animals with non-null deathDate (default false)
- *
- * Returns an array of animal reports. Each report includes:
- *  - animal attributes (from Animal)
- *  - habitat info
- *  - diet (specialNotes)
- *  - dietSchedule: array of day/feedTime/food records
- *  - handlers: array of employees caring for the animal
- *  - medicalRecords: array of records (each may include prescribed medications and assigned veterinarian)
+ * Generates a comprehensive animal report with medical records, diet, and handler information.
+ * 
+ * @param {string[]} req.body.animalIds - Optional array of specific animal UUIDs
+ * @param {string} req.body.habitatId - Optional habitat ID to filter by
+ * @param {string} req.body.handlerId - Optional handler/employee ID to filter by
+ * 
+ * @returns {Promise<Array>} Array of animal objects with:
+ *   - Animal details (name, species, etc.)
+ *   - Habitat information
+ *   - Handlers (array of employees)
+ *   - Medical records (array)
+ *   - Diet with schedule (array of schedule days)
  */
 async function getAnimalReport(req, _res) {
-	const {
-		animalIds,
-		handlerIds,
-		habitatIds,
-		includeDead = false,
-	} = req.body || {};
+	const { animalIds, habitatId, handlerId } = req.body;
 
-	// Build base WHERE clause for animals
-	const where = ['a.deletedAt IS NULL'];
-	const params = [];
+	// Build WHERE clause for animal filtering
+	let animalWhereClause = 'WHERE a.deletedAt IS NULL';
+	let animalParams = [];
 
-	// animalIds filter (array expected)
-	if (animalIds && Array.isArray(animalIds) && animalIds.length) {
+	if (animalIds && Array.isArray(animalIds) && animalIds.length > 0) {
+		// Filter by specific animal IDs
 		const placeholders = animalIds.map(() => '?').join(', ');
-		where.push(`a.animalId IN (${placeholders})`);
-		params.push(...animalIds);
+		animalWhereClause += ` AND a.animalId IN (${placeholders})`;
+		animalParams = [...animalIds];
+	} else if (habitatId) {
+		// Filter by habitat
+		animalWhereClause += ' AND a.habitatId = ?';
+		animalParams = [habitatId];
+	} else if (handlerId) {
+		// Filter by handler - need to join with TakesCareOf
+		animalWhereClause += ' AND a.animalId IN (SELECT animalId FROM TakesCareOf WHERE employeeId = ?)';
+		animalParams = [handlerId];
 	}
 
-	// habitatIds filter
-	if (habitatIds && Array.isArray(habitatIds) && habitatIds.length) {
-		const placeholders = habitatIds.map(() => '?').join(', ');
-		where.push(`a.habitatId IN (${placeholders})`);
-		params.push(...habitatIds);
-	}
+	// Main query to get animals with habitat
+	const animalQuery = `
+		SELECT 
+			a.animalId,
+			a.firstName,
+			a.lastName,
+			a.commonName,
+			a.species,
+			a.genus,
+			a.birthDate,
+			a.deathDate,
+			a.importedFrom,
+			a.importDate,
+			a.sex,
+			a.behavior,
+			a.imageUrl,
+			h.habitatId,
+			h.name as habitatName,
+			h.description as habitatDescription
+		FROM Animal a
+		LEFT JOIN Habitat h ON a.habitatId = h.habitatId AND h.deletedAt IS NULL
+		${animalWhereClause}
+		ORDER BY a.commonName, a.firstName
+	`;
 
-	// handlerIds filter — require that the animal is taken care of by at least one of these handlers
-	if (handlerIds && Array.isArray(handlerIds) && handlerIds.length) {
-		const placeholders = handlerIds.map(() => '?').join(', ');
-		// use EXISTS to ensure animals returned have a matching record in TakesCareOf
-		where.push(
-			`EXISTS (SELECT 1 FROM TakesCareOf t WHERE t.animalId = a.animalId AND t.employeeId IN (${placeholders}))`
-		);
-		params.push(...handlerIds);
-	}
+	console.log('Animal query:', animalQuery);
+	console.log('Animal params:', animalParams);
 
-	// Exclude dead animals by default
-	if (!includeDead) {
-		where.push('a.deathDate IS NULL');
-	}
+	const animals = await query(animalQuery, animalParams);
+	console.log('Animals found:', animals.length);
 
-	const whereClause = where.length ? `WHERE ${where.join(' AND ')}` : '';
-
-	// Main animals query: fetch animal attributes + habitat name + dietId
-	const animalsSql = `
-    SELECT
-      a.animalId,
-      a.firstName,
-      a.lastName,
-      a.commonName,
-      a.species,
-      a.genus,
-      a.birthDate,
-      a.deathDate,
-      a.importedFrom,
-      a.importDate,
-      a.sex,
-      a.behavior,
-      a.habitatId,
-      h.name AS habitatName,
-      h.description AS habitatDescription,
-      a.dietId,
-      d.specialNotes AS dietNotes
-    FROM Animal a
-    LEFT JOIN Habitat h ON a.habitatId = h.habitatId
-    LEFT JOIN Diet d ON a.dietId = d.dietId
-    ${whereClause}
-    ORDER BY a.commonName, a.firstName
-  `;
-
-	const animals = await db.query(animalsSql, params);
-
-	// If no animals found, return empty array (match friend style)
-	if (!animals || animals.length === 0) return [];
-
-	// For each animal fetch diet schedule, handlers, and medical records (with meds & vets)
+	// For each animal, get handlers, medical records, and diet
 	const reports = await Promise.all(
 		animals.map(async (animal) => {
-			// 1) Diet schedule
-			const dietScheduleSql = `
-        SELECT dietScheduleDayId, dayOfWeek, feedTime, food
-        FROM DietScheduleDay
-        WHERE dietId = ?
-        ORDER BY FIELD(dayOfWeek, 'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'), feedTime
-      `;
-			const dietSchedule = animal.dietId
-				? await db.query(dietScheduleSql, [animal.dietId])
-				: [];
+			// Get handlers for this animal
+			const handlersQuery = `
+				SELECT 
+					e.employeeId,
+					e.firstName,
+					e.lastName,
+					e.accessLevel,
+					e.jobTitle
+				FROM Employee e
+				INNER JOIN TakesCareOf tco ON e.employeeId = tco.employeeId
+				WHERE tco.animalId = ? AND e.deletedAt IS NULL
+			`;
+			const handlers = await query(handlersQuery, [animal.animalId]);
 
-			// 2) Handlers (employees that take care of the animal)
-			const handlersSql = `
-        SELECT e.employeeId, e.firstName, e.lastName, e.jobTitle, e.accessLevel
-        FROM TakesCareOf t
-        JOIN Employee e ON e.employeeId = t.employeeId
-        WHERE t.animalId = ? AND e.deletedAt IS NULL
-      `;
-			const handlers = await db.query(handlersSql, [animal.animalId]);
+			// Get medical records for this animal
+			const medicalRecordsQuery = `
+				SELECT 
+					medicalRecordId,
+					veterinarianNotes,
+					reasonForVisit,
+					visitDate,
+					checkoutDate
+				FROM MedicalRecord
+				WHERE animalId = ? AND deletedAt IS NULL
+				ORDER BY visitDate DESC
+			`;
+			const medicalRecords = await query(medicalRecordsQuery, [animal.animalId]);
 
-			// 3) Medical records for animal (with prescribed medications and assigned veterinarian)
-			// We'll first get medical records, then attachments
-			const medicalRecordsSql = `
-        SELECT 
-          mr.medicalRecordId,
-          mr.reasonForVisit,
-          mr.veterinarianNotes,
-          mr.visitDate,
-          mr.checkoutDate
-        FROM MedicalRecord mr
-        WHERE mr.animalId = ? AND mr.deletedAt IS NULL
-        ORDER BY mr.visitDate DESC
-      `;
-			const medicalRecords = await db.query(medicalRecordsSql, [
-				animal.animalId,
-			]);
+			// Get diet and schedule for this animal
+			const dietQuery = `
+				SELECT 
+					d.dietId,
+					d.specialNotes,
+					dsd.dietScheduleDayId,
+					dsd.dayOfWeek,
+					dsd.feedTime,
+					dsd.food
+				FROM Diet d
+				LEFT JOIN DietScheduleDay dsd ON d.dietId = dsd.dietId
+				WHERE d.animalId = ? AND d.deletedAt IS NULL
+				ORDER BY dsd.dayOfWeek, dsd.feedTime
+			`;
+			const dietRows = await query(dietQuery, [animal.animalId]);
 
-			// For each medical record, fetch medications and assigned vet
-			const enrichedMedicalRecords = await Promise.all(
-				medicalRecords.map(async (mr) => {
-					const medsSql = `
-            SELECT prescribedMedicationId, medication
-            FROM PrescribedMedication
-            WHERE medicalRecordId = ?
-          `;
-					const meds = await db.query(medsSql, [mr.medicalRecordId]);
+			// Organize diet data
+			const dietSchedules = [];
+			const scheduleMap = new Map();
+			
+			// Group schedule days by diet
+			dietRows.forEach(row => {
+				if (row.dietId) {
+					if (!scheduleMap.has(row.dietId)) {
+						scheduleMap.set(row.dietId, {
+							dietId: row.dietId,
+							specialNotes: row.specialNotes,
+							schedule: []
+						});
+					}
+					
+					if (row.dietScheduleDayId) {
+						scheduleMap.get(row.dietId).schedule.push({
+							dayOfWeek: row.dayOfWeek,
+							feedTime: row.feedTime,
+							food: row.food
+						});
+					}
+				}
+			});
 
-					const vetSql = `
-            SELECT veterinarianId, vetName, vetEmail, vetOffice
-            FROM AssignedVeterinarian
-            WHERE medicalRecordId = ?
-            LIMIT 1
-          `;
-					const assignedVetRows = await db.query(vetSql, [
-						mr.medicalRecordId,
-					]);
-					const assignedVet =
-						assignedVetRows && assignedVetRows.length
-							? assignedVetRows[0]
-							: null;
-
-					return {
-						...mr,
-						prescribedMedications: meds,
-						assignedVeterinarian: assignedVet,
-					};
-				})
-			);
+			dietSchedules.push(...Array.from(scheduleMap.values()));
 
 			return {
-				// basic animal attributes
-				animalId: animal.animalId,
-				firstName: animal.firstName,
-				lastName: animal.lastName,
-				commonName: animal.commonName,
-				species: animal.species,
-				genus: animal.genus,
-				birthDate: animal.birthDate,
-				deathDate: animal.deathDate,
-				importedFrom: animal.importedFrom,
-				importDate: animal.importDate,
-				sex: animal.sex,
-				behavior: animal.behavior,
-
-				// habitat
-				habitat: {
-					habitatId: animal.habitatId,
-					name: animal.habitatName,
-					description: animal.habitatDescription,
-				},
-
-				// diet
-				diet: {
-					dietId: animal.dietId,
-					specialNotes: animal.dietNotes,
-					schedule: dietSchedule,
-				},
-
-				// handlers
-				handlers,
-
-				// medical records
-				medicalRecords: enrichedMedicalRecords,
+				...animal,
+				handlers: handlers || [],
+				medicalRecords: medicalRecords || [],
+				dietSchedules: dietSchedules || []
 			};
 		})
 	);
 
-	return reports;
-}
-
-/**
- * Lightweight summary: just counts and minimal attributes
- * Returns array of { animalId, commonName, species, handlerCount, medicalRecordCount }
- */
-async function getAnimalReportSummary(req, _res) {
-	const full = await getAnimalReport(req, _res);
-
-	return full.map((an) => ({
-		animalId: an.animalId,
-		commonName: an.commonName,
-		species: an.species,
-		handlerCount: (an.handlers || []).length,
-		medicalRecordCount: (an.medicalRecords || []).length,
-	}));
+	return [reports];
 }
 
 export default {
 	getAnimalReport,
-	getAnimalReportSummary,
 };
