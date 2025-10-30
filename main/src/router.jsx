@@ -36,6 +36,7 @@ import { MembershipTransactionPage } from './pages/portal/membershipTransaction/
 import { PortalEmployeesPage } from './pages/portal/employees/employees';
 import { ShiftReportPage } from './pages/portal/reports/shiftReport/shiftReport';
 import { PortalExpensesPage } from './pages/portal/expenses/portalExpenses';
+import { PortalAnimalReportPage } from './pages/portal/reports/animalReport';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -79,10 +80,10 @@ export default function Router() {
 		'/portal/schedule-management': ScheduleManagementPage,
 		'/portal/reports': PortalReportsPage,
 		'/portal/reports/revenue': PortalRevenueReportPage,
+		'/portal/reports/animal': PortalAnimalReportPage,
 		'/portal/business-management': BusinessManagementPage,
 		'/portal/notifications': NotificationsPage,
 		'/portal/reports/shifts': ShiftReportPage,
-		'/portal/reports/animals': <div>Animals & Medical report</div>,
 
 		'/testing': TestingPage,
 	};

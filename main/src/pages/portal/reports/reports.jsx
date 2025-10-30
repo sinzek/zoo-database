@@ -56,8 +56,8 @@ export function PortalReportsPage() {
 				</Link>
 
 				<Link
-					to='/portal/reports/animals'
-					href='/portal/reports/animals'
+					to='/portal/reports/animal'
+					href='/portal/reports/animal'
 					className='option-card'
 				>
 					<HeartPulse size={32} />
