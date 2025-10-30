@@ -13,6 +13,51 @@ export async function fetchEmployees() {
     return result.data || [];
 }
 
+
+// New
+export async function fetchAnimals() {
+	
+	const result = await api('/api/animal/get-all-grouped-by-habitat','POST');
+
+	if (!result.success) {
+		showToast(`Error: ${result.error || 'Failed to fetch animals.'}`);
+		return [];
+	}
+
+	const animals = [];
+	for (const habitatGroup of result.data || []) {
+		if (habitatGroup.animals) {
+			for (const animal of habitatGroup.animals) {
+				animals.push({
+					
+					animalId: animal.animalId,
+					name: animal.firstName || animal.commonName, 
+					species: animal.species,
+				});
+			}
+		}
+	}
+
+    
+	return animals; //Flat list
+}
+
+// New
+export async function updateAssignedAnimals(employeeId, animalIds) {
+    const result = await api('/api/employee/assign-animals', 'POST', {
+        employeeId: employeeId,
+        animalIds: animalIds, //array of animal IDs
+    });
+
+    if (!result.success) {
+        console.error("API Error: Failed to assign animals.", result.error);
+        return { success: false, error: result.error };
+    }
+    return { success: true };
+}
+
+
+
 // Fetches businesses for dropdowns
 export async function fetchBusinesses() {
     // NOTE: Ensure this API endpoint exists
