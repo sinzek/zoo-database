@@ -1,7 +1,7 @@
 const ACCESS_LEVELS = {
-	zookeeper: 3,
-	manager: 5,
-	db_admin: 6,
+	zookeeper: 1,
+	manager: 2,
+	db_admin: 3,
 };
 
 /**

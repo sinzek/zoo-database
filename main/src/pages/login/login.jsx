@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import { Link } from 'react-router-dom'; 
-import { ArrowLeft } from 'lucide-react'; 
+import { Link } from '../../components/link';
+import { ArrowLeft } from 'lucide-react';
 
 import './login.css';
 import { useUserData } from '../../context/userDataContext';
@@ -30,23 +30,15 @@ export default function LoginPage() {
 
 	return (
 		<div className='main-container'>
+			<Link
+				to='/'
+				className='btn btn-outline btn-sm'
+			>
+				<ArrowLeft size={16} />
+				Back to Home
+			</Link>
 
-		<a href = "/" className="home-button" style={{
-			position: 'absolute',
-			top: '20px',
-			left: '20px',
-			display: 'flex',
-			alignItems: 'center',
-			gap: '8px',
-			color: 'var(--color-lbrown)', 
-			textDecoration: 'none', 
-			fontWeight: '500' }}>
-				
-			<ArrowLeft size={20} />
-			Back to Home
-		</a>
-
-			<h1>Welcome back to</h1>
+			<h1 style={{ marginTop: '20px' }}>Welcome back to</h1>
 			<h1 className='the-zoo-text'>The Zoo™</h1>
 			<p className='login-subtext'>
 				Log in to access your account and explore the wild side!
