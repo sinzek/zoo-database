@@ -1,9 +1,11 @@
 .portal-feeding-schedules-page {
 	max-width: 90%;
-	margin: auto auto;
+	margin-left: auto;
+	margin-right: auto;
 	margin-top: 100px;
 	padding: 24px;
 	color: var(--color-foreground);
+	width: 100%;
 }
 
 .feeding-schedules-header h1 {
@@ -28,14 +30,6 @@
 
 .animal-section {
 	margin-bottom: 2rem;
-	width: 100%;
-}
-
-.portal-feeding-schedules-page {
-	max-width: 90%;
-	margin: auto auto;
-	padding: 24px;
-	color: var(--color-foreground);
 	width: 100%;
 }
 
@@ -68,6 +62,7 @@
 		box-shadow 0.2s;
 	cursor: default;
 	position: relative;
+	transition: all 0.15s ease;
 }
 
 .animal-card.clickable {
@@ -77,7 +72,13 @@
 .animal-card.clickable:hover {
 	transform: translateY(-4px);
 	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-	border-color: var(--color-lgreen);
+	border-color: var(--color-green);
+	background-color: var(--color-brown);
+	background-color: color-mix(
+		in srgb,
+		var(--color-brown) 50%,
+		transparent 50%
+	);
 }
 
 .animal-image {

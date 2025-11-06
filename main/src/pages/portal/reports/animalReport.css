@@ -146,7 +146,9 @@
 	border: 2px solid var(--color-brown);
 	border-radius: 12px;
 	padding: 1.5rem;
-	transition: transform 0.2s, box-shadow 0.2s;
+	transition:
+		transform 0.2s,
+		box-shadow 0.2s;
 }
 
 .animal-report-animal-card:hover {
@@ -191,7 +193,7 @@
 .animal-section {
 	margin-top: 1.5rem;
 	padding-top: 1rem;
-	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	border-top: 2px solid var(--color-green);
 }
 
 .animal-section h4 {
@@ -295,4 +297,3 @@
 	border-top: 1px solid rgba(255, 255, 255, 0.1);
 	margin: 0.5rem 0;
 }
-

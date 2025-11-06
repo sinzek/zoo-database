@@ -578,7 +578,6 @@ export function PortalAttractionsPage() {
 											onClick={() =>
 												handleEdit(attraction)
 											}
-											className='edit-button'
 											size='sm'
 											variant='green'
 										>
@@ -589,7 +588,6 @@ export function PortalAttractionsPage() {
 											onClick={() =>
 												handleDelete(attraction)
 											}
-											className='delete-button'
 											variant='outline'
 										>
 											<Trash2 size={16} />
