@@ -1,4 +1,8 @@
 import { useState } from 'react';
+
+import { Link } from 'react-router-dom'; 
+import { ArrowLeft } from 'lucide-react'; 
+
 import './login.css';
 import { useUserData } from '../../context/userDataContext';
 import { Button } from '../../components/button';
@@ -26,6 +30,22 @@ export default function LoginPage() {
 
 	return (
 		<div className='main-container'>
+
+		<a href = "/" className="home-button" style={{
+			position: 'absolute',
+			top: '20px',
+			left: '20px',
+			display: 'flex',
+			alignItems: 'center',
+			gap: '8px',
+			color: 'var(--color-lbrown)', 
+			textDecoration: 'none', 
+			fontWeight: '500' }}>
+				
+			<ArrowLeft size={20} />
+			Back to Home
+		</a>
+
 			<h1>Welcome back to</h1>
 			<h1 className='the-zoo-text'>The Zoo™</h1>
 			<p className='login-subtext'>
