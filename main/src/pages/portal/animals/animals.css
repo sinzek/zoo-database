@@ -66,13 +66,16 @@
 }
 
 .form-group select,
-.form-group textarea {
+textarea {
 	background-color: var(--color-dbrown);
 	border: 2px solid var(--color-lbrown);
 	padding: 0.5rem;
-	color: var(--color-foreground);
-	font-size: 0.9rem;
+	color: var(--color-lgreen);
+	font-size: 1rem;
 	transition: all 0.15s;
+	border-radius: 12px;
+	font-family: inherit;
+	font-weight: 500;
 }
 
 .form-group select {

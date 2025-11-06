@@ -6,8 +6,17 @@ import { api } from '../../../utils/client-api-utils';
 import { showToast } from '../../../components/toast/showToast';
 import { Loader } from '../../../components/loader/loader';
 import { Button } from '../../../components/button';
-import { Building, Edit, Trash2, Plus, Save, X } from 'lucide-react';
+import {
+	Building,
+	Edit,
+	Trash2,
+	Plus,
+	Save,
+	X,
+	ShoppingBag,
+} from 'lucide-react';
 import './businessManagement.css';
+import { Link } from '../../../components/link';
 
 const initialFormData = {
 	name: '',
@@ -285,7 +294,7 @@ export function BusinessManagementPage() {
 		if (result.success) {
 			setBusinesses(result.data);
 		} else {
-			showToast('Failed to load businesses.', 'error');
+			showToast('Failed to load businesses.');
 		}
 		setLoading(false);
 	}, []);
@@ -318,13 +327,10 @@ export function BusinessManagementPage() {
 				businessId,
 			});
 			if (result.success) {
-				showToast('Business deleted successfully.', 'success');
+				showToast('Business deleted successfully.');
 				loadBusinesses();
 			} else {
-				showToast(
-					result.error || 'Failed to delete business.',
-					'error'
-				);
+				showToast(result.error || 'Failed to delete business.');
 			}
 		}
 	};
@@ -339,13 +345,12 @@ export function BusinessManagementPage() {
 
 		if (result.success) {
 			showToast(
-				`Business ${formData.businessId ? 'updated' : 'created'} successfully.`,
-				'success'
+				`Business ${formData.businessId ? 'updated' : 'created'} successfully.`
 			);
 			setIsModalOpen(false);
 			loadBusinesses();
 		} else {
-			showToast(result.error || 'Failed to save business.', 'error');
+			showToast(result.error || 'Failed to save business.');
 		}
 	};
 
@@ -395,6 +400,9 @@ export function BusinessManagementPage() {
 								</h3>
 								<span className='business-type'>
 									{business.type}
+									{business.businessId ===
+										userEntityData.businessId &&
+										' (You work here)'}
 								</span>
 							</div>
 							<p>{business.address}</p>
@@ -435,12 +443,25 @@ export function BusinessManagementPage() {
 							{canEdit && (
 								<div className='card-actions'>
 									<Button
-										variant='outline'
-										size='small'
+										variant='green'
+										size='lg'
 										onClick={() => handleEdit(business)}
 									>
 										<Edit size={14} /> Edit
 									</Button>
+									<Link
+										to={`/portal/inventory-management/${business.businessId}`}
+										href={`/portal/inventory-management/${business.businessId}`}
+									>
+										<Button
+											variant='outline'
+											size='lg'
+											onClick={() => handleEdit(business)}
+										>
+											<ShoppingBag size={14} /> Manage
+											Inventory
+										</Button>
+									</Link>
 									{isDbAdmin && (
 										<Button
 											variant='danger'

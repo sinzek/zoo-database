@@ -38,6 +38,7 @@ import { ShiftReportPage } from './pages/portal/reports/shiftReport/shiftReport'
 import { PortalExpensesPage } from './pages/portal/expenses/portalExpenses';
 import { PortalAnimalReportPage } from './pages/portal/reports/animalReport';
 import { SignupPage } from './pages/signup/signup';
+import { InventoryManagementPage } from './pages/portal/inventoryManagement/inventoryManagement';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -52,6 +53,9 @@ export default function Router() {
 	const feedingScheduleMatch = match('/portal/feeding-schedules/:animalId');
 	const membershipTransactionMatch = match(
 		'/portal/membership-transaction/:transactionId'
+	);
+	const inventoryManagementMatch = match(
+		'/portal/inventory-management/:businessId'
 	);
 
 	let content = null;
@@ -109,6 +113,12 @@ export default function Router() {
 	} else if (pathMap[path]) {
 		const Component = pathMap[path];
 		content = <Component />;
+	} else if (inventoryManagementMatch) {
+		content = (
+			<InventoryManagementPage
+				businessId={inventoryManagementMatch.businessId}
+			/>
+		);
 	} else {
 		content = <NotFoundPage />;
 	}
