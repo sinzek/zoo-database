@@ -10,6 +10,13 @@ const UserDataContext = createContext({
 	userInfo: null, // { userId, email } | null
 	userEntityData: null, // customerData | employeeData | null
 	userEntityType: null, // 'customer' | 'employee' | null
+	signup: async (
+		_email,
+		_password,
+		_firstName,
+		_lastName,
+		_middleInitial
+	) => {},
 	login: async (_email, _password) => {},
 	logout: async () => {},
 	authLoading: false,
@@ -36,7 +43,7 @@ export function UserDataProvider({ children }) {
 	const [clockedInSince, setClockedInSince] = useState(null);
 
 	// consume some hooks to perform login/logout and set the above states accordingly
-	const { login, logout, getUserData, getBusinessEmployeeWorksFor } =
+	const { signup, login, logout, getUserData, getBusinessEmployeeWorksFor } =
 		useAuth();
 
 	async function clock(inStatus) {
@@ -138,6 +145,24 @@ export function UserDataProvider({ children }) {
 				userInfo,
 				userEntityData,
 				userEntityType,
+				signup: async (
+					email,
+					password,
+					firstName,
+					lastName,
+					middleInitial
+				) =>
+					await signup(
+						email,
+						password,
+						firstName,
+						lastName,
+						middleInitial,
+						setUserInfo,
+						setUserEntityData,
+						setUserEntityType,
+						navigate
+					),
 				login: async (email, password) =>
 					await login(
 						email,

@@ -3,9 +3,74 @@ import { sha256Hash, signJWT } from '../utils/auth-utils.js';
 import { getCustomerOrEmployeeById } from '../utils/auth-utils.js';
 import { checkIfUserHasExpiredMembership } from '../utils/notif-utils.js';
 import { getMembershipByCustomerId } from '../utils/other-utils.js';
+import { createOneQuery } from '../utils/query-utils.js';
+import crypto from 'crypto';
 
-// im using underscore-prefixed variables to avoid linting errors
-// about unused variables since these are just placeholders
+async function signup(req, _res) {
+	const { email, password, firstName, lastName, middleInitial } = req.body;
+
+	if (!email || !password || !firstName || !lastName) {
+		throw new Error('Missing required signup fields');
+	}
+
+	// check if email already exists
+	const [existingUser] = await query(
+		`SELECT userId FROM User WHERE email = ?`,
+		[email]
+	);
+
+	if (existingUser) {
+		throw new Error('Email already in use');
+	}
+
+	const hashedPwd = sha256Hash(password);
+	const newUserId = crypto.randomUUID();
+
+	const newUser = {
+		userId: newUserId,
+		email,
+		passwordHash: hashedPwd,
+	};
+
+	// create new user
+	await createOneQuery('User', newUser);
+
+	// create customer record
+	const newCustomerId = crypto.randomUUID();
+	const newCustomer = {
+		customerId: newCustomerId,
+		firstName,
+		lastName,
+		middleInitial: middleInitial || null,
+		joinDate: new Date(),
+		deletedAt: null,
+		userId: newUserId,
+	};
+
+	await createOneQuery('Customer', newCustomer);
+
+	const token = signJWT({ id: newUserId });
+
+	const cookie = {
+		name: 'session',
+		value: token,
+		options: {
+			HttpOnly: true,
+			Path: '/',
+			MaxAge: 30 * 24 * 60 * 60, // 30 days
+			SameSite: 'Strict',
+			Secure: true,
+		},
+	};
+
+	return [
+		{
+			user: { userId: newUserId, email: email },
+			relatedInfo: { type: 'customer', data: newCustomer },
+		},
+		[cookie],
+	]; // omit passwordHash
+}
 
 async function login(req, _res) {
 	const { email, password } = req.body;
@@ -101,4 +166,4 @@ async function getUserData(req, _res) {
 	return [{ user, relatedInfo, membership }]; // omit passwordHash
 }
 
-export default { login, logout, getUserData };
+export default { login, logout, getUserData, signup };

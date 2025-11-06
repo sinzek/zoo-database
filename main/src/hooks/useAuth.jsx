@@ -2,6 +2,49 @@ import { api } from '../utils/client-api-utils';
 import { showToast } from '../components/toast/showToast';
 
 export function useAuth() {
+	const signup = async (
+		email,
+		password,
+		firstName,
+		lastName,
+		middleInitial,
+		setUserInfo,
+		setUserEntityData,
+		setUserEntityType,
+		navigate
+	) => {
+		console.log('Attempting signup for email:', email);
+
+		const result = await api('/api/auth/signup', 'POST', {
+			email,
+			password,
+			firstName,
+			lastName,
+			middleInitial,
+		});
+
+		if (!result.success) {
+			console.error('Signup error:', result.error);
+			showToast(`ERROR: ${result.error || 'Failed to sign up'}`);
+			return result; // { success: false, error: '...'}
+		}
+
+		const { user, relatedInfo } = result.data;
+
+		console.log('Signup data received:', result.data);
+
+		setUserInfo(user);
+		setUserEntityData(relatedInfo.data);
+		setUserEntityType(relatedInfo.type);
+
+		console.log('Signup successful:', result.data);
+		navigate('/portal', { replace: true });
+		showToast(
+			`Welcome to The Zoo™, ${relatedInfo.data.firstName || 'User'}!`
+		);
+		return { success: true };
+	};
+
 	const login = async (
 		email,
 		password,
@@ -128,5 +171,5 @@ export function useAuth() {
 		setLoading(false);
 	};
 
-	return { login, logout, getUserData, getBusinessEmployeeWorksFor };
+	return { signup, login, logout, getUserData, getBusinessEmployeeWorksFor };
 }

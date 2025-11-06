@@ -37,6 +37,7 @@ import { PortalEmployeesPage } from './pages/portal/employees/employees';
 import { ShiftReportPage } from './pages/portal/reports/shiftReport/shiftReport';
 import { PortalExpensesPage } from './pages/portal/expenses/portalExpenses';
 import { PortalAnimalReportPage } from './pages/portal/reports/animalReport';
+import { SignupPage } from './pages/signup/signup';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -58,6 +59,7 @@ export default function Router() {
 	const pathMap = {
 		'/': HomePage,
 		'/login': LoginPage,
+		'/signup': SignupPage,
 
 		'/habitats': HabitatsPage,
 		'/attractions': AttractionsPage,

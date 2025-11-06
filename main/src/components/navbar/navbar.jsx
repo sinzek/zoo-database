@@ -69,18 +69,32 @@ export function Navbar() {
 						</Link>
 					</>
 				) : (
-					<Link
-						to='/login'
-						href='/login'
-					>
-						<Button
-							variant='lgreen'
-							size='lg'
-							loading={authLoading}
+					<>
+						<Link
+							to='/login'
+							href='/login'
 						>
-							Login
-						</Button>
-					</Link>
+							<Button
+								variant='lgreen'
+								size='lg'
+								loading={authLoading}
+							>
+								Login
+							</Button>
+						</Link>
+						<Link
+							to='/signup'
+							href='/signup'
+						>
+							<Button
+								variant='brown'
+								size='lg'
+								loading={authLoading}
+							>
+								Sign Up
+							</Button>
+						</Link>
+					</>
 				)}
 			</div>
 		</nav>

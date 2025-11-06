@@ -126,7 +126,7 @@ button:focus-visible {
 }
 
 .link:hover {
-	text-decoration: underline;
+	/* text-decoration: underline; */
 	color: var(--color-lgreen);
 }
 
@@ -167,7 +167,7 @@ button:focus-visible {
 }
 
 .btn:hover {
-	text-decoration: none;
+	text-decoration: none !important;
 }
 
 .btn:disabled {
