@@ -47,7 +47,6 @@ export function FeedingScheduleDetailPage({ animalId }) {
 		if (userEntityData?.accessLevel) {
 			const zookeeperLevels = [
 				'zookeeper',
-				'veterinarian',
 				'manager',
 				'executive',
 				'db_admin',

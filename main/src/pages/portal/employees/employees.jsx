@@ -17,9 +17,7 @@ import { Plus, Edit2, Save, X, Briefcase, CalendarOff } from 'lucide-react';
 import './employees.css';
 
 const ACCESS_LEVELS = [
-	'worker',
 	'zookeeper',
-	'veterinarian',
 	'manager',
 	'executive',
 	'db_admin',
@@ -44,7 +42,7 @@ export function PortalEmployeesPage() {
 		lastName: '',
 		middleInitial: '',
 		jobTitle: '',
-		accessLevel: 'worker',
+		accessLevel: 'zookeeper',
 		hourlyWage: '',
 		ssn: '',
 		sex: 'male',
@@ -186,7 +184,7 @@ export function PortalEmployeesPage() {
 			lastName: '',
 			middleInitial: '',
 			jobTitle: '',
-			accessLevel: 'worker',
+			accessLevel: 'zookeeper',
 			hourlyWage: '',
 			ssn: '',
 			sex: 'male',
@@ -216,7 +214,7 @@ export function PortalEmployeesPage() {
 			lastName: employee.lastName || '',
 			middleInitial: employee.middleInitial || '',
 			jobTitle: employee.jobTitle || '',
-			accessLevel: employee.accessLevel || 'worker',
+			accessLevel: employee.accessLevel || 'zookeeper',
 			hourlyWage: employee.hourlyWage || '',
 			ssn: employee.ssn || '', //
 			sex: employee.sex || 'male',
@@ -238,8 +236,9 @@ export function PortalEmployeesPage() {
 		setShowAddForm(true);
 
 		// New
-		const currentAssignedIds = employee.assignedAnimals?.map(a => a.animalId || a) || [];
-        setAssignedAnimalIds(currentAssignedIds);
+		const currentAssignedIds = (employee.assignedAnimals || [])
+			.map(a => (a.animalId ? a.animalId : a).toString());
+		setAssignedAnimalIds(currentAssignedIds);
 
 		setSupervisors(
 			employees.filter((emp) => emp.employeeId !== employee.employeeId)
@@ -498,7 +497,7 @@ export function PortalEmployeesPage() {
 											})
 										}
 										required
-										placeholder='worker, zookeeper, manager, etc.'
+										placeholder='zookeeper, manager, etc.'
 									>
 										{ACCESS_LEVELS.map((level) => (
 											<option
@@ -634,7 +633,7 @@ export function PortalEmployeesPage() {
                                             <option disabled>No animals available</option>
                                         ) : (
                                             animals.map(animal => (
-                                                <option key={animal.animalId} value={animal.animalId}>
+                                               	<option key={animal.animalId} value={animal.animalId.toString()}>
                                                     {animal.name} ({animal.species})
                                                 </option>
                                             ))

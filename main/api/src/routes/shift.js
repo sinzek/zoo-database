@@ -29,6 +29,6 @@ export function registerShiftRoutes(app) {
 	);
 	app.post(
 		'/api/shifts/clockOut',
-		withAccessLevel('worker', shiftController.clockOutEmployee)
+		withAccessLevel('zookeeper', shiftController.clockOutEmployee)
 	);
 }

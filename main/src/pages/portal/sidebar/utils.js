@@ -16,7 +16,7 @@ import {
 export function availableLinksForAccessLevel(uedata) {
 	const links = [];
 
-	if (hasMinAccessLvl('worker', uedata)) {
+	if (hasMinAccessLvl('zookeeper', uedata)) {
 		links.push({
 			to: '/portal/shift-schedule',
 			label: 'My Schedule',
