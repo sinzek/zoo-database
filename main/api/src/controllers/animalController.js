@@ -211,6 +211,18 @@ async function deleteOne(req, _res) {
 	return [{ message: 'Animal successfully deleted' }];
 }
 
+async function getAllDeleted(_req, _res) {
+	const deletedAnimals = await query(
+		`SELECT * FROM Animal WHERE deletedAt IS NOT NULL`
+	);
+
+	if (deletedAnimals.length === 0) {
+		throw new Error('No deleted animals found');
+	}
+
+	return [deletedAnimals];
+}
+
 export default {
 	createOne,
 	updateOne,
@@ -219,4 +231,5 @@ export default {
 	getNByHandler,
 	getAllGroupedByHabitat,
 	deleteOne,
+	getAllDeleted,
 };

@@ -11,6 +11,7 @@ import {
 } from './utils';
 import { Plus, Edit2, Save, X, Skull, Trash } from 'lucide-react';
 import './animals.css';
+import { getAllDeletedAnimals } from './extra';
 
 export function PortalAnimalsPage() {
 	const { userEntityData, userEntityType } = useUserData();
@@ -19,6 +20,7 @@ export function PortalAnimalsPage() {
 	const [loading, setLoading] = useState(true);
 	const [showAddForm, setShowAddForm] = useState(false);
 	const [editingId, setEditingId] = useState(null);
+	const [hasFetchedDeleted, setHasFetchedDeleted] = useState(false);
 	const [formData, setFormData] = useState({
 		firstName: '',
 		lastName: '',
@@ -432,15 +434,44 @@ export function PortalAnimalsPage() {
 			</div>
 
 			<div className='animals-list'>
-				<h2
+				<div
 					style={{
-						marginLeft: '20px',
-						color: 'var(--color-lbrown)',
-						fontWeight: '500',
+						display: 'flex',
+						alignItems: 'center',
+						gap: '10px',
+						justifyContent: 'space-between',
 					}}
 				>
-					All Animals
-				</h2>
+					<h2
+						style={{
+							marginLeft: '20px',
+							color: 'var(--color-lbrown)',
+							fontWeight: '500',
+						}}
+					>
+						All Animals
+					</h2>
+					<Button
+						onClick={async () => {
+							if (hasFetchedDeleted) return;
+							setHasFetchedDeleted(true);
+							await getAllDeletedAnimals(
+								animals,
+								setAnimals,
+								setLoading,
+								userEntityData
+							);
+						}}
+						variant='outline'
+						size='sm'
+						disabled={hasFetchedDeleted}
+						loading={loading}
+					>
+						{hasFetchedDeleted
+							? 'Deleted Animals Included'
+							: 'Include Deleted Animals'}
+					</Button>
+				</div>
 				{animals.length === 0 ? (
 					<p className='no-animals'>No animals found.</p>
 				) : (
@@ -449,10 +480,17 @@ export function PortalAnimalsPage() {
 							<div
 								key={animal.animalId}
 								className='animal-card'
+								style={{
+									opacity: animal.deletedAt ? 0.5 : 1,
+									pointerEvents: animal.deletedAt
+										? 'none'
+										: 'auto',
+								}}
 							>
 								<div className='animal-header'>
 									<h3>
-										{animal.firstName} {animal.lastName}
+										{animal.firstName} {animal.lastName}{' '}
+										{animal.deletedAt ? '(Deleted)' : ''}
 									</h3>
 									<div className='animal-actions'>
 										{animal.deathDate && (
@@ -468,15 +506,19 @@ export function PortalAnimalsPage() {
 										>
 											<Edit2 size={16} />
 										</Button>
-										<Button
-											onClick={() =>
-												handleDelete(animal.animalId)
-											}
-											className='btn-icon'
-											variant='outline'
-										>
-											<Trash size={16} />
-										</Button>
+										{!animal.deletedAt && (
+											<Button
+												onClick={() =>
+													handleDelete(
+														animal.animalId
+													)
+												}
+												className='btn-icon'
+												variant='outline'
+											>
+												<Trash size={16} />
+											</Button>
+										)}
 									</div>
 								</div>
 								{animal.imageUrl && (
