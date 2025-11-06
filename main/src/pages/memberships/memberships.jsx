@@ -46,7 +46,8 @@ const membershipTiers = [
 ];
 
 export function MembershipsPage() {
-	const { userInfo, userEntityData, userEntityType } = useUserData();
+	const { userInfo, userEntityData, userEntityType, refetchUserInfo } =
+		useUserData();
 	const { navigate } = useRouter();
 	const [loading, setLoading] = useState(false);
 
@@ -81,6 +82,7 @@ export function MembershipsPage() {
 				'/portal/membership-transaction/' +
 					result.data.transaction.transactionId
 			);
+			await refetchUserInfo();
 		} else {
 			showToast(result.error || 'Failed to purchase membership.');
 		}
