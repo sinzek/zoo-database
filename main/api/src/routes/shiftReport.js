@@ -21,7 +21,7 @@ export function registerShiftReportRoutes(app) {
   // Get aggregated shift report (grand totals across all selected businesses)
   app.post(
     "/api/shift-report/aggregated", 
-    withAccessLevel('executive', shiftReportController.getAllBusinessesShiftReport)
+    withAccessLevel('manager', shiftReportController.getAllBusinessesShiftReport)
   );
 }
 

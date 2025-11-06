@@ -4,7 +4,7 @@ import { withAccessLevel } from '../utils/auth-utils.js';
 export function registerEmployeeRoutes(app) {
 	app.post(
 		'/api/employee/create',
-		withAccessLevel('executive', employeeController.createOne)
+		withAccessLevel('manager', employeeController.createOne)
 	);
 	app.post(
 		'/api/employee/get-one-by-id',

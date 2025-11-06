@@ -48,7 +48,6 @@ export function FeedingScheduleDetailPage({ animalId }) {
 			const zookeeperLevels = [
 				'zookeeper',
 				'manager',
-				'executive',
 				'db_admin',
 			];
 			setIsZookeeperPlus(

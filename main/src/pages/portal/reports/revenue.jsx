@@ -17,7 +17,7 @@ export function PortalRevenueReportPage() {
   const [businesses, setBusinesses] = useState([]);
   const [error, setError] = useState('');
 
-  const isAuthorized = userEntityData && userEntityType === 'employee' && ['manager','executive','db_admin'].includes(userEntityData.accessLevel);
+  const isAuthorized = userEntityData && userEntityType === 'employee' && ['manager', 'db_admin'].includes(userEntityData.accessLevel);
 
   // Load businesses on mount for filtering
   useEffect(() => {

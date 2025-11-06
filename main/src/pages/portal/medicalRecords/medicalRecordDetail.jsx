@@ -47,7 +47,6 @@ export function MedicalRecordDetailPage({ animalId }) {
 			const vetLevels = [
 				'zookeeper',
 				'manager',
-				'executive',
 				'db_admin',
 			];
 			const isVet = vetLevels.includes(userEntityData.accessLevel);

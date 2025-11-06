@@ -19,7 +19,6 @@ import './employees.css';
 const ACCESS_LEVELS = [
 	'zookeeper',
 	'manager',
-	'executive',
 	'db_admin',
 ];
 const REQUIRED_ACCESS_LEVEL = 'manager';

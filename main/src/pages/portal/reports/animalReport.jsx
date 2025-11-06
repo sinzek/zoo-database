@@ -26,7 +26,7 @@ export function PortalAnimalReportPage() {
 
 	const isAuthorized = userEntityData && 
 		userEntityType === 'employee' && 
-		['zookeeper', 'manager', 'executive', 'db_admin'].includes(userEntityData.accessLevel);
+		['zookeeper', 'manager', 'db_admin'].includes(userEntityData.accessLevel);
 
 	// Load all filter options on mount
 	useEffect(() => {

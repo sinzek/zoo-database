@@ -60,7 +60,7 @@ export function availableLinksForAccessLevel(uedata) {
 		);
 	}
 
-	if (hasMinAccessLvl('executive', uedata)) {
+	if (hasMinAccessLvl('manager', uedata)) {
 		links.push({
 			to: '/portal/business-management',
 			label: 'Business Management',

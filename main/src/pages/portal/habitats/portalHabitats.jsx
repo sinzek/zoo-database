@@ -26,7 +26,7 @@ export function PortalHabitatsPage() {
 	useEffect(() => {
 		// Check if user is manager or above
 		if (userEntityData?.accessLevel) {
-			const managerLevels = ['manager', 'executive', 'db_admin'];
+			const managerLevels = ['manager', 'db_admin'];
 			setIsManagerPlus(
 				managerLevels.includes(userEntityData.accessLevel)
 			);
