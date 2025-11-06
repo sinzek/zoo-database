@@ -11,6 +11,7 @@ export function PortalAttractionsPage() {
 	const { userEntityData, userEntityType } = useUserData();
 	const [attractions, setAttractions] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const [updating, setUpdating] = useState(false);
 	const [showAddForm, setShowAddForm] = useState(false);
 	const [editingId, setEditingId] = useState(null);
 	const [isManagerPlus, setIsManagerPlus] = useState(false);
@@ -66,6 +67,11 @@ export function PortalAttractionsPage() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
+		if (!formData.name || !formData.location) {
+			showToast('Please fill in all required fields.');
+			return;
+		}
+
 		// Validate operating hours - close time must be after open time
 		const days = [
 			'monday',
@@ -93,8 +99,7 @@ export function PortalAttractionsPage() {
 
 				if (closeTotal <= openTotal) {
 					showToast(
-						`Invalid hours for ${day.charAt(0).toUpperCase() + day.slice(1)}: closing time must be after opening time`,
-						'error'
+						`Invalid hours for ${day.charAt(0).toUpperCase() + day.slice(1)}: closing time must be after opening time`
 					);
 					return;
 				}
@@ -107,8 +112,9 @@ export function PortalAttractionsPage() {
 			location: formData.location,
 			description: formData.uiDescription,
 			uiImage: formData.uiImage,
-			startingDay: formData.startDate,
-			endingDay: formData.endDate,
+			startingDay:
+				formData.startDate.trim() === '' ? null : formData.startDate,
+			endingDay: formData.endDate.trim() === '' ? null : formData.endDate,
 			// Operating hours - pass empty strings directly (don't convert to undefined)
 			mondayOpen: formData.mondayOpen,
 			mondayClose: formData.mondayClose,
@@ -126,6 +132,7 @@ export function PortalAttractionsPage() {
 			sundayClose: formData.sundayClose,
 		};
 
+		setUpdating(true);
 		const result = editingId
 			? await api('/api/attraction/update-info', 'PUT', {
 					...attractionData,
@@ -143,10 +150,11 @@ export function PortalAttractionsPage() {
 			loadData();
 		} else {
 			showToast(
-				`Failed to ${editingId ? 'update' : 'create'} attraction`,
-				'error'
+				`Failed to ${editingId ? 'update' : 'create'} attraction`
 			);
 		}
+
+		setUpdating(false);
 	};
 
 	const resetForm = () => {
@@ -254,21 +262,21 @@ export function PortalAttractionsPage() {
 		}
 
 		try {
+			setUpdating(true);
 			const result = await api('/api/attraction/delete', 'POST', {
 				attractionID: attraction.attractionId,
 			});
 
 			if (result.success) {
-				showToast('Attraction deleted successfully', 'success');
+				showToast('Attraction deleted successfully');
 				loadData();
 			} else {
-				showToast(
-					result.error || 'Failed to delete attraction',
-					'error'
-				);
+				showToast(result.error || 'Failed to delete attraction');
 			}
 		} catch (error) {
-			showToast(error.message || 'Failed to delete attraction.', 'error');
+			showToast(error.message || 'Failed to delete attraction.');
+		} finally {
+			setUpdating(false);
 		}
 	};
 
@@ -516,6 +524,7 @@ export function PortalAttractionsPage() {
 								type='submit'
 								variant='green'
 								size='lg'
+								loading={updating}
 							>
 								<Save size={16} />
 								{editingId ? 'Update' : 'Create'} Attraction

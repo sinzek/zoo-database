@@ -23,12 +23,14 @@ export function PortalExpensesPage() {
 		businessId: '',
 	});
 
-	const isManagerPlus = userEntityData && 
-		userEntityType === 'employee' && 
+	const isManagerPlus =
+		userEntityData &&
+		userEntityType === 'employee' &&
 		['manager', 'db_admin'].includes(userEntityData.accessLevel);
 
-	const canAccessAllBusinesses = userEntityData && 
-		userEntityType === 'employee' && 
+	const canAccessAllBusinesses =
+		userEntityData &&
+		userEntityType === 'employee' &&
 		['manager', 'db_admin'].includes(userEntityData.accessLevel);
 
 	// Load businesses on mount
@@ -41,7 +43,7 @@ export function PortalExpensesPage() {
 						setBusinesses(res.data);
 					} else if (isManagerPlus && userEntityData?.businessId) {
 						const filteredBusiness = res.data.filter(
-							b => b.businessId === userEntityData.businessId
+							(b) => b.businessId === userEntityData.businessId
 						);
 						setBusinesses(filteredBusiness);
 						setSelectedBusinessId(userEntityData.businessId);
@@ -51,7 +53,7 @@ export function PortalExpensesPage() {
 				console.error('Failed to load businesses:', e);
 			}
 		};
-		
+
 		if (isManagerPlus) {
 			loadBusinesses();
 		}
@@ -96,7 +98,9 @@ export function PortalExpensesPage() {
 			expenseDescription: '',
 			cost: '',
 			purchaseDate: '',
-			businessId: canAccessAllBusinesses ? '' : userEntityData?.businessId || '',
+			businessId: canAccessAllBusinesses
+				? ''
+				: userEntityData?.businessId || '',
 		});
 	};
 
@@ -112,14 +116,20 @@ export function PortalExpensesPage() {
 
 		try {
 			// Validation
-			if (!formData.expenseDescription || formData.expenseDescription.trim() === '') {
+			if (
+				!formData.expenseDescription ||
+				formData.expenseDescription.trim() === ''
+			) {
 				showToast('Please enter a description', 'error');
 				setLoading(false);
 				return;
 			}
 
 			if (!formData.cost || parseFloat(formData.cost) <= 0) {
-				showToast('Please enter a valid cost (greater than 0)', 'error');
+				showToast(
+					'Please enter a valid cost (greater than 0)',
+					'error'
+				);
 				setLoading(false);
 				return;
 			}
@@ -131,11 +141,12 @@ export function PortalExpensesPage() {
 			}
 
 			// Set business ID based on access level
-			const businessId = canAccessAllBusinesses && editingId === null
-				? formData.businessId || selectedBusinessId
-				: canAccessAllBusinesses && editingId
-					? selectedBusinessId
-					: userEntityData?.businessId;
+			const businessId =
+				canAccessAllBusinesses && editingId === null
+					? formData.businessId || selectedBusinessId
+					: canAccessAllBusinesses && editingId
+						? selectedBusinessId
+						: userEntityData?.businessId;
 
 			if (!businessId) {
 				showToast('Please select a business', 'error');
@@ -163,7 +174,12 @@ export function PortalExpensesPage() {
 			}
 
 			if (res.success) {
-				showToast(editingId ? 'Expense updated successfully' : 'Expense added successfully', 'success');
+				showToast(
+					editingId
+						? 'Expense updated successfully'
+						: 'Expense added successfully',
+					'success'
+				);
 				closeForm();
 				await loadExpenses();
 			} else {
@@ -178,8 +194,10 @@ export function PortalExpensesPage() {
 
 	const handleEdit = (expense) => {
 		// Format date for input (YYYY-MM-DD)
-		const purchaseDate = expense.purchaseDate ? new Date(expense.purchaseDate).toISOString().split('T')[0] : '';
-		
+		const purchaseDate = expense.purchaseDate
+			? new Date(expense.purchaseDate).toISOString().split('T')[0]
+			: '';
+
 		setFormData({
 			expenseDescription: expense.expenseDescription || '',
 			cost: expense.cost || '',
@@ -247,7 +265,9 @@ export function PortalExpensesPage() {
 			{canAccessAllBusinesses && (
 				<div className='expense-filter-container'>
 					<div className='form-group'>
-						<label htmlFor='businessFilter'>Filter by Business</label>
+						<label htmlFor='businessFilter'>
+							Filter by Business
+						</label>
 						<select
 							id='businessFilter'
 							name='businessFilter'
@@ -256,7 +276,10 @@ export function PortalExpensesPage() {
 						>
 							<option value=''>Select a business</option>
 							{businesses.map((business) => (
-								<option key={business.businessId} value={business.businessId}>
+								<option
+									key={business.businessId}
+									value={business.businessId}
+								>
 									{business.name} ({business.type})
 								</option>
 							))}
@@ -278,9 +301,14 @@ export function PortalExpensesPage() {
 							<X size={24} />
 						</button>
 					</div>
-					<form className='expense-form' onSubmit={handleSubmit}>
+					<form
+						className='expense-form'
+						onSubmit={handleSubmit}
+					>
 						<div className='form-group'>
-							<label htmlFor='expenseDescription'>Description *</label>
+							<label htmlFor='expenseDescription'>
+								Description *
+							</label>
 							<input
 								type='text'
 								id='expenseDescription'
@@ -309,7 +337,9 @@ export function PortalExpensesPage() {
 						</div>
 
 						<div className='form-group'>
-							<label htmlFor='purchaseDate'>Purchase Date *</label>
+							<label htmlFor='purchaseDate'>
+								Purchase Date *
+							</label>
 							<input
 								type='date'
 								id='purchaseDate'
@@ -345,33 +375,42 @@ export function PortalExpensesPage() {
 			<div className='expenses-list'>
 				<h2>Expenses</h2>
 				{expensesLoading ? (
-					<div className='centered-loader'><Loader /></div>
+					<div className='centered-loader'>
+						<Loader />
+					</div>
 				) : expenses.length === 0 ? (
 					<p className='no-expenses'>No expenses found.</p>
 				) : (
 					<div className='expenses-grid'>
 						{expenses.map((expense) => (
-							<div key={expense.expenseId} className='expense-card'>
+							<div
+								key={expense.expenseId}
+								className='expense-card'
+							>
 								<div className='expense-info'>
 									<h3>{expense.expenseDescription}</h3>
-									<p className='expense-cost'>${parseFloat(expense.cost).toFixed(2)}</p>
+									<p className='expense-cost'>
+										${parseFloat(expense.cost).toFixed(2)}
+									</p>
 									<p className='expense-date'>
-										{new Date(expense.purchaseDate).toLocaleDateString()}
+										{new Date(
+											expense.purchaseDate
+										).toLocaleDateString()}
 									</p>
 								</div>
 								<div className='expense-actions'>
 									<button
 										type='button'
 										onClick={() => handleEdit(expense)}
-										className='edit-button'
 										aria-label='Edit expense'
 									>
 										<Edit2 size={18} />
 									</button>
 									<button
 										type='button'
-										onClick={() => handleDelete(expense.expenseId)}
-										className='delete-button'
+										onClick={() =>
+											handleDelete(expense.expenseId)
+										}
 										aria-label='Delete expense'
 									>
 										<Trash2 size={18} />
