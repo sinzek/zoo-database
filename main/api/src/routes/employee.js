@@ -4,7 +4,7 @@ import { withAccessLevel } from '../utils/auth-utils.js';
 export function registerEmployeeRoutes(app) {
 	app.post(
 		'/api/employee/create',
-		withAccessLevel('executive', employeeController.createOne)
+		withAccessLevel('manager', employeeController.createOne)
 	);
 	app.post(
 		'/api/employee/get-one-by-id',
@@ -16,7 +16,7 @@ export function registerEmployeeRoutes(app) {
 	);
 	app.put(
 		'/api/employee/update-one',
-		withAccessLevel('worker', employeeController.updateOne)
+		withAccessLevel('zookeeper', employeeController.updateOne)
 	);
 	app.post(
 		'/api/employee/get-n-by-animal',
@@ -37,4 +37,8 @@ export function registerEmployeeRoutes(app) {
 		'/api/employee/get-all-handlers',
 		employeeController.getAllHandlers
 	);
+	app.post(
+        '/api/employee/assign-animals',
+        withAccessLevel('manager', employeeController.assignAnimals)
+    );
 }

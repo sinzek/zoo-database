@@ -1,14 +1,11 @@
 const ACCESS_LEVELS = {
-	worker: 1,
-	zookeeper: 2,
-	veterinarian: 3,
-	manager: 4,
-	executive: 5,
+	zookeeper: 3,
+	manager: 5,
 	db_admin: 6,
 };
 
 /**
- * @param {'worker' | 'zookeeper' | 'veterinarian' | 'manager' | 'executive' | 'db_admin'} level
+ * @param {'zookeeper' | 'manager' | 'db_admin'} level
  * @returns {boolean}
  */
 export function hasMinAccessLvl(level, userEntityData) {

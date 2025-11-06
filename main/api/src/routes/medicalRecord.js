@@ -4,15 +4,15 @@ import medicalRecordController from '../controllers/medicalRecordController.js';
 export function registerMedicalRecordRoutes(app) {
 	app.post(
 		'/api/medical-record/create',
-		withAccessLevel('veterinarian', medicalRecordController.createOne)
+		withAccessLevel('zookeeper', medicalRecordController.createOne)
 	);
 	app.put(
 		'/api/medical-record/update',
-		withAccessLevel('veterinarian', medicalRecordController.updateOne)
+		withAccessLevel('zookeeper', medicalRecordController.updateOne)
 	);
 	app.post(
 		'/api/medical-record/delete',
-		withAccessLevel('veterinarian', medicalRecordController.deleteOne)
+		withAccessLevel('zookeeper', medicalRecordController.deleteOne)
 	);
 	app.post('/api/medical-record/get-by-id', medicalRecordController.getOneById);
 	app.post('/api/medical-record/get-by-animal', medicalRecordController.getNyByAnimal);

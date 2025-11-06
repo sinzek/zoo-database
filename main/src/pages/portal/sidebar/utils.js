@@ -16,7 +16,7 @@ import {
 export function availableLinksForAccessLevel(uedata) {
 	const links = [];
 
-	if (hasMinAccessLvl('worker', uedata)) {
+	if (hasMinAccessLvl('zookeeper', uedata)) {
 		links.push({
 			to: '/portal/shift-schedule',
 			label: 'My Schedule',
@@ -60,7 +60,7 @@ export function availableLinksForAccessLevel(uedata) {
 		);
 	}
 
-	if (hasMinAccessLvl('executive', uedata)) {
+	if (hasMinAccessLvl('manager', uedata)) {
 		links.push({
 			to: '/portal/business-management',
 			label: 'Business Management',

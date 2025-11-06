@@ -90,7 +90,7 @@ export const withAuth = (handler) => async (req, res) => {
 
 /**
  * Middleware to protect routes that require a specific access level (on employee-only routes). Provides `req.user.employeeData` for use within controller functions wrapped by this.
- * @param {'worker' | 'zookeeper' | 'veterinarian' | 'manager' | 'executive' | 'db_admin'} requiredLevel 
+ * @param {'zookeeper' | 'manager' | 'executive' | 'db_admin'} requiredLevel 
  * @param {Function} handler 
  * @returns {Function}
  */

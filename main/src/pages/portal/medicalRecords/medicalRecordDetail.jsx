@@ -45,9 +45,8 @@ export function MedicalRecordDetailPage({ animalId }) {
 		// Check if user is a veterinarian or above
 		if (userEntityData?.accessLevel) {
 			const vetLevels = [
-				'veterinarian',
+				'zookeeper',
 				'manager',
-				'executive',
 				'db_admin',
 			];
 			const isVet = vetLevels.includes(userEntityData.accessLevel);

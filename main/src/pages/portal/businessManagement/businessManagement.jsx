@@ -276,7 +276,7 @@ export function BusinessManagementPage() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [editingBusiness, setEditingBusiness] = useState(null);
 
-	const hasAccess = hasMinAccessLvl('executive', userEntityData);
+	const hasAccess = hasMinAccessLvl('manager', userEntityData);
 	const isDbAdmin = userEntityData?.accessLevel === 'db_admin';
 
 	const loadBusinesses = useCallback(async () => {

@@ -85,7 +85,7 @@ export async function createEmployee(employeeData) {
 // Updates an existing employee
 export async function updateEmployee(employeeId, employeeData) {
     // NOTE: Ensure this API endpoint exists and handles updates
-    const result = await api('/api/employee/update', 'PUT', {
+    const result = await api('/api/employee/update-one', 'PUT', {
         employeeId, // Make sure API expects employeeId in the body
         ...employeeData,
     });

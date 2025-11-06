@@ -25,11 +25,11 @@ export function PortalExpensesPage() {
 
 	const isManagerPlus = userEntityData && 
 		userEntityType === 'employee' && 
-		['manager', 'executive', 'db_admin'].includes(userEntityData.accessLevel);
+		['manager', 'db_admin'].includes(userEntityData.accessLevel);
 
 	const canAccessAllBusinesses = userEntityData && 
 		userEntityType === 'employee' && 
-		['executive', 'db_admin'].includes(userEntityData.accessLevel);
+		['manager', 'db_admin'].includes(userEntityData.accessLevel);
 
 	// Load businesses on mount
 	useEffect(() => {
