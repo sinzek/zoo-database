@@ -4,6 +4,8 @@ import './notifications.css';
 import { api } from '../../../utils/client-api-utils';
 import { showToast } from '../../../components/toast/showToast';
 import { Loader } from '../../../components/loader/loader';
+import { Button } from '../../../components/button';
+import { BookCheck, Check, Trash2 } from 'lucide-react';
 
 export function NotificationsPage() {
 	const { userInfo } = useUserData();
@@ -43,6 +45,44 @@ export function NotificationsPage() {
 		return new Date(dateString).toLocaleDateString(undefined, options);
 	};
 
+	async function markAsRead(notificationId) {
+		const result = await api('/api/notifications/mark-as-read', 'POST', {
+			notificationId,
+		});
+
+		if (!result.success) {
+			showToast('Error marking notification as read: ' + result.message);
+			return;
+		}
+
+		// update local state
+		setNotis((prevNotis) =>
+			prevNotis.map((noti) =>
+				noti.notificationId === notificationId
+					? { ...noti, seen: true }
+					: noti
+			)
+		);
+	}
+
+	async function hardDeleteNotification(notificationId) {
+		const result = await api('/api/notifications/delete-one', 'POST', {
+			notificationId,
+		});
+
+		if (!result.success) {
+			showToast('Error deleting notification: ' + result.message);
+			return;
+		}
+
+		// update local state
+		setNotis((prevNotis) =>
+			prevNotis.filter((noti) => noti.notificationId !== notificationId)
+		);
+
+		showToast('Notification deleted successfully');
+	}
+
 	if (loading) {
 		return (
 			<div
@@ -72,7 +112,7 @@ export function NotificationsPage() {
 			<div
 				style={{
 					display: 'grid',
-					gridTemplateColumns: '1fr 1fr',
+					gridTemplateColumns: '1fr 1fr 0.5fr',
 					columnGap: '1rem',
 					marginTop: '1rem',
 					marginBottom: '0rem',
@@ -110,16 +150,58 @@ export function NotificationsPage() {
 							style={{
 								marginBottom: '1.5rem',
 								display: 'grid',
-								gridTemplateColumns: '1fr 1fr',
+								gridTemplateColumns: '1fr 1fr 0.5fr',
 								columnGap: '1rem',
 								alignItems: 'center',
 								borderBottom: '2px solid var(--color-brown)',
 								paddingBottom: '1.75rem',
 								color: 'var(--color-lgreen)',
+								opacity: noti.seen ? 0.6 : 1,
 							}}
 						>
 							<h3>{formatDateTime(noti.sentAt)}</h3>
 							<p>{noti.content}</p>
+							<div
+								style={{
+									display: 'flex',
+									gap: '0.5rem',
+									flexDirection: 'column',
+								}}
+							>
+								<Button
+									variant='green'
+									size='sm'
+									onClick={() =>
+										markAsRead(noti.notificationId)
+									}
+									disabled={noti.seen}
+								>
+									{noti.seen ? (
+										<>
+											<Check size={16} />
+											Read
+										</>
+									) : (
+										<>
+											<BookCheck size={16} />
+											Mark as Read
+										</>
+									)}
+								</Button>
+
+								<Button
+									variant='outline'
+									size='sm'
+									onClick={() =>
+										hardDeleteNotification(
+											noti.notificationId
+										)
+									}
+								>
+									<Trash2 size={16} />
+									Delete
+								</Button>
+							</div>
 						</div>
 					))}
 		</div>

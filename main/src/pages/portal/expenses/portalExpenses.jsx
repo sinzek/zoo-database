@@ -120,22 +120,19 @@ export function PortalExpensesPage() {
 				!formData.expenseDescription ||
 				formData.expenseDescription.trim() === ''
 			) {
-				showToast('Please enter a description', 'error');
+				showToast('Please enter a description');
 				setLoading(false);
 				return;
 			}
 
 			if (!formData.cost || parseFloat(formData.cost) <= 0) {
-				showToast(
-					'Please enter a valid cost (greater than 0)',
-					'error'
-				);
+				showToast('Please enter a valid cost (greater than 0)');
 				setLoading(false);
 				return;
 			}
 
 			if (!formData.purchaseDate) {
-				showToast('Please select a purchase date', 'error');
+				showToast('Please select a purchase date');
 				setLoading(false);
 				return;
 			}
@@ -149,7 +146,7 @@ export function PortalExpensesPage() {
 						: userEntityData?.businessId;
 
 			if (!businessId) {
-				showToast('Please select a business', 'error');
+				showToast('Please select a business');
 				setLoading(false);
 				return;
 			}
@@ -177,16 +174,15 @@ export function PortalExpensesPage() {
 				showToast(
 					editingId
 						? 'Expense updated successfully'
-						: 'Expense added successfully',
-					'success'
+						: 'Expense added successfully'
 				);
 				closeForm();
 				await loadExpenses();
 			} else {
-				showToast(res.error || 'Failed to save expense', 'error');
+				showToast(res.error || 'Failed to save expense');
 			}
 		} catch (e) {
-			showToast(e?.message || 'Failed to save expense', 'error');
+			showToast(e?.message || 'Failed to save expense');
 		} finally {
 			setLoading(false);
 		}
@@ -217,13 +213,13 @@ export function PortalExpensesPage() {
 		try {
 			const res = await api('/api/expense/delete', 'POST', { expenseId });
 			if (res.success) {
-				showToast('Expense deleted successfully', 'success');
+				showToast('Expense deleted successfully');
 				await loadExpenses();
 			} else {
-				showToast(res.error || 'Failed to delete expense', 'error');
+				showToast(res.error || 'Failed to delete expense');
 			}
 		} catch (e) {
-			showToast(e?.message || 'Failed to delete expense', 'error');
+			showToast(e?.message || 'Failed to delete expense');
 		} finally {
 			setLoading(false);
 		}
@@ -246,7 +242,7 @@ export function PortalExpensesPage() {
 	return (
 		<div className='portal-expenses-page'>
 			<div className='expenses-header'>
-				<h1>Expense Management</h1>
+				<h1 style={{ marginRight: '20px' }}>Expense Management</h1>
 				<Button
 					onClick={() => {
 						resetFormFields();
@@ -255,7 +251,6 @@ export function PortalExpensesPage() {
 					}}
 					variant='green'
 					size='sm'
-					className='add-button'
 				>
 					<Plus size={20} />
 					Add Expense
@@ -292,14 +287,14 @@ export function PortalExpensesPage() {
 				<div className='expense-form-container'>
 					<div className='form-header'>
 						<h2>{editingId ? 'Edit Expense' : 'New Expense'}</h2>
-						<button
-							type='button'
+						<Button
 							onClick={closeForm}
-							className='close-button'
+							variant='outline'
 							aria-label='Close'
+							size='sm'
 						>
 							<X size={24} />
-						</button>
+						</Button>
 					</div>
 					<form
 						className='expense-form'
@@ -353,9 +348,8 @@ export function PortalExpensesPage() {
 						<div className='expense-form-actions'>
 							<Button
 								type='button'
-								variant='brown'
+								variant='outline'
 								onClick={closeForm}
-								className='cancel-button'
 							>
 								Cancel
 							</Button>
@@ -363,7 +357,6 @@ export function PortalExpensesPage() {
 								type='submit'
 								variant='green'
 								loading={loading}
-								className='save-button'
 							>
 								{editingId ? 'Update Expense' : 'Add Expense'}
 							</Button>
@@ -399,22 +392,22 @@ export function PortalExpensesPage() {
 									</p>
 								</div>
 								<div className='expense-actions'>
-									<button
-										type='button'
+									<Button
+										variant='green'
 										onClick={() => handleEdit(expense)}
 										aria-label='Edit expense'
 									>
 										<Edit2 size={18} />
-									</button>
-									<button
-										type='button'
+									</Button>
+									<Button
+										variant='outline'
 										onClick={() =>
 											handleDelete(expense.expenseId)
 										}
 										aria-label='Delete expense'
 									>
 										<Trash2 size={18} />
-									</button>
+									</Button>
 								</div>
 							</div>
 						))}

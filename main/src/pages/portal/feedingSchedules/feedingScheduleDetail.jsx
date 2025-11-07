@@ -568,7 +568,6 @@ export function FeedingScheduleDetailPage({ animalId }) {
 																		day
 																	)
 																}
-																className='edit-button'
 																variant='green'
 															>
 																<Edit
@@ -581,7 +580,6 @@ export function FeedingScheduleDetailPage({ animalId }) {
 																		day.dietScheduleDayId
 																	)
 																}
-																className='delete-button'
 																variant='outline'
 															>
 																<Trash2

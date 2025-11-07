@@ -14,8 +14,16 @@ export async function getMembershipByCustomerId(customerId) {
 			'Membership',
 			'customerId',
 			customerId,
-			false
+			true
 		);
+		if (
+			membership &&
+			membership.expiresAt &&
+			new Date(membership.expiresAt) < new Date()
+		) {
+			return null;
+		}
+
 		return membership || null;
 	} catch (err) {
 		if (err.message.includes('No records found')) {
@@ -37,9 +45,14 @@ export async function incrementNumEmployees(businessId) {
 
 	const newNumEmployees = (business.numEmployees || 0) + 1;
 
-	await updateOneQuery('Business', 'businessId', businessId, {
-		numEmployees: newNumEmployees,
-	});
+	await updateOneQuery(
+		'Business',
+		{
+			businessId,
+			numEmployees: newNumEmployees,
+		},
+		'businessId'
+	);
 
 	return newNumEmployees;
 }

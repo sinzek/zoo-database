@@ -17,8 +17,12 @@ async function createOne(req, _res) {
 		throw new Error('Missing employee account email or password');
 	}
 
+	console.log('CREATING USER AAAAAAAAAAAAAAA', newEmp.email);
+
 	// create user account first
 	const { userId } = await createUser(newEmp.email, newEmp.password);
+
+	console.log('USER CREATED AAAAAAAAAAAAAAA', userId);
 
 	const employeeId = crypto.randomUUID();
 
@@ -52,8 +56,12 @@ async function createOne(req, _res) {
 	// now create employee record
 	await createOneQuery('Employee', employeeData);
 
+	console.log('EMPLOYEE CREATED AAAAAAAAAAAAAAA', employeeData);
+
 	// ! TRIGGER: UPDATE NUM EMPLOYEES
 	await incrementNumEmployees(newEmp.businessId);
+
+	console.log('NUM EMPLOYEES INCREMENTED AAAAAAAAAAAAAAA');
 
 	// return created employee data
 	return [employeeData];
@@ -176,7 +184,6 @@ async function getNByBusinessAndAccessLevel(req, _res) {
 	return [employees];
 }
 
-
 /*
 async function getAll(_req, _res) {
     const employees = await query(SELECT * FROM Employee);
@@ -189,40 +196,40 @@ async function getAll(_req, _res) {
 }
 */
 
-
 async function getAll(_req, _res) {
-    //Gets all employees
-    const employees = await query(`SELECT * FROM Employee WHERE deletedAt IS NULL`);
+	//Gets all employees
+	const employees = await query(
+		`SELECT * FROM Employee WHERE deletedAt IS NULL`
+	);
 
-    if (!employees || employees.length === 0) {
-         return [[]]; //Return empty array if no employees
-    }
+	if (!employees || employees.length === 0) {
+		return [[]]; //Return empty array if no employees
+	}
 
-    const assignments = await query(`
+	const assignments = await query(`
         SELECT tco.employeeId, tco.animalId, a.commonName AS name, a.species
         FROM TakesCareOf tco
         JOIN Animal a ON tco.animalId = a.animalId`);
 
-    const employeeAnimalsMap = {};
-    for (const assignment of assignments) {
-        if (!employeeAnimalsMap[assignment.employeeId]) {
-            employeeAnimalsMap[assignment.employeeId] = [];
-        }
-        employeeAnimalsMap[assignment.employeeId].push({
-            animalId: assignment.animalId,
-            name: assignment.name,
-            species: assignment.species
-        });
-    }
+	const employeeAnimalsMap = {};
+	for (const assignment of assignments) {
+		if (!employeeAnimalsMap[assignment.employeeId]) {
+			employeeAnimalsMap[assignment.employeeId] = [];
+		}
+		employeeAnimalsMap[assignment.employeeId].push({
+			animalId: assignment.animalId,
+			name: assignment.name,
+			species: assignment.species,
+		});
+	}
 
-
-    for (const employee of employees) {
-        //Attach the array
-        employee.assignedAnimals = employeeAnimalsMap[employee.employeeId] || [];
-    }
-    return [employees];
+	for (const employee of employees) {
+		//Attach the array
+		employee.assignedAnimals =
+			employeeAnimalsMap[employee.employeeId] || [];
+	}
+	return [employees];
 }
-
 
 /**
  * Retrieves all distinct employees who are handlers (in TakesCareOf table).
@@ -249,28 +256,29 @@ async function getAllHandlers(_req, _res) {
 //Get Access Level
 //Update Employee
 
-
 //new function
 async function assignAnimals(req, _res) {
-    const { employeeId, animalIds } = req.body;
+	const { employeeId, animalIds } = req.body;
 
-    if (!employeeId) {
-        throw new Error('Missing employeeId');
-    }
+	if (!employeeId) {
+		throw new Error('Missing employeeId');
+	}
 
-    const animalsToAssign = Array.isArray(animalIds) ? animalIds : [];
+	const animalsToAssign = Array.isArray(animalIds) ? animalIds : [];
 
-    await query('DELETE FROM TakesCareOf WHERE employeeId = ?', [employeeId]);
+	await query('DELETE FROM TakesCareOf WHERE employeeId = ?', [employeeId]);
 
-    if (animalsToAssign.length > 0) {
-        const values = animalsToAssign.map(animalId => [employeeId, animalId]);
-        await query(
-            'INSERT INTO TakesCareOf (employeeId, animalId) VALUES ?',
-            [values]
-        );
-    }
+	if (animalsToAssign.length > 0) {
+		const values = animalsToAssign.map((animalId) => [
+			employeeId,
+			animalId,
+		]);
+		await query('INSERT INTO TakesCareOf (employeeId, animalId) VALUES ?', [
+			values,
+		]);
+	}
 
-    return [{ success: true, message: 'Animal assignments updated.' }];
+	return [{ success: true, message: 'Animal assignments updated.' }];
 }
 
 export default {

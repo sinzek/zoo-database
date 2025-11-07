@@ -1,3 +1,11 @@
+CREATE TABLE "User" (
+    "userId" char(36) NOT NULL,
+    "email" varchar(100) NOT NULL,
+    "passwordHash" char(64) NOT NULL,
+    PRIMARY KEY ("userId"),
+    UNIQUE KEY "email" ("email")
+);
+
 CREATE TABLE Customer (
     customerId CHAR(36) PRIMARY KEY, -- uuid
     firstName VARCHAR(50) NOT NULL CHECK (LENGTH(firstName) >= 1), -- at least 1 char, max 50
@@ -295,6 +303,15 @@ CREATE TABLE AuthSession (
     expiresAt DATETIME NOT NULL, -- session expiration datetime
     createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP -- defaults to current timestamp
 );
+
+CREATE TABLE "Notification" (
+  "notificationId" char(36) NOT NULL,
+  "userId" char(36) NOT NULL,
+  "content" varchar(500) NOT NULL,
+  "sentAt" datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("notificationId")
+  FOREIGN KEY ("userId") REFERENCES "User"("userId") ON DELETE CASCADE ON UPDATE CASCADE
+)
 
 ALTER TABLE Business
 ADD CONSTRAINT fk_business_owner
