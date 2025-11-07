@@ -70,7 +70,7 @@ async function getAnimalReport(req, _res) {
 	// For each animal, get handlers, medical records, and diet
 	const reports = await Promise.all(
 		animals.map(async (animal) => {
-			// Get handlers for this animal
+			// animal handlers
 			const handlersQuery = `
 				SELECT 
 					e.employeeId,
@@ -84,7 +84,7 @@ async function getAnimalReport(req, _res) {
 			`;
 			const handlers = await query(handlersQuery, [animal.animalId]);
 
-			// Get medical records for this animal
+			// med records
 			const medicalRecordsQuery = `
 				SELECT 
 					medicalRecordId,
@@ -98,7 +98,7 @@ async function getAnimalReport(req, _res) {
 			`;
 			const medicalRecords = await query(medicalRecordsQuery, [animal.animalId]);
 
-			// Get diet and schedule for this animal
+			// diet and schedule
 			const dietQuery = `
 				SELECT 
 					d.dietId,
