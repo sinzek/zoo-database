@@ -5,10 +5,17 @@ import { showToast } from '../../../components/toast/showToast';
 import { api } from '../../../utils/client-api-utils';
 import { FormBuilder } from '../../../components/formBuilder/formBuilder';
 import './account.css';
+import { AlertCircle } from 'lucide-react';
 
 export function AccountPage() {
-	const { userEntityData, userInfo, userEntityType, setUserEntityData } =
-		useUserData();
+	const {
+		userEntityData,
+		userInfo,
+		userEntityType,
+		setUserEntityData,
+		membership,
+		refetchUserInfo,
+	} = useUserData();
 
 	const [isEditing, setIsEditing] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,6 +81,35 @@ export function AccountPage() {
 		return commonFields; // For customer
 	};
 
+	async function handleCancelMembership() {
+		if (!membership) showToast('No active membership to cancel.');
+		setIsSubmitting(true);
+
+		const ok = window.confirm(
+			'Are you sure you want to cancel your membership? This action cannot be undone.'
+		);
+		if (!ok) {
+			setIsSubmitting(false);
+			return;
+		}
+
+		const result = await api('/api/membership/cancel', 'POST', {
+			membershipId: membership.membershipId,
+		});
+
+		if (result.success) {
+			showToast('Membership cancelled successfully.');
+			await refetchUserInfo();
+		} else {
+			showToast(
+				`Error: ${result.error || 'Failed to cancel membership.'}`
+			);
+			console.error('Cancel membership error:', result.error);
+		}
+
+		setIsSubmitting(false);
+	}
+
 	if (!userEntityData) {
 		return <div className='centered-page'>Loading account details...</div>;
 	}
@@ -120,31 +156,40 @@ export function AccountPage() {
 							userEntityType === 'employee' ? 'wrap' : 'nowrap',
 					}}
 				/>
-
-				<div className='account-actions'>
-					{isEditing ? (
-						<>
-							<Button
-								variant='outline'
-								onClick={handleCancel}
-								disabled={isSubmitting}
-							>
-								Cancel
-							</Button>
-							<Button
-								variant='green'
-								onClick={handleSave}
-								loading={isSubmitting}
-							>
-								Save Changes
-							</Button>
-						</>
-					) : (
-						<Button onClick={() => setIsEditing(true)}>
-							Edit Information
+			</div>
+			<div className='account-actions'>
+				{isEditing ? (
+					<>
+						<Button
+							variant='outline'
+							onClick={handleCancel}
+							disabled={isSubmitting}
+						>
+							Cancel
 						</Button>
-					)}
-				</div>
+						<Button
+							variant='green'
+							onClick={handleSave}
+							loading={isSubmitting}
+						>
+							Save Changes
+						</Button>
+					</>
+				) : (
+					<Button onClick={() => setIsEditing(true)}>
+						Edit Information
+					</Button>
+				)}
+				{userEntityType === 'customer' && membership && !isEditing && (
+					<Button
+						variant='outline'
+						onClick={handleCancelMembership}
+						loading={isSubmitting}
+					>
+						<AlertCircle size={16} />
+						Cancel Membership
+					</Button>
+				)}
 			</div>
 		</div>
 	);
