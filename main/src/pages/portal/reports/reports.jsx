@@ -2,7 +2,7 @@ import { useUserData } from '../../../context/userDataContext';
 import { hasMinAccessLvl } from '../../../utils/access';
 import { Link } from '../../../components/link';
 import '../portal.css';
-import { BarChart2, Calendar, DollarSign, HeartPulse } from 'lucide-react';
+import { BarChart2, Calendar, DollarSign, Apple } from 'lucide-react';
 
 export function PortalReportsPage() {
 	const { userEntityData } = useUserData();
@@ -60,8 +60,8 @@ export function PortalReportsPage() {
 					href='/portal/reports/animal'
 					className='option-card'
 				>
-					<HeartPulse size={32} />
-					Animals & Medical
+					<Apple size={32} />
+					Diet Report
 				</Link>
 			</div>
 		</div>
