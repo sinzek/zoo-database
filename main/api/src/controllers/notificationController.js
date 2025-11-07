@@ -60,4 +60,19 @@ async function deleteOne(req, _res) {
 	return [{ message: 'Notification successfully deleted' }];
 }
 
-export default { getNByUser, markAsRead, deleteOne };
+async function getNumUnread(req, _res) {
+	const userId = req.user.data.id;
+
+	if (!userId) {
+		throw new Error('Missing userId');
+	}
+
+	const result = await query(
+		'SELECT COUNT(*) AS numUnread FROM Notification WHERE userId = ? AND seen = FALSE',
+		[userId]
+	);
+
+	return [{ numUnread: result[0].numUnread }];
+}
+
+export default { getNByUser, markAsRead, deleteOne, getNumUnread };

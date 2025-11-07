@@ -14,4 +14,8 @@ export function registerNotificationRoutes(app) {
 		'/api/notifications/delete-one',
 		withAuth(notificationController.deleteOne)
 	);
+	app.post(
+		'/api/notifications/get-num-unread',
+		withAuth(notificationController.getNumUnread)
+	);
 }

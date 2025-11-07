@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useUserData } from '../../context/userDataContext';
 import './topMenu.css';
 import { ChevronDown, ShoppingCart } from 'lucide-react';
@@ -6,6 +6,7 @@ import { Link } from '../link';
 import { useShoppingCart } from '../../context/shoppingCartContext';
 import { Button } from '../button';
 import { useRouter } from '../../context/routerContext';
+import { api } from '../../utils/client-api-utils';
 
 function formatDuration(ms) {
 	const totalSeconds = Math.floor(ms / 1000);
@@ -36,8 +37,10 @@ export function TopMenu() {
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [mouseLeaveTimeout, setMouseLeaveTimeout] = useState(null);
+	const [numUnreadNotis, setNumUnreadNotis] = useState(0);
 
 	const { cartItemCount } = useShoppingCart();
+	const hasFetchedUnreadNotis = useRef(false);
 
 	const mouseLeaveDebounceTime = 1000; // milliseconds
 
@@ -76,6 +79,33 @@ export function TopMenu() {
 
 		return () => clearInterval(interval);
 	}, [clockedInSince]);
+
+	useEffect(() => {
+		async function fetchUnreadCount() {
+			if (!userEntityData || !userEntityData.userId) return;
+
+			const result = await api(
+				'/api/notifications/get-num-unread',
+				'POST'
+			);
+
+			if (!result.success) {
+				console.error(
+					'Failed to fetch unread notifications count:',
+					result.message
+				);
+				return;
+			}
+
+			hasFetchedUnreadNotis.current = true;
+
+			setNumUnreadNotis(result.data.numUnread || 0);
+		}
+
+		if (!hasFetchedUnreadNotis.current) {
+			fetchUnreadCount();
+		}
+	}, [userEntityData]);
 
 	if (!userEntityData || !path.startsWith('/portal')) {
 		return null;
@@ -180,7 +210,37 @@ export function TopMenu() {
 						onMouseLeave={handleMouseLeave}
 						className='user-menu-button'
 					>
-						<div className='avatar'>
+						<div
+							className='avatar'
+							style={{ position: 'relative' }}
+						>
+							<div
+								style={{
+									position: 'absolute',
+									top: '-6px',
+									right: '-6px',
+								}}
+							>
+								{numUnreadNotis > 0 && (
+									<div
+										style={{
+											backgroundColor:
+												'var(--color-green)',
+											color: 'var(--color-dbrown)',
+											borderRadius: '50%',
+											width: '20px',
+											height: '20px',
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'center',
+											fontSize: '0.75rem',
+											fontWeight: 'bold',
+										}}
+									>
+										{numUnreadNotis}
+									</div>
+								)}
+							</div>
 							{userEntityData.firstName.charAt(0)}
 							{userEntityData.lastName.charAt(0)}
 						</div>
@@ -209,7 +269,34 @@ export function TopMenu() {
 								to='/portal/notifications'
 								className='user-menu-link'
 							>
-								<li>Notifications</li>
+								<li style={{ position: 'relative' }}>
+									<div
+										style={{
+											display: 'flex',
+											alignItems: 'center',
+											gap: '6px',
+										}}
+									>
+										Notifications
+										{numUnreadNotis > 0 && (
+											<div
+												style={{
+													backgroundColor:
+														'var(--color-green)',
+													color: 'var(--color-dbrown)',
+													borderRadius: '50%',
+													width: '12px',
+													height: '12px',
+													display: 'flex',
+													alignItems: 'center',
+													justifyContent: 'center',
+													fontSize: '0.7rem',
+													fontWeight: 'bold',
+												}}
+											/>
+										)}
+									</div>
+								</li>
 							</Link>
 							<Link
 								to='/portal/account'
