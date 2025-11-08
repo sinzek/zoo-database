@@ -40,6 +40,9 @@ export function MedicalRecordDetailPage({ animalId }) {
 		checkoutDate: '',
 	});
 	const [isVeterinarian, setIsVeterinarian] = useState(false);
+	
+	
+	const [hasFetchedDeleted, setHasFetchedDeleted] = useState(false);
 
 	useEffect(() => {
 		// Check if user is a veterinarian or above
@@ -47,6 +50,7 @@ export function MedicalRecordDetailPage({ animalId }) {
 			const vetLevels = [
 				'zookeeper',
 				'manager',
+				'executive',
 				'db_admin',
 			];
 			const isVet = vetLevels.includes(userEntityData.accessLevel);
@@ -60,6 +64,7 @@ export function MedicalRecordDetailPage({ animalId }) {
 
 	const loadData = async () => {
 		setLoading(true);
+		setHasFetchedDeleted(false); //Reset on load
 
 		// Get animal details
 		const animalResult = await api('/api/animal/get-one-by-id', 'POST', {
@@ -67,12 +72,13 @@ export function MedicalRecordDetailPage({ animalId }) {
 		});
 
 		if (animalResult.success) {
-			setAnimal(animalResult.data);
+			
+			setAnimal(animalResult.data[0]);
 		}
 
 		// Get medical records
 		const recordsResult = await api(
-			'/api/medical-record/get-by-animal',
+			'/api/medical-record/get-by-animal', 
 			'POST',
 			{
 				animalId,
@@ -86,10 +92,45 @@ export function MedicalRecordDetailPage({ animalId }) {
 		setLoading(false);
 	};
 
+	
+	const handleIncludeDeleted = async () => {
+		if (hasFetchedDeleted) return;
+		setLoading(true);
+
+		const result = await api(
+			'/api/medical-record/get-all-deleted-for-animal', 
+			'POST',
+			{ animalId }
+		);
+
+		
+		if (result.success && result.data?.length > 0) {
+			
+			const deletedRecords = result.data;
+			
+			setRecords((current) =>
+				[...current, ...deletedRecords].sort(
+					(a, b) => new Date(b.visitDate) - new Date(a.visitDate)
+				)
+			);
+			
+		} 
+		
+		else if (!result.success) {
+			showToast(`Error: ${result.error || 'Failed to fetch deleted records.'}`);
+		}
+
+		setHasFetchedDeleted(true);
+		setLoading(false);
+	};
+
 	const formatDateForInput = (dateString) => {
-		if (!dateString) return '';
+		if (!dateString) { 
+			return '';
+		}
+
 		const date = new Date(dateString);
-		// Convert to YYYY-MM-DDTHH:mm format for datetime-local
+		
 		const year = date.getFullYear();
 		const month = String(date.getMonth() + 1).padStart(2, '0');
 		const day = String(date.getDate()).padStart(2, '0');
@@ -100,6 +141,7 @@ export function MedicalRecordDetailPage({ animalId }) {
 
 	const handleEdit = (record) => {
 		setEditingId(record.medicalRecordId);
+
 		setEditingFormData({
 			veterinarianNotes: record.veterinarianNotes || '',
 			reasonForVisit: record.reasonForVisit || '',
@@ -121,9 +163,9 @@ export function MedicalRecordDetailPage({ animalId }) {
 
 		showToast('Medical record updated successfully', 'success');
 		setEditingId(null);
-		loadData();
+		loadData(); 
 
-		setLoading(false);
+		
 	};
 
 	const handleDelete = async (medicalRecordId) => {
@@ -131,18 +173,18 @@ export function MedicalRecordDetailPage({ animalId }) {
 			return;
 		}
 		setLoading(true);
+		//soft-delete 
 		const result = await api('/api/medical-record/delete', 'POST', {
 			medicalRecordId,
 		});
 
 		if (result.success) {
 			showToast('Medical record deleted successfully');
-			loadData();
+			loadData(); //Reloads data, deleted item will disappear
 		} else {
 			showToast('Failed to delete medical record');
+			setLoading(false);
 		}
-
-		setLoading(false);
 	};
 
 	const handleCancel = () => {
@@ -173,12 +215,13 @@ export function MedicalRecordDetailPage({ animalId }) {
 				visitDate: '',
 				checkoutDate: '',
 			});
-			loadData();
-		} else {
+			loadData(); //Reloads data 
+		} 
+		
+		else {
 			showToast('Failed to create medical record');
+			setLoading(false);
 		}
-
-		setLoading(false);
 	};
 
 	const goBack = () => {
@@ -197,7 +240,7 @@ export function MedicalRecordDetailPage({ animalId }) {
 		});
 	};
 
-	if (loading) {
+	if (loading && !animal) {
 		return (
 			<div className='medical-record-detail-page'>
 				<div className='centered-loader'>
@@ -226,6 +269,10 @@ export function MedicalRecordDetailPage({ animalId }) {
 							src={animal.imageUrl}
 							alt={animal.firstName}
 							className='animal-header-image'
+							//Fallback placeholder
+							onError={(e) => {
+								e.target.src = `https://placehold.co/150x150/5A4A3A/FFF?text=${animal.firstName}`;
+							}}
 						/>
 					)}
 					<div className='animal-header-info'>
@@ -257,21 +304,36 @@ export function MedicalRecordDetailPage({ animalId }) {
 			<div className='records-section'>
 				<div className='records-section-header'>
 					<h2>Medical History</h2>
-					{isVeterinarian && (
-						<Button
-							onClick={() =>
-								setShowNewRecordForm(!showNewRecordForm)
-							}
-							className='add-record-button'
-							variant='green'
-							style={{ marginBottom: '1rem' }}
-						>
-							<Plus size={16} />
-							{showNewRecordForm
-								? 'Cancel'
-								: 'Add Medical Record'}
-						</Button>
-					)}
+					<div className='header-buttons'>
+						{isVeterinarian && (
+							<Button
+								onClick={handleIncludeDeleted}
+								variant='outline'
+								size='sm'
+								disabled={hasFetchedDeleted}
+								loading={loading && hasFetchedDeleted}
+							>
+								{hasFetchedDeleted
+									? 'Deleted Records Included'
+									: 'Include Deleted Records'}
+							</Button>
+						)}
+
+						{isVeterinarian && (
+							<Button
+								onClick={() =>
+									setShowNewRecordForm(!showNewRecordForm)
+								}
+								className='add-record-button'
+								variant='green'
+							>
+								<Plus size={16} />
+								{showNewRecordForm
+									? 'Cancel'
+									: 'Add Medical Record'}
+							</Button>
+						)}
+					</div>
 				</div>
 
 				{showNewRecordForm && (
@@ -372,7 +434,15 @@ export function MedicalRecordDetailPage({ animalId }) {
 					</form>
 				)}
 
-				{records.length === 0 ? (
+				
+				{loading && records.length > 0 ? (
+					<div
+						className='centered-loader'
+						style={{ height: '100px' }}
+					>
+						<Loader />
+					</div>
+				) : records.length === 0 ? (
 					<p className='no-records'>
 						No medical records found for this animal.
 					</p>
@@ -385,6 +455,13 @@ export function MedicalRecordDetailPage({ animalId }) {
 								<div
 									key={record.medicalRecordId}
 									className='record-card'
+									
+									style={{
+										opacity: record.deletedAt ? 0.5 : 1,
+										border: record.deletedAt
+											? '1px dashed #666'
+											: undefined,
+									}}
 								>
 									{isEditing ? (
 										<div className='record-edit-form'>
@@ -467,6 +544,8 @@ export function MedicalRecordDetailPage({ animalId }) {
 												<h3>
 													<FileText size={20} />
 													{record.reasonForVisit}
+													
+													{record.deletedAt ? ' (Deleted)' : ''}
 												</h3>
 												{isVeterinarian && (
 													<div className='record-actions'>
@@ -478,6 +557,10 @@ export function MedicalRecordDetailPage({ animalId }) {
 															}
 															variant='green'
 															size='sm'
+															
+															disabled={
+																record.deletedAt
+															}
 														>
 															<Edit size={16} />
 															Edit
@@ -494,6 +577,10 @@ export function MedicalRecordDetailPage({ animalId }) {
 															}}
 															variant='outline'
 															size='sm'
+															
+															disabled={
+																record.deletedAt
+															}
 														>
 															<Trash2 size={16} />
 															Delete
@@ -522,15 +609,17 @@ export function MedicalRecordDetailPage({ animalId }) {
 														)}
 													</div>
 												)}
-												{!record.checkoutDate && (
-													<div className='info-row active'>
-														<Clock size={16} />
-														<strong>
-															Status:
-														</strong>{' '}
-														Active (Still in care)
-													</div>
-												)}
+												
+												{!record.checkoutDate &&
+													!record.deletedAt && (
+														<div className='info-row active'>
+															<Clock size={16} />
+															<strong>
+																Status:
+															</strong>{' '}
+															Active (Still in care)
+														</div>
+													)}
 											</div>
 											{record.veterinarianNotes && (
 												<div className='record-notes'>
