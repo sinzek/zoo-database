@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import {
+	createContext,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+	useCallback,
+} from 'react';
 import PropTypes from 'prop-types';
 import { useAuth } from '../hooks/useAuth';
 import { useRouter } from './routerContext';
@@ -25,6 +32,7 @@ const UserDataContext = createContext({
 	clock: (_inStatus) => {},
 	membership: null, // membership data for customers (if any)
 	setUserEntityData: (_data) => {},
+	refetchUserInfo: async () => {},
 });
 
 export function UserDataProvider({ children }) {
@@ -79,35 +87,42 @@ export function UserDataProvider({ children }) {
 		}
 	}
 
-	useEffect(() => {
-		async function fetchUserData() {
-			const result = await getUserData(
-				setUserInfo,
-				setUserEntityData,
-				setUserEntityType,
-				setMembership,
-				setAuthLoading
-			);
+	const fetchUserData = useCallback(async () => {
+		const result = await getUserData(
+			setUserInfo,
+			setUserEntityData,
+			setUserEntityType,
+			setMembership,
+			setAuthLoading
+		);
 
-			if (!result || !result.success) {
-				// failed to get user data, not logged in
-				return;
-			}
-
-			if (result.data.relatedInfo.type === 'employee') {
-				await getBusinessEmployeeWorksFor(
-					result.data.relatedInfo.data.businessId,
-					setBusinessEmployeeWorksFor,
-					setBusinessLoading
-				);
-			}
+		if (!result || !result.success) {
+			// failed to get user data, not logged in
+			return;
 		}
 
+		if (result.data.relatedInfo.type === 'employee') {
+			await getBusinessEmployeeWorksFor(
+				result.data.relatedInfo.data.businessId,
+				setBusinessEmployeeWorksFor,
+				setBusinessLoading
+			);
+		}
+	}, [getUserData, getBusinessEmployeeWorksFor]);
+
+	useEffect(() => {
 		if (!userInfo && !userDataFetched.current) {
 			userDataFetched.current = true;
 			fetchUserData();
 		}
-	}, [userInfo, getUserData, logout, navigate, getBusinessEmployeeWorksFor]);
+	}, [
+		userInfo,
+		getUserData,
+		logout,
+		navigate,
+		getBusinessEmployeeWorksFor,
+		fetchUserData,
+	]);
 
 	useEffect(() => {
 		if (typeof window === 'undefined' || authLoading || businessLoading)
@@ -188,6 +203,7 @@ export function UserDataProvider({ children }) {
 				clock,
 				membership,
 				setUserEntityData,
+				refetchUserInfo: fetchUserData,
 			}}
 		>
 			{children}

@@ -49,13 +49,18 @@ async function getOneById(req, _res) {
 	if (!habitatId) throw new Error('Missing habitatId');
 
 	const [habitat] = await getNByKeyQuery('Habitat', 'habitatId', habitatId);
-	const associatedAnimals = await getNByKeyQuery(
-		'Animal',
-		'habitatId',
-		habitatId
-	);
 
-	return [{ habitat, associatedAnimals }];
+	try {
+		const associatedAnimals = await getNByKeyQuery(
+			'Animal',
+			'habitatId',
+			habitatId
+		);
+
+		return [{ habitat, associatedAnimals }];
+	} catch {
+		return [{ habitat, associatedAnimals: [] }];
+	}
 }
 
 /**

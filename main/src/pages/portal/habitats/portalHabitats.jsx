@@ -336,7 +336,6 @@ export function PortalHabitatsPage() {
 									>
 										<Button
 											onClick={() => handleEdit(habitat)}
-											className='edit-button'
 											variant='green'
 										>
 											<Edit2 size={16} />
@@ -346,7 +345,6 @@ export function PortalHabitatsPage() {
 											onClick={() =>
 												handleDelete(habitat)
 											}
-											className='delete-button'
 											variant='outline'
 										>
 											<Trash2 size={16} />

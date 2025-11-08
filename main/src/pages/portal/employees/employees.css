@@ -6,6 +6,10 @@
 	display: grid;
 	grid-template-columns: 1fr 3fr;
 	gap: 4rem;
+
+	.form-group select {
+		border-radius: 12px;
+	}
 }
 
 .employees-header {

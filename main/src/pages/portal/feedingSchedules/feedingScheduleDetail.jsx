@@ -45,11 +45,7 @@ export function FeedingScheduleDetailPage({ animalId }) {
 	useEffect(() => {
 		// Check if user can edit (zookeeper+)
 		if (userEntityData?.accessLevel) {
-			const zookeeperLevels = [
-				'zookeeper',
-				'manager',
-				'db_admin',
-			];
+			const zookeeperLevels = ['zookeeper', 'manager', 'db_admin'];
 			setIsZookeeperPlus(
 				zookeeperLevels.includes(userEntityData.accessLevel)
 			);
@@ -237,7 +233,7 @@ export function FeedingScheduleDetailPage({ animalId }) {
 			</Button>
 
 			{animal && (
-				<div className='animal-header'>
+				<div className='animal-header-2'>
 					{animal.imageUrl && (
 						<img
 							src={animal.imageUrl}
@@ -572,7 +568,6 @@ export function FeedingScheduleDetailPage({ animalId }) {
 																		day
 																	)
 																}
-																className='edit-button'
 																variant='green'
 															>
 																<Edit
@@ -585,7 +580,6 @@ export function FeedingScheduleDetailPage({ animalId }) {
 																		day.dietScheduleDayId
 																	)
 																}
-																className='delete-button'
 																variant='outline'
 															>
 																<Trash2

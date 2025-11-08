@@ -3,19 +3,22 @@ import {
 	createOneQuery,
 	getNByKeyQuery,
 	updateOneQuery,
-	getAllQuery
+	getAllQuery,
+	deleteOneQuery,
 } from '../utils/query-utils.js';
 import { MEMBERSHIP_LEVELS } from '../constants/membershipLevels.js';
+import { sendNotificationToUser } from '../utils/notif-utils.js';
 
-async function createOne(req, _res){
+async function createOne(req, _res) {
 	const newMembership = req.body;
 
 	if (!newMembership) throw new Error('Missing membership data');
 
-	if(!newMembership.customerId) throw new Error('Missing purchaser (customerId)');
-	if(!newMembership.transactionId) throw new Error('Missing transactionId');
+	if (!newMembership.customerId)
+		throw new Error('Missing purchaser (customerId)');
+	if (!newMembership.transactionId) throw new Error('Missing transactionId');
 
-	if(!MEMBERSHIP_LEVELS[newMembership.level]){
+	if (!MEMBERSHIP_LEVELS[newMembership.level]) {
 		throw new Error('Invalid membership level');
 	}
 
@@ -26,18 +29,18 @@ async function createOne(req, _res){
 		startDate: new Date(),
 		expireDate: newMembership.expireDate,
 		autoRenew: newMembership.autoRenew,
-		transactionId: newMembership.transactionId
-	}
+		transactionId: newMembership.transactionId,
+	};
 
 	await createOneQuery('Membership', newMembershipData);
 
 	return [newMembershipData];
 }
 
-async function updateOne(req, _res){
+async function updateOne(req, _res) {
 	const updatedMembership = req.body;
 
-	if(!updatedMembership || !updatedMembership.membershipId) {
+	if (!updatedMembership || !updatedMembership.membershipId) {
 		throw new Error('Missing membership data or membershipId');
 	}
 
@@ -56,12 +59,16 @@ async function updateOne(req, _res){
  * @returns {Promise<Array>} Array containing the membership object
  * @throws {Error} If membershipID is missing or no membership is found
  */
-async function getOneByID(req, _res){
+async function getOneByID(req, _res) {
 	const { membershipId } = req.body;
 
 	if (!membershipId) throw new Error('Missing membershipId');
 
-	const [membership] = await getNByKeyQuery('Membership', 'membershipId', membershipId);
+	const [membership] = await getNByKeyQuery(
+		'Membership',
+		'membershipId',
+		membershipId
+	);
 
 	return [membership];
 }
@@ -71,6 +78,52 @@ async function getN(_req, _res) {
 	return [memberships];
 }
 
+async function deleteOne(req, _res) {
+	const { membershipId } = req.body;
+
+	if (!membershipId) throw new Error('Missing membershipId');
+
+	await deleteOneQuery('Membership', 'membershipId', membershipId);
+
+	return [];
+}
+
+async function cancelMembership(req, _res) {
+	const { membershipId } = req.body;
+
+	if (!membershipId) throw new Error('Missing membershipId');
+
+	const [membership] = await getNByKeyQuery(
+		'Membership',
+		'membershipId',
+		membershipId
+	);
+
+	if (!membership) {
+		throw new Error('Membership not found');
+	}
+
+	await updateOneQuery(
+		'Membership',
+		{ membershipId, deletedAt: new Date() },
+		'membershipId'
+	);
+
+	await sendNotificationToUser(
+		membership.userId,
+		'Membership cancelled! Sorry to see you go little buddy. You can always rejoin later I guess? Idk bro.'
+	);
+
+	return [];
+}
+
 // no need to fetch memberships by customerId here, customerId is unique in Membership table
 
-export default { createOne, updateOne, getOneByID, getN };
+export default {
+	createOne,
+	updateOne,
+	getOneByID,
+	getN,
+	deleteOne,
+	cancelMembership,
+};

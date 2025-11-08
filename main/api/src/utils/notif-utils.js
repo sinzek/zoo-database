@@ -3,13 +3,17 @@ import { createOneQuery, getNByKeyQuery } from './query-utils.js';
 
 export async function sendNotificationToUser(userId, message) {
 	const notificationId = crypto.randomUUID();
-
-	const [existingNotification] = await getNByKeyQuery(
-		'Notification',
-		'userId',
-		userId,
-		false
-	);
+	let existingNotification;
+	try {
+		[existingNotification] = await getNByKeyQuery(
+			'Notification',
+			'userId',
+			userId,
+			false
+		);
+	} catch {
+		// no existing notification found, proceed
+	}
 
 	// naive check to avoid sending duplicate notifications, could def be improved lol BUT THERE'S NO TIME !!!!!!!!!!!!!!
 	if (existingNotification && existingNotification.content === message) {

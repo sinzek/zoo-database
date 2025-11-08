@@ -27,10 +27,8 @@ async function createOne(req, _res) {
 	const accessLevel = employee.accessLevel;
 
 	// Managers can only add expenses to their own business
-	if (accessLevel === 'manager') {
-		if (!newExpense.businessId || newExpense.businessId !== employee.businessId) {
-			throw new Error('Managers can only add expenses to their own business');
-		}
+	if (accessLevel !== 'manager') {
+		throw new Error('Invalid access level');
 	}
 	// Executive and db_admin can add to any business
 
@@ -78,15 +76,6 @@ async function getManyByBusiness(req, _res) {
 	const { businessId } = req.body;
 
 	if (!businessId) throw new Error('Missing businessId');
-
-	// Get current employee data
-	const employee = req.user.employeeData;
-	const accessLevel = employee.accessLevel;
-
-	// For managers, verify they can only view expenses for their own business
-	if (accessLevel === 'manager' && businessId !== employee.businessId) {
-		throw new Error('Managers can only view expenses for their own business');
-	}
 
 	const rows = await getNByKeyQuery('Expense', 'businessId', businessId);
 
@@ -175,9 +164,18 @@ async function updateOne(req, _res) {
 
 	// For managers, verify they can only update expenses for their own business
 	if (accessLevel === 'manager') {
-		const [existingExpense] = await getNByKeyQuery('Expense', 'expenseId', updatedExpense.expenseId);
-		if (!existingExpense || existingExpense.businessId !== employee.businessId) {
-			throw new Error('Managers can only update expenses for their own business');
+		const [existingExpense] = await getNByKeyQuery(
+			'Expense',
+			'expenseId',
+			updatedExpense.expenseId
+		);
+		if (
+			!existingExpense ||
+			existingExpense.businessId !== employee.businessId
+		) {
+			throw new Error(
+				'Managers can only update expenses for their own business'
+			);
 		}
 	}
 
@@ -207,9 +205,18 @@ async function deleteOne(req, _res) {
 
 	// For managers, verify they can only delete expenses for their own business
 	if (accessLevel === 'manager') {
-		const [existingExpense] = await getNByKeyQuery('Expense', 'expenseId', expenseId);
-		if (!existingExpense || existingExpense.businessId !== employee.businessId) {
-			throw new Error('Managers can only delete expenses for their own business');
+		const [existingExpense] = await getNByKeyQuery(
+			'Expense',
+			'expenseId',
+			expenseId
+		);
+		if (
+			!existingExpense ||
+			existingExpense.businessId !== employee.businessId
+		) {
+			throw new Error(
+				'Managers can only delete expenses for their own business'
+			);
 		}
 	}
 

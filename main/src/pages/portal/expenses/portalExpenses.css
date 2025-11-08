@@ -78,27 +78,6 @@
 	margin-top: 2rem;
 }
 
-.save-button {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	padding: 0.75rem 1.5rem;
-	border: none;
-	border-radius: 8px;
-	cursor: pointer;
-	font-size: 1rem;
-	transition: all 0.2s;
-}
-
-.save-button {
-	background-color: var(--color-green);
-	color: white;
-}
-
-.save-button:hover {
-	background-color: var(--color-lgreen);
-}
-
 .error-message {
 	color: #ff6b6b;
 	font-weight: 600;
@@ -128,28 +107,6 @@
 	margin: 0;
 }
 
-.close-button {
-	background: none;
-	border: none;
-	color: var(--color-foreground);
-	cursor: pointer;
-	padding: 0.25rem;
-	transition: color 0.2s;
-}
-
-.close-button:hover {
-	color: var(--color-lgreen);
-}
-
-.cancel-button {
-	background-color: var(--color-brown);
-	color: var(--color-foreground);
-}
-
-.cancel-button:hover {
-	background-color: var(--color-lbrown);
-}
-
 .expenses-list h2 {
 	color: var(--color-green);
 	margin-bottom: 1.5rem;
@@ -166,7 +123,9 @@
 	border: 2px solid var(--color-brown);
 	border-radius: 12px;
 	padding: 1.5rem;
-	transition: transform 0.2s, box-shadow 0.2s;
+	transition:
+		transform 0.2s,
+		box-shadow 0.2s;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -201,33 +160,6 @@
 	gap: 0.5rem;
 }
 
-.edit-button,
-.delete-button {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 0.5rem;
-	border: none;
-	border-radius: 6px;
-	cursor: pointer;
-	transition: all 0.2s;
-	background-color: var(--color-brown);
-	color: var(--color-foreground);
-}
-
-.edit-button:hover {
-	background-color: var(--color-lbrown);
-}
-
-.delete-button {
-	background-color: #dc3545;
-	color: white;
-}
-
-.delete-button:hover {
-	background-color: #c82333;
-}
-
 .no-expenses {
 	text-align: center;
 	color: var(--color-lbrown);
@@ -241,10 +173,3 @@
 	align-items: center;
 	height: 200px;
 }
-
-.add-button {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-}
-
