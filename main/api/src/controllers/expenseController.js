@@ -188,8 +188,7 @@ async function updateOne(req, _res) {
 
 /**
  * Soft deletes an expense by setting its deletedAt timestamp.
- * Managers can only delete expenses for their own business.
- * Executives and above can delete expenses for any business.
+ * Only admins can delete expenses.
  * @param {string} req.body.expenseId - UUID of the expense to delete
  * @returns {Promise<Array>} Array containing success message
  * @throws {Error} If expenseId is missing or user doesn't have permission
@@ -198,27 +197,6 @@ async function deleteOne(req, _res) {
 	const { expenseId } = req.body;
 
 	if (!expenseId) throw new Error('Missing expenseId');
-
-	// Get current employee data
-	const employee = req.user.employeeData;
-	const accessLevel = employee.accessLevel;
-
-	// For managers, verify they can only delete expenses for their own business
-	if (accessLevel === 'manager') {
-		const [existingExpense] = await getNByKeyQuery(
-			'Expense',
-			'expenseId',
-			expenseId
-		);
-		if (
-			!existingExpense ||
-			existingExpense.businessId !== employee.businessId
-		) {
-			throw new Error(
-				'Managers can only delete expenses for their own business'
-			);
-		}
-	}
 
 	// using db.query for soft delete
 	await db.query(
@@ -233,6 +211,21 @@ async function deleteOne(req, _res) {
 	return [{ message: 'Expense successfully deleted' }];
 }
 
+/**
+ * Retrieves all deleted expenses from the database.
+ * Only admins can view deleted expenses.
+ * @returns {Promise<Array>} Array of deleted expense objects
+ * @throws {Error} If no deleted expenses are found
+ */
+async function getAllDeleted(_req, _res) {
+	const deletedExpenses = await db.query(
+		`SELECT * FROM Expense WHERE deletedAt IS NOT NULL`
+	);
+
+	// Return empty array if no deleted expenses found (don't throw error)
+	return [deletedExpenses || []];
+}
+
 export default {
 	createOne,
 	getOneById,
@@ -241,4 +234,5 @@ export default {
 	getTotalByBusiness,
 	updateOne,
 	deleteOne,
+	getAllDeleted,
 };

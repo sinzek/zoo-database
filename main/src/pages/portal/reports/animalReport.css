@@ -1,0 +1,149 @@
+.animal-report-page {
+	max-width: 1400px;
+	width: 80%;
+	margin: auto;
+	padding: 24px;
+	padding-top: 80px;
+	color: var(--color-foreground);
+}
+
+.report-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 2rem;
+}
+
+.report-header h1 {
+	color: var(--color-green);
+	margin: 0;
+}
+
+.report-filter-container {
+	background-color: rgba(37, 31, 26, 0.8);
+	border-radius: 12px;
+	border: 2px solid var(--color-brown);
+	padding: 1.5rem;
+	margin-bottom: 2rem;
+}
+
+.report-filter-container h2 {
+	color: var(--color-green);
+	margin-bottom: 1.5rem;
+}
+
+.report-filter-form {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	gap: 1.5rem;
+}
+
+.report-filter-form .form-group {
+	margin-bottom: 0;
+}
+
+.report-filter-form .form-group label {
+	display: block;
+	margin-bottom: 0.5rem;
+	color: var(--color-lgreen);
+	font-weight: 600;
+	font-size: 1em;
+}
+
+.report-filter-form .form-group input,
+.report-filter-form .form-group select {
+	width: 100%;
+	padding: 0.75rem;
+	background-color: var(--color-dbrown);
+	border: 2px solid var(--color-lbrown);
+	border-radius: 8px;
+	color: var(--color-foreground);
+	font-size: 0.9rem;
+	transition: all 0.2s;
+}
+
+.report-filter-form .form-group input:focus,
+.report-filter-form .form-group select:focus {
+	outline: none;
+	border-color: var(--color-green);
+}
+
+.centered-loader {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 400px;
+}
+
+.error-message {
+	color: #ff6b6b;
+	font-weight: 600;
+	font-size: 1.2rem;
+	text-align: center;
+	margin-top: 2rem;
+}
+
+.report-results {
+	margin-top: 2rem;
+}
+
+.report-results h2 {
+	color: var(--color-green);
+	margin-bottom: 1.5rem;
+}
+
+.diet-report-table-container {
+	max-height: 600px;
+	overflow-y: auto;
+	position: relative;
+	margin-top: 0.5rem;
+	border-radius: 8px;
+	border: 2px solid var(--color-brown);
+	background-color: rgba(37, 31, 26, 0.8);
+}
+
+.diet-report-table {
+	width: 100%;
+	font-size: 0.85rem;
+	border-collapse: collapse;
+}
+
+.diet-report-table thead {
+	position: sticky;
+	top: 0;
+	background-color: var(--color-dbrown);
+	z-index: 10;
+}
+
+.diet-report-table thead tr {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.diet-report-table th {
+	text-align: left;
+	padding: 0.75rem;
+	font-weight: 600;
+	color: var(--color-lgreen);
+}
+
+.diet-report-table tbody tr {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	transition: background-color 0.2s;
+}
+
+.diet-report-table tbody tr:hover {
+	background-color: rgba(255, 255, 255, 0.05);
+}
+
+.diet-report-table td {
+	padding: 0.75rem;
+	color: var(--color-lbrown);
+}
+
+.no-data-message {
+	color: var(--color-lbrown);
+	text-align: center;
+	font-size: 1rem;
+	padding: 2rem;
+}
+
