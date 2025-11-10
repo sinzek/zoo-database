@@ -14,8 +14,9 @@ export function PortalAnimalReportPage() {
 	const [error, setError] = useState('');
 	const [habitats, setHabitats] = useState([]);
 	const [selectedHabitatId, setSelectedHabitatId] = useState('');
-	const [startDate, setStartDate] = useState('');
-	const [endDate, setEndDate] = useState('');
+	const [selectedDays, setSelectedDays] = useState([]);
+	
+	const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 	const isAuthorized = userEntityData && 
 		userEntityType === 'employee' && 
@@ -75,79 +76,21 @@ export function PortalAnimalReportPage() {
 		}
 	}, [isAuthorized, loadReport]);
 
-	// Filter by date range (habitat filtering is done on backend)
+	// Filter by selected days (habitat filtering is done on backend)
 	useEffect(() => {
-		// If no date filters, show all data
-		if (!startDate && !endDate) {
+		// If no day filters, show all data
+		if (selectedDays.length === 0) {
 			setFilteredData(reportData);
 			return;
 		}
 
 		const filtered = reportData.filter((entry) => {
-			// Filter by date range
-			if (startDate || endDate) {
-				const dayOfWeekMap = {
-					'Monday': 1,
-					'Tuesday': 2,
-					'Wednesday': 3,
-					'Thursday': 4,
-					'Friday': 5,
-					'Saturday': 6,
-					'Sunday': 0
-				};
-
-				const entryDayOfWeek = dayOfWeekMap[entry.dayOfWeek];
-				const start = startDate ? new Date(startDate) : null;
-				const end = endDate ? new Date(endDate) : null;
-
-				// Check if any date in the range matches the day of week
-				if (start && end) {
-					const currentDate = new Date(start);
-					let foundMatch = false;
-					
-					while (currentDate <= end) {
-						if (currentDate.getDay() === entryDayOfWeek) {
-							foundMatch = true;
-							break;
-						}
-						currentDate.setDate(currentDate.getDate() + 1);
-					}
-					
-					return foundMatch;
-				} else if (start) {
-					// Check if start date or any date after matches
-					const currentDate = new Date(start);
-					const maxDate = new Date(start);
-					maxDate.setDate(maxDate.getDate() + 365); // Check up to a year ahead
-					
-					while (currentDate <= maxDate) {
-						if (currentDate.getDay() === entryDayOfWeek) {
-							return true;
-						}
-						currentDate.setDate(currentDate.getDate() + 1);
-					}
-					return false;
-				} else if (end) {
-					// Check if end date or any date before matches
-					const currentDate = new Date(end);
-					const minDate = new Date(end);
-					minDate.setDate(minDate.getDate() - 365); // Check up to a year back
-					
-					while (currentDate >= minDate) {
-						if (currentDate.getDay() === entryDayOfWeek) {
-							return true;
-						}
-						currentDate.setDate(currentDate.getDate() - 1);
-					}
-					return false;
-				}
-			}
-
-			return true;
+			// Filter by selected days of the week
+			return selectedDays.includes(entry.dayOfWeek);
 		});
 
 		setFilteredData(filtered);
-	}, [reportData, startDate, endDate]);
+	}, [reportData, selectedDays]);
 
 	const formatTime = (timeString) => {
 		if (!timeString) return 'N/A';
@@ -201,25 +144,26 @@ export function PortalAnimalReportPage() {
 						</select>
 					</div>
 
-					<div className='form-group'>
-						<label htmlFor='startDate'>Start Date (Optional)</label>
-						<input
-							type='date'
-							id='startDate'
-							value={startDate}
-							onChange={(e) => setStartDate(e.target.value)}
-						/>
-					</div>
-
-					<div className='form-group'>
-						<label htmlFor='endDate'>End Date (Optional)</label>
-						<input
-							type='date'
-							id='endDate'
-							value={endDate}
-							onChange={(e) => setEndDate(e.target.value)}
-							min={startDate || undefined}
-						/>
+					<div className='form-group' style={{ gridColumn: '1 / -1' }}>
+						<label>Filter by Days of Week (Optional)</label>
+						<div className='days-checkbox-container'>
+							{daysOfWeek.map((day) => (
+								<label key={day} className='day-checkbox-label'>
+									<input
+										type='checkbox'
+										checked={selectedDays.includes(day)}
+										onChange={(e) => {
+											if (e.target.checked) {
+												setSelectedDays([...selectedDays, day]);
+											} else {
+												setSelectedDays(selectedDays.filter(d => d !== day));
+											}
+										}}
+									/>
+									<span>{day}</span>
+								</label>
+							))}
+						</div>
 					</div>
 				</div>
 			</div>
