@@ -392,7 +392,8 @@ export function PortalExpensesPage() {
 									expenses,
 									setExpenses,
 									setExpensesLoading,
-									userEntityData
+									userEntityData,
+									selectedBusinessId
 								);
 							}}
 							variant='outline'

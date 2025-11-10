@@ -24,7 +24,7 @@ export function registerExpenseRoutes(app) {
 	app.post('/api/expense/delete', withAccessLevel('db_admin', expenseController.deleteOne));
 
 	// Get all deleted expenses - admin only
-	app.get('/api/expense/get-all-deleted', withAccessLevel('db_admin', expenseController.getAllDeleted));
+	app.post('/api/expense/get-all-deleted', withAccessLevel('db_admin', expenseController.getAllDeleted));
 
 	// Get expenses - manager+ can view (filtered by business permission)
 	app.post('/api/expense/get-by-business', withAccessLevel('manager', expenseController.getManyByBusiness));

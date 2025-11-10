@@ -212,15 +212,24 @@ async function deleteOne(req, _res) {
 }
 
 /**
- * Retrieves all deleted expenses from the database.
+ * Retrieves all deleted expenses from the database, optionally filtered by businessId.
  * Only admins can view deleted expenses.
+ * @param {string} [req.body.businessId] - UUID of the business (optional filter)
  * @returns {Promise<Array>} Array of deleted expense objects
  * @throws {Error} If no deleted expenses are found
  */
-async function getAllDeleted(_req, _res) {
-	const deletedExpenses = await db.query(
-		`SELECT * FROM Expense WHERE deletedAt IS NOT NULL`
-	);
+async function getAllDeleted(req, _res) {
+	const { businessId } = req.body || {};
+
+	let query = `SELECT * FROM Expense WHERE deletedAt IS NOT NULL`;
+	const params = [];
+
+	if (businessId) {
+		query += ` AND businessId = ?`;
+		params.push(businessId);
+	}
+
+	const deletedExpenses = await db.query(query, params);
 
 	// Return empty array if no deleted expenses found (don't throw error)
 	return [deletedExpenses || []];
