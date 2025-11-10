@@ -1,4 +1,5 @@
 import businessController from '../controllers/businessController.js';
+import { withAccessLevel } from '../utils/auth-utils.js';
 
 export function registerBusinessRoutes(app) {
 	app.post('/api/business/get-one-by-id', businessController.getOneById);
@@ -6,6 +7,13 @@ export function registerBusinessRoutes(app) {
 		'/api/business/get-all-with-hours',
 		businessController.getAllWithHours
 	);
+
+
+	app.get(
+	'/api/business/get-all-deleted',
+		withAccessLevel('manager', businessController.getAllDeleted) //Restriction
+	);
+
 	app.post('/api/business/get-all', businessController.getAll);
 	app.post('/api/business/create', businessController.createOne);
 	app.post('/api/business/update-info', businessController.updateOneInfo);
