@@ -6,6 +6,7 @@ import { api } from '../../../utils/client-api-utils';
 import { Button } from '../../../components/button';
 import { Edit2, Trash2, Plus, X } from 'lucide-react';
 import './portalExpenses.css';
+import { getAllDeletedExpenses } from './extra';
 
 export function PortalExpensesPage() {
 	const { userEntityData, userEntityType } = useUserData();
@@ -16,6 +17,7 @@ export function PortalExpensesPage() {
 	const [selectedBusinessId, setSelectedBusinessId] = useState('');
 	const [editingId, setEditingId] = useState(null);
 	const [showAddForm, setShowAddForm] = useState(false);
+	const [hasFetchedDeleted, setHasFetchedDeleted] = useState(false);
 	const [formData, setFormData] = useState({
 		expenseDescription: '',
 		cost: '',
@@ -27,6 +29,11 @@ export function PortalExpensesPage() {
 		userEntityData &&
 		userEntityType === 'employee' &&
 		['manager', 'db_admin'].includes(userEntityData.accessLevel);
+
+	const isAdmin =
+		userEntityData &&
+		userEntityType === 'employee' &&
+		userEntityData.accessLevel === 'db_admin';
 
 	const canAccessAllBusinesses =
 		userEntityData &&
@@ -62,6 +69,7 @@ export function PortalExpensesPage() {
 	// Load expenses when business changes
 	useEffect(() => {
 		if (selectedBusinessId) {
+			setHasFetchedDeleted(false);
 			loadExpenses();
 		}
 	}, [selectedBusinessId]);
@@ -366,7 +374,38 @@ export function PortalExpensesPage() {
 			)}
 
 			<div className='expenses-list'>
-				<h2>Expenses</h2>
+				<div
+					style={{
+						display: 'flex',
+						alignItems: 'center',
+						gap: '10px',
+						justifyContent: 'space-between',
+					}}
+				>
+					<h2>Expenses</h2>
+					{isAdmin && (
+						<Button
+							onClick={async () => {
+								if (hasFetchedDeleted) return;
+								setHasFetchedDeleted(true);
+								await getAllDeletedExpenses(
+									expenses,
+									setExpenses,
+									setExpensesLoading,
+									userEntityData
+								);
+							}}
+							variant='outline'
+							size='sm'
+							disabled={hasFetchedDeleted}
+							loading={expensesLoading}
+						>
+							{hasFetchedDeleted
+								? 'Deleted Expenses Included'
+								: 'Include Deleted Expenses'}
+						</Button>
+					)}
+				</div>
 				{expensesLoading ? (
 					<div className='centered-loader'>
 						<Loader />
@@ -379,16 +418,25 @@ export function PortalExpensesPage() {
 							<div
 								key={expense.expenseId}
 								className='expense-card'
+								style={{
+									opacity: expense.deletedAt ? 0.5 : 1,
+									pointerEvents: expense.deletedAt
+										? 'none'
+										: 'auto',
+								}}
 							>
 								<div className='expense-info'>
-									<h3>{expense.expenseDescription}</h3>
+									<h3>
+										{expense.expenseDescription || 'No description'}
+										{expense.deletedAt ? ' (Deleted)' : ''}
+									</h3>
 									<p className='expense-cost'>
-										${parseFloat(expense.cost).toFixed(2)}
+										${expense.cost !== null && expense.cost !== undefined ? parseFloat(expense.cost).toFixed(2) : '0.00'}
 									</p>
 									<p className='expense-date'>
-										{new Date(
-											expense.purchaseDate
-										).toLocaleDateString()}
+										{expense.purchaseDate
+											? new Date(expense.purchaseDate).toLocaleDateString()
+											: 'No date'}
 									</p>
 								</div>
 								<div className='expense-actions'>
@@ -399,15 +447,18 @@ export function PortalExpensesPage() {
 									>
 										<Edit2 size={18} />
 									</Button>
-									<Button
-										variant='outline'
-										onClick={() =>
-											handleDelete(expense.expenseId)
-										}
-										aria-label='Delete expense'
-									>
-										<Trash2 size={18} />
-									</Button>
+									{/* only the admins can delete expenses, and deleted expenses cannot be deleted again */}
+									{isAdmin && !expense.deletedAt && (
+										<Button
+											variant='outline'
+											onClick={() =>
+												handleDelete(expense.expenseId)
+											}
+											aria-label='Delete expense'
+										>
+											<Trash2 size={18} />
+										</Button>
+									)}
 								</div>
 							</div>
 						))}
