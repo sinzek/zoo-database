@@ -147,3 +147,45 @@
 	padding: 2rem;
 }
 
+.days-checkbox-container {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	margin-top: 0.5rem;
+}
+
+.day-checkbox-label {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
+	padding: 0.5rem 1rem;
+	background-color: var(--color-dbrown);
+	border: 2px solid var(--color-lbrown);
+	border-radius: 8px;
+	transition: all 0.2s;
+	user-select: none;
+}
+
+.day-checkbox-label:hover {
+	border-color: var(--color-green);
+	background-color: rgba(76, 175, 80, 0.1);
+}
+
+.day-checkbox-label input[type='checkbox'] {
+	cursor: pointer;
+	width: 18px;
+	height: 18px;
+	accent-color: var(--color-green);
+}
+
+.day-checkbox-label input[type='checkbox']:checked + span {
+	color: var(--color-green);
+	font-weight: 600;
+}
+
+.day-checkbox-label span {
+	color: var(--color-lbrown);
+	transition: color 0.2s;
+}
+

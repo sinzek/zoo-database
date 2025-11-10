@@ -6,7 +6,8 @@ export async function getAllDeletedExpenses(
 	curExpenses,
 	setExpenses,
 	setLoading,
-	userEntityData
+	userEntityData,
+	selectedBusinessId
 ) {
 	if (!hasMinAccessLvl('db_admin', userEntityData)) {
 		showToast('ERROR: You do not have permission to view deleted expenses.');
@@ -14,7 +15,9 @@ export async function getAllDeletedExpenses(
 	}
 
 	setLoading(true);
-	const result = await api('/api/expense/get-all-deleted', 'GET');
+	const result = await api('/api/expense/get-all-deleted', 'POST', {
+		businessId: selectedBusinessId || null,
+	});
 
 	if (!result.success) {
 		console.error('Error fetching deleted expenses:', result.error);
