@@ -9,7 +9,6 @@ import {
 	Building,
 	Users,
 	BarChart,
-	ShieldBan,
 	DollarSign,
 } from 'lucide-react';
 
@@ -64,14 +63,6 @@ export function availableLinksForAccessLevel(uedata) {
 				icon: Building,
 			}
 		);
-	}
-
-	if (hasMinAccessLvl('db_admin', uedata)) {
-		links.push({
-			to: '/portal/admin',
-			label: 'Command Center',
-			icon: ShieldBan,
-		});
 	}
 
 	return links;
