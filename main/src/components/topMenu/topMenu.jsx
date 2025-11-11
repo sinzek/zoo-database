@@ -1,7 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useUserData } from '../../context/userDataContext';
 import './topMenu.css';
-import { ChevronDown, ShoppingCart } from 'lucide-react';
+import {
+	Building,
+	ChevronDown,
+	ClockFading,
+	ClockPlus,
+	ShoppingCart,
+} from 'lucide-react';
 import { Link } from '../link';
 import { useShoppingCart } from '../../context/shoppingCartContext';
 import { Button } from '../button';
@@ -137,6 +143,7 @@ export function TopMenu() {
 									size='sm'
 									onClick={() => clock('in')}
 								>
+									<ClockPlus size={16} />
 									Clock In
 								</Button>
 							</p>
@@ -148,6 +155,7 @@ export function TopMenu() {
 									size='sm'
 									onClick={() => clock('out')}
 								>
+									<ClockFading size={16} />
 									Clock out
 								</Button>
 							</p>
@@ -162,6 +170,14 @@ export function TopMenu() {
 							marginLeft: '1rem',
 						}}
 					>
+						<Building
+							size={18}
+							style={{
+								display: 'inline',
+								marginRight: '0.3rem',
+								transform: 'translateY(2px)',
+							}}
+						/>
 						<strong>{userEntityData.jobTitle}</strong> at{' '}
 						<strong>{businessEmployeeWorksFor.name}</strong>
 					</p>
