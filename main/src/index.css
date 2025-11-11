@@ -291,6 +291,7 @@ textarea {
 		'Open Sans',
 		'Helvetica Neue',
 		sans-serif;
+	padding: 8px 16px;
 }
 
 input:focus,

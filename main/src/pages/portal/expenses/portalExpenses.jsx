@@ -71,6 +71,8 @@ export function PortalExpensesPage() {
 		if (selectedBusinessId) {
 			setHasFetchedDeleted(false);
 			loadExpenses();
+		} else {
+			setExpenses([]);
 		}
 	}, [selectedBusinessId]);
 
@@ -383,6 +385,18 @@ export function PortalExpensesPage() {
 					}}
 				>
 					<h2>Expenses</h2>
+					{expenses?.length > 0 && (
+						<p style={{ color: 'var(--color-lbrown)' }}>
+							Total Expenses: $
+							{expenses
+								.reduce(
+									(total, exp) =>
+										total + parseFloat(exp.cost || 0),
+									0
+								)
+								.toFixed(2)}
+						</p>
+					)}
 					{isAdmin && (
 						<Button
 							onClick={async () => {
@@ -415,54 +429,73 @@ export function PortalExpensesPage() {
 					<p className='no-expenses'>No expenses found.</p>
 				) : (
 					<div className='expenses-grid'>
-						{expenses.map((expense) => (
-							<div
-								key={expense.expenseId}
-								className='expense-card'
-								style={{
-									opacity: expense.deletedAt ? 0.5 : 1,
-									pointerEvents: expense.deletedAt
-										? 'none'
-										: 'auto',
-								}}
-							>
-								<div className='expense-info'>
-									<h3>
-										{expense.expenseDescription || 'No description'}
-										{expense.deletedAt ? ' (Deleted)' : ''}
-									</h3>
-									<p className='expense-cost'>
-										${expense.cost !== null && expense.cost !== undefined ? parseFloat(expense.cost).toFixed(2) : '0.00'}
-									</p>
-									<p className='expense-date'>
-										{expense.purchaseDate
-											? new Date(expense.purchaseDate).toLocaleDateString()
-											: 'No date'}
-									</p>
-								</div>
-								<div className='expense-actions'>
-									<Button
-										variant='green'
-										onClick={() => handleEdit(expense)}
-										aria-label='Edit expense'
-									>
-										<Edit2 size={18} />
-									</Button>
-									{/* only the admins can delete expenses, and deleted expenses cannot be deleted again */}
-									{isAdmin && !expense.deletedAt && (
+						{expenses
+							.sort(
+								(a, b) =>
+									new Date(b.purchaseDate) -
+									new Date(a.purchaseDate)
+							)
+							.map((expense) => (
+								<div
+									key={expense.expenseId}
+									className='expense-card'
+									style={{
+										opacity: expense.deletedAt ? 0.5 : 1,
+										pointerEvents: expense.deletedAt
+											? 'none'
+											: 'auto',
+									}}
+								>
+									<div className='expense-info'>
+										<h3>
+											{expense.expenseDescription ||
+												'No description'}
+											{expense.deletedAt
+												? ' (Deleted)'
+												: ''}
+										</h3>
+										<p className='expense-cost'>
+											$
+											{expense.cost !== null &&
+											expense.cost !== undefined
+												? parseFloat(
+														expense.cost
+													).toFixed(2)
+												: '0.00'}
+										</p>
+										<p className='expense-date'>
+											{expense.purchaseDate
+												? new Date(
+														expense.purchaseDate
+													).toLocaleDateString()
+												: 'No date'}
+										</p>
+									</div>
+									<div className='expense-actions'>
 										<Button
-											variant='outline'
-											onClick={() =>
-												handleDelete(expense.expenseId)
-											}
-											aria-label='Delete expense'
+											variant='green'
+											onClick={() => handleEdit(expense)}
+											aria-label='Edit expense'
 										>
-											<Trash2 size={18} />
+											<Edit2 size={18} />
 										</Button>
-									)}
+										{/* only the admins can delete expenses, and deleted expenses cannot be deleted again */}
+										{isAdmin && !expense.deletedAt && (
+											<Button
+												variant='outline'
+												onClick={() =>
+													handleDelete(
+														expense.expenseId
+													)
+												}
+												aria-label='Delete expense'
+											>
+												<Trash2 size={18} />
+											</Button>
+										)}
+									</div>
 								</div>
-							</div>
-						))}
+							))}
 					</div>
 				)}
 			</div>
