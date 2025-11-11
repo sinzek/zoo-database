@@ -6,122 +6,122 @@
 	padding: 24px;
 	color: var(--color-foreground);
 	width: 100%;
-}
 
-.feeding-schedules-header h1 {
-	color: var(--color-lgreen);
-	margin-bottom: 2rem;
-}
+	.feeding-schedules-header h1 {
+		color: var(--color-lgreen);
+		margin-bottom: 2rem;
+	}
 
-.centered-loader {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: 400px;
-}
+	.centered-loader {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 400px;
+	}
 
-.error-message {
-	color: #ff6b6b;
-	font-weight: 600;
-	font-size: 1.2rem;
-	text-align: center;
-	margin-top: 2rem;
-}
+	.error-message {
+		color: #ff6b6b;
+		font-weight: 600;
+		font-size: 1.2rem;
+		text-align: center;
+		margin-top: 2rem;
+	}
 
-.animal-section {
-	margin-bottom: 2rem;
-	width: 100%;
-}
+	.animal-section {
+		margin-bottom: 2rem;
+		width: 100%;
+	}
 
-.section-header {
-	color: var(--color-lgreen);
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	margin-bottom: 1rem;
-}
+	.section-header {
+		color: var(--color-lgreen);
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 1rem;
+	}
 
-.animals-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-	gap: 1rem;
-	max-height: 80vh;
-	overflow-y: auto;
-	padding: 1rem;
-	background-color: rgba(37, 31, 26, 0.3);
-	border-radius: 8px;
-}
+	.animals-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: 1rem;
+		max-height: 80vh;
+		overflow-y: auto;
+		padding: 1rem;
+		background-color: rgba(37, 31, 26, 0.3);
+		border-radius: 8px;
+	}
 
-.animal-card {
-	background-color: rgba(37, 31, 26, 0.8);
-	border-radius: 12px;
-	border: 2px solid var(--color-brown);
-	overflow: hidden;
-	transition:
-		transform 0.2s,
-		box-shadow 0.2s;
-	cursor: default;
-	position: relative;
-	transition: all 0.15s ease;
-}
+	.animal-card {
+		background-color: rgba(37, 31, 26, 0.8);
+		border-radius: 12px;
+		border: 2px solid var(--color-brown);
+		overflow: hidden;
+		transition:
+			transform 0.2s,
+			box-shadow 0.2s;
+		cursor: default;
+		position: relative;
+		transition: all 0.15s ease;
+	}
 
-.animal-card.clickable {
-	cursor: pointer;
-}
+	.animal-card.clickable {
+		cursor: pointer;
+	}
 
-.animal-card.clickable:hover {
-	transform: translateY(-4px);
-	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-	border-color: var(--color-green);
-	background-color: var(--color-brown);
-	background-color: color-mix(
-		in srgb,
-		var(--color-brown) 50%,
-		transparent 50%
-	);
-}
+	.animal-card.clickable:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+		border-color: var(--color-green);
+		background-color: var(--color-brown);
+		background-color: color-mix(
+			in srgb,
+			var(--color-brown) 50%,
+			transparent 50%
+		);
+	}
 
-.animal-image {
-	width: 100%;
-	height: 150px;
-	object-fit: cover;
-}
+	.animal-image {
+		width: 100%;
+		height: 150px;
+		object-fit: cover;
+	}
 
-.animal-content {
-	padding: 1rem;
-	position: relative;
-	padding-right: 3rem;
-}
+	.animal-content {
+		padding: 1rem;
+		position: relative;
+		padding-right: 3rem;
+	}
 
-.animal-content h3 {
-	color: var(--color-lgreen);
-	margin: 0 0 0.5rem 0;
-	font-size: 1.1rem;
-}
+	.animal-content h3 {
+		color: var(--color-lgreen);
+		margin: 0 0 0.5rem 0;
+		font-size: 1.1rem;
+	}
 
-.common-name {
-	color: var(--color-brown);
-	font-size: 0.9rem;
-	margin: 0.25rem 0;
-}
+	.common-name {
+		color: var(--color-brown);
+		font-size: 0.9rem;
+		margin: 0.25rem 0;
+	}
 
-.habitat {
-	color: var(--color-lbrown);
-	font-size: 0.85rem;
-	margin: 0.25rem 0;
-}
+	.habitat {
+		color: var(--color-lbrown);
+		font-size: 0.85rem;
+		margin: 0.25rem 0;
+	}
 
-.chevron-icon {
-	position: absolute;
-	right: 1rem;
-	top: 50%;
-	transform: translateY(-50%);
-	color: var(--color-lbrown);
-}
+	.chevron-icon {
+		position: absolute;
+		right: 1rem;
+		top: 50%;
+		transform: translateY(-50%);
+		color: var(--color-lbrown);
+	}
 
-.no-animals {
-	text-align: center;
-	color: var(--color-lbrown);
-	padding: 2rem;
-	font-size: 1.1rem;
+	.no-animals {
+		text-align: center;
+		color: var(--color-lbrown);
+		padding: 2rem;
+		font-size: 1.1rem;
+	}
 }

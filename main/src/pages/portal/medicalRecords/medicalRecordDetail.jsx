@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import './medicalRecordDetail.css';
 import { Button } from '../../../components/button';
+import { hasMinAccessLvl } from '../../../utils/access.js';
 
 // eslint-disable-next-line react/prop-types
 export function MedicalRecordDetailPage({ animalId }) {
@@ -40,21 +41,13 @@ export function MedicalRecordDetailPage({ animalId }) {
 		checkoutDate: '',
 	});
 	const [isVeterinarian, setIsVeterinarian] = useState(false);
-	
-	
+
 	const [hasFetchedDeleted, setHasFetchedDeleted] = useState(false);
 
 	useEffect(() => {
 		// Check if user is a veterinarian or above
 		if (userEntityData?.accessLevel) {
-			const vetLevels = [
-				'zookeeper',
-				'manager',
-				'executive',
-				'db_admin',
-			];
-			const isVet = vetLevels.includes(userEntityData.accessLevel);
-			setIsVeterinarian(isVet);
+			setIsVeterinarian(hasMinAccessLvl('zookeeper', userEntityData));
 		}
 
 		if (animalId) {
@@ -72,13 +65,12 @@ export function MedicalRecordDetailPage({ animalId }) {
 		});
 
 		if (animalResult.success) {
-			
-			setAnimal(animalResult.data[0]);
+			setAnimal(animalResult.data);
 		}
 
 		// Get medical records
 		const recordsResult = await api(
-			'/api/medical-record/get-by-animal', 
+			'/api/medical-record/get-by-animal',
 			'POST',
 			{
 				animalId,
@@ -92,32 +84,28 @@ export function MedicalRecordDetailPage({ animalId }) {
 		setLoading(false);
 	};
 
-	
 	const handleIncludeDeleted = async () => {
 		if (hasFetchedDeleted) return;
 		setLoading(true);
 
 		const result = await api(
-			'/api/medical-record/get-all-deleted-for-animal', 
+			'/api/medical-record/get-all-deleted-for-animal',
 			'POST',
 			{ animalId }
 		);
 
-		
 		if (result.success && result.data?.length > 0) {
-			
 			const deletedRecords = result.data;
-			
+
 			setRecords((current) =>
 				[...current, ...deletedRecords].sort(
 					(a, b) => new Date(b.visitDate) - new Date(a.visitDate)
 				)
 			);
-			
-		} 
-		
-		else if (!result.success) {
-			showToast(`Error: ${result.error || 'Failed to fetch deleted records.'}`);
+		} else if (!result.success) {
+			showToast(
+				`Error: ${result.error || 'Failed to fetch deleted records.'}`
+			);
 		}
 
 		setHasFetchedDeleted(true);
@@ -125,12 +113,12 @@ export function MedicalRecordDetailPage({ animalId }) {
 	};
 
 	const formatDateForInput = (dateString) => {
-		if (!dateString) { 
+		if (!dateString) {
 			return '';
 		}
 
 		const date = new Date(dateString);
-		
+
 		const year = date.getFullYear();
 		const month = String(date.getMonth() + 1).padStart(2, '0');
 		const day = String(date.getDate()).padStart(2, '0');
@@ -161,11 +149,9 @@ export function MedicalRecordDetailPage({ animalId }) {
 			showToast('Failed to update medical record');
 		}
 
-		showToast('Medical record updated successfully', 'success');
+		showToast('Medical record updated successfully');
 		setEditingId(null);
-		loadData(); 
-
-		
+		loadData();
 	};
 
 	const handleDelete = async (medicalRecordId) => {
@@ -173,7 +159,7 @@ export function MedicalRecordDetailPage({ animalId }) {
 			return;
 		}
 		setLoading(true);
-		//soft-delete 
+		//soft-delete
 		const result = await api('/api/medical-record/delete', 'POST', {
 			medicalRecordId,
 		});
@@ -215,10 +201,8 @@ export function MedicalRecordDetailPage({ animalId }) {
 				visitDate: '',
 				checkoutDate: '',
 			});
-			loadData(); //Reloads data 
-		} 
-		
-		else {
+			loadData(); //Reloads data
+		} else {
 			showToast('Failed to create medical record');
 			setLoading(false);
 		}
@@ -289,6 +273,11 @@ export function MedicalRecordDetailPage({ animalId }) {
 								).toLocaleDateString()}
 							</p>
 						)}
+						{animal.behavior && (
+							<p className='birth-date'>
+								Behavior: {animal.behavior}
+							</p>
+						)}
 						{animal.deathDate && (
 							<p className='death-date'>
 								Deceased:{' '}
@@ -297,6 +286,18 @@ export function MedicalRecordDetailPage({ animalId }) {
 								).toLocaleDateString()}
 							</p>
 						)}
+						<Button
+							variant='lgreen'
+							size='sm'
+							style={{ marginTop: '1rem', width: '100%' }}
+							onClick={() =>
+								navigate(
+									`/portal/feeding-schedules/${animal.animalId}`
+								)
+							}
+						>
+							View Diet
+						</Button>
 					</div>
 				</div>
 			)}
@@ -324,8 +325,11 @@ export function MedicalRecordDetailPage({ animalId }) {
 								onClick={() =>
 									setShowNewRecordForm(!showNewRecordForm)
 								}
-								className='add-record-button'
 								variant='green'
+								syle={{
+									marginTop: '1rem',
+									marginBottom: '1rem',
+								}}
 							>
 								<Plus size={16} />
 								{showNewRecordForm
@@ -434,7 +438,6 @@ export function MedicalRecordDetailPage({ animalId }) {
 					</form>
 				)}
 
-				
 				{loading && records.length > 0 ? (
 					<div
 						className='centered-loader'
@@ -455,7 +458,6 @@ export function MedicalRecordDetailPage({ animalId }) {
 								<div
 									key={record.medicalRecordId}
 									className='record-card'
-									
 									style={{
 										opacity: record.deletedAt ? 0.5 : 1,
 										border: record.deletedAt
@@ -544,8 +546,10 @@ export function MedicalRecordDetailPage({ animalId }) {
 												<h3>
 													<FileText size={20} />
 													{record.reasonForVisit}
-													
-													{record.deletedAt ? ' (Deleted)' : ''}
+
+													{record.deletedAt
+														? ' (Deleted)'
+														: ''}
 												</h3>
 												{isVeterinarian && (
 													<div className='record-actions'>
@@ -557,7 +561,6 @@ export function MedicalRecordDetailPage({ animalId }) {
 															}
 															variant='green'
 															size='sm'
-															
 															disabled={
 																record.deletedAt
 															}
@@ -577,7 +580,6 @@ export function MedicalRecordDetailPage({ animalId }) {
 															}}
 															variant='outline'
 															size='sm'
-															
 															disabled={
 																record.deletedAt
 															}
@@ -609,7 +611,7 @@ export function MedicalRecordDetailPage({ animalId }) {
 														)}
 													</div>
 												)}
-												
+
 												{!record.checkoutDate &&
 													!record.deletedAt && (
 														<div className='info-row active'>
@@ -617,7 +619,8 @@ export function MedicalRecordDetailPage({ animalId }) {
 															<strong>
 																Status:
 															</strong>{' '}
-															Active (Still in care)
+															Active (Still in
+															care)
 														</div>
 													)}
 											</div>

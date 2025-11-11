@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { api } from '../../utils/client-api-utils';
 import { Loader } from '../../components/loader/loader';
+import { Button } from '../../components/button';
+import { Link } from '../../components/link';
 
 // eslint-disable-next-line react/prop-types
 export default function AttractionDetailPage({ id }) {
@@ -121,7 +123,15 @@ export default function AttractionDetailPage({ id }) {
 	return (
 		<div className='page attractions-page'>
 			<div className='section'>
-				<div className='attraction-card two-col'>
+				<Link
+					to='/attractions'
+					href='/attractions'
+					style={{ width: 'fit-content', marginBottom: '1rem' }}
+				>
+					<Button variant={'outline'}>← Back to Attractions</Button>
+				</Link>
+
+				<div className='attraction-card two-col2'>
 					<div className='media-wrap'>
 						<img
 							src={

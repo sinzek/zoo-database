@@ -213,7 +213,6 @@ export function PortalRevenueReportPage() {
 							onClick={loadReport}
 							loading={loading}
 							variant='green'
-							className='save-button'
 						>
 							Load Report
 						</Button>

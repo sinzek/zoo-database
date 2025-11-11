@@ -239,7 +239,8 @@ button:focus-visible {
 	flex: 1;
 }
 
-input {
+input,
+select {
 	width: 100%;
 	padding: 8px 16px;
 	border: 2px solid var(--color-lbrown);
@@ -266,19 +267,23 @@ input {
 }
 
 input:focus,
-input:focus-visible {
+input:focus-visible,
+select:focus,
+select:focus-visible {
 	border-color: var(--color-green);
 	background-color: var(--color-brown);
 	outline: none;
 }
 
-input::placeholder {
+input::placeholder,
+select::placeholder {
 	color: var(--color-lbrown);
 	font-weight: 500;
 	opacity: 0.8;
 }
 
-input:hover {
+input:hover,
+select:hover {
 	border-color: var(--color-green);
 }
 
