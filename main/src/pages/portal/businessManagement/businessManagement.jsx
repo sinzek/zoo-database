@@ -444,7 +444,7 @@ export function BusinessManagementPage() {
 								<div className='card-actions'>
 									<Button
 										variant='green'
-										size='lg'
+										size='sm'
 										onClick={() => handleEdit(business)}
 									>
 										<Edit size={14} /> Edit
@@ -452,10 +452,12 @@ export function BusinessManagementPage() {
 									<Link
 										to={`/portal/inventory-management/${business.businessId}`}
 										href={`/portal/inventory-management/${business.businessId}`}
+										style={{ width: '100%' }}
 									>
 										<Button
 											variant='outline'
-											size='lg'
+											size='sm'
+											style={{ width: '100%' }}
 											onClick={() => handleEdit(business)}
 										>
 											<ShoppingBag size={14} /> Manage
@@ -464,8 +466,8 @@ export function BusinessManagementPage() {
 									</Link>
 									{isDbAdmin && (
 										<Button
-											variant='danger'
-											size='small'
+											variant='outline'
+											size='sm'
 											onClick={() =>
 												handleDelete(
 													business.businessId

@@ -22,15 +22,13 @@ async function createOne(req, _res) {
 
 	if (!newExpense) throw new Error('Missing expense data');
 
-	// Get current employee data from req.user (set by withAccessLevel middleware)
 	const employee = req.user.employeeData;
 	const accessLevel = employee.accessLevel;
 
-	// Managers can only add expenses to their own business
+	// managers can only add expenses to their own business
 	if (accessLevel !== 'manager') {
 		throw new Error('Invalid access level');
 	}
-	// Executive and db_admin can add to any business
 
 	const expenseId = crypto.randomUUID();
 
@@ -45,7 +43,7 @@ async function createOne(req, _res) {
 
 	await createOneQuery('Expense', expenseData);
 
-	return [{ expenseId, ...newExpense }];
+	return [expenseData];
 }
 
 /**

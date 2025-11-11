@@ -153,7 +153,7 @@ async function getShiftReport(req, _res) {
 			)
 		);
 
-		// Optional: sort and keep only those with at least minimal overlap
+		// sort and keep only those with at least minimal overlap
 		matches.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
 
 		return {
