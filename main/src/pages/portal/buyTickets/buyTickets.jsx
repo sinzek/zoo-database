@@ -5,6 +5,7 @@ import { useUserData } from '../../../context/userDataContext';
 import { Button } from '../../../components/button';
 import { Link } from '../../../components/link';
 import { Check } from 'lucide-react';
+import { showToast } from '../../../components/toast/showToast';
 
 const EXAMPLE_TICKET = {
 	itemId: 'general-admission',
@@ -95,7 +96,7 @@ export function BuyTicketsPage() {
 		today.setHours(0, 0, 0, 0); // Reset time to compare dates only
 		
 		if (selectedDate < today) {
-			setFeedback('Cannot purchase tickets for past dates. Please select today or a future date.');
+			showToast('Cannot purchase tickets for past dates. Please select today or a future date.');
 			// Reset to today's date
 			setFormData(prev => ({
 				...prev,
