@@ -336,21 +336,59 @@ export function BusinessManagementPage() {
 	};
 
 	const handleSave = async (formData) => {
-		const endpoint = formData.businessId
-			? '/api/business/update-one'
-			: '/api/business/create-one';
-		const method = formData.businessId ? 'PUT' : 'POST';
+		if (formData.businessId) {
+			// Update existing business
+			const result = await api('/api/business/update-one', 'PUT', formData);
 
-		const result = await api(endpoint, method, formData);
-
-		if (result.success) {
-			showToast(
-				`Business ${formData.businessId ? 'updated' : 'created'} successfully.`
-			);
-			setIsModalOpen(false);
-			loadBusinesses();
+			if (result.success) {
+				showToast('Business updated successfully.');
+				setIsModalOpen(false);
+				loadBusinesses();
+			} else {
+				showToast(result.error || 'Failed to save business.');
+			}
 		} else {
-			showToast(result.error || 'Failed to save business.');
+			// Create new business - transform data to match backend expectations
+			const dayMapping = {
+				Monday: 'monday',
+				Tuesday: 'tuesday',
+				Wednesday: 'wednesday',
+				Thursday: 'thursday',
+				Friday: 'friday',
+				Saturday: 'saturday',
+				Sunday: 'sunday',
+			};
+
+			const businessData = {
+				name: formData.name,
+				address: formData.address,
+				phone: formData.phone,
+				email: formData.email,
+				uiDesc: formData.uiDescription || null,
+				businessType: formData.type,
+				createdAt: new Date().toISOString().split('T')[0],
+				ownerID: formData.ownerId || null,
+			};
+
+			// Add hours in the format backend expects (only for open days)
+			Object.entries(formData.hours).forEach(([day, times]) => {
+				const dayKey = dayMapping[day];
+				if (times.openTime && times.closeTime) {
+					businessData[`${dayKey}Open`] = times.openTime + ':00';
+					businessData[`${dayKey}Close`] = times.closeTime + ':00';
+				}
+				// If closed, don't include the fields (backend will skip creating records)
+			});
+
+			const result = await api('/api/business/create', 'POST', businessData);
+
+			if (result.success) {
+				showToast('Business created successfully.');
+				setIsModalOpen(false);
+				loadBusinesses();
+			} else {
+				showToast(result.error || 'Failed to save business.');
+			}
 		}
 	};
 
