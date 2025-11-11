@@ -30,6 +30,9 @@ export function BuyTicketsPage() {
 	const [quantity, setQuantity] = useState(0);
 	const [feedback, setFeedback] = useState('');
 
+	// Get today's date in YYYY-MM-DD format for min date restriction
+	const today = new Date().toISOString().split('T')[0];
+
 	const contactFields = useMemo(
 		() => [
 			{
@@ -52,9 +55,10 @@ export function BuyTicketsPage() {
 				type: 'date',
 				placeholder: '',
 				autoComplete: 'off',
+				min: today, // Prevent selecting past dates
 			},
 		],
-		[]
+		[today]
 	);
 
 	const currencyFormatter = useMemo(
@@ -82,6 +86,21 @@ export function BuyTicketsPage() {
 			setFeedback(
 				'Please complete visitor details before adding tickets.'
 			);
+			return;
+		}
+
+		// Validate that visit date is not in the past
+		const selectedDate = new Date(visitDate);
+		const today = new Date();
+		today.setHours(0, 0, 0, 0); // Reset time to compare dates only
+		
+		if (selectedDate < today) {
+			setFeedback('Cannot purchase tickets for past dates. Please select today or a future date.');
+			// Reset to today's date
+			setFormData(prev => ({
+				...prev,
+				visitDate: new Date().toISOString().split('T')[0]
+			}));
 			return;
 		}
 
