@@ -281,14 +281,35 @@ export function BuyTicketsPage() {
 										<input
 											type='number'
 											min={1}
+											max={9}
 											step={1}
 											value={quantity}
-											onChange={(event) =>
+											onChange={(event) => {
+												if (
+													Number(event.target.value) <
+													0
+												) {
+													handleQuantityChange(
+														EXAMPLE_TICKET.itemId,
+														0
+													);
+													return;
+												} else if (
+													Number(event.target.value) >
+													9
+												) {
+													handleQuantityChange(
+														EXAMPLE_TICKET.itemId,
+														9
+													);
+													return;
+												}
+
 												handleQuantityChange(
 													EXAMPLE_TICKET.itemId,
 													event.target.value
-												)
-											}
+												);
+											}}
 											style={{
 												width: '82px',
 												textAlign: 'center',

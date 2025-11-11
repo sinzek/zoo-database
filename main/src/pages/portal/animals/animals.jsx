@@ -558,6 +558,16 @@ export function PortalAnimalsPage() {
 									<p>
 										<strong>Habitat:</strong>{' '}
 										{animal.habitatName || 'Unknown'}
+										{animal.habitatDeletedAt && (
+											<strong style={{ color: 'red' }}>
+												{' '}
+												(Habitat deleted{' '}
+												{new Date(
+													animal.habitatDeletedAt
+												).toLocaleDateString()}
+												)
+											</strong>
+										)}
 									</p>
 									{animal.birthDate && (
 										<p>

@@ -5,6 +5,8 @@ import { ArrowLeft } from 'lucide-react';
 import { useUserData } from '../../context/userDataContext';
 import { Button } from '../../components/button';
 
+const testEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export function SignupPage() {
 	const { signup } = useUserData();
 
@@ -184,7 +186,8 @@ export function SignupPage() {
 									!formData.password.trim() ||
 									!formData.confirmPassword.trim() ||
 									formData.password !==
-										formData.confirmPassword
+										formData.confirmPassword ||
+									!testEmailRegex.test(formData.email)
 								}
 							>
 								Next
@@ -268,7 +271,8 @@ export function SignupPage() {
 									onClick={handleFinalSubmit}
 									disabled={
 										!formData.firstName.trim() ||
-										!formData.lastName.trim()
+										!formData.lastName.trim() ||
+										!testEmailRegex.test(formData.email)
 									}
 								>
 									Sign up

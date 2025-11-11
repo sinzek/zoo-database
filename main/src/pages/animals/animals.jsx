@@ -80,51 +80,76 @@ export default function AnimalsPage() {
 
 				<div className='section'>
 					<div className='habitat-row'>
-						{loading ? (
-							Array(3).fill(0).map((_, idx) => (
-								<Skeleton key={`skeleton-${idx}`} className='animal-loader' />
-							))
-						) : (
-							animalsByHabitat.map(
-								({ habitatId, habitatName, animals }) => (
-									<div
-										key={habitatId}
-										className='habitat-row'
-									>
-										<h2 className='habitat-name'>
-											{habitatName}
-										</h2>
-										<div className='animal-grid'>
-											{animals.map((animal) => (
-												<div
-													key={animal.animalId}
-													className='animal-card'
-												>
-													<img
-														src={animal.imageUrl}
-														alt={animal.commonName}
-														className='animal-img'
-													/>
-													<div>
-														<h3 className='animal-name'>
-															{animal.firstName}{' '}
-															the{' '}
-															{animal.commonName}
-														</h3>
-														<p className='animal-behavior'>
-															{animal.behavior}
+						{loading
+							? Array(3)
+									.fill(0)
+									.map((_, idx) => (
+										<Skeleton
+											key={`skeleton-${idx}`}
+											className='animal-loader'
+										/>
+									))
+							: animalsByHabitat.map(
+									({
+										habitatId,
+										habitatName,
+										habitatDeletedAt,
+										animals,
+									}) => (
+										<div
+											key={habitatId}
+											className='habitat-row'
+											style={{
+												display: habitatDeletedAt
+													? 'none'
+													: 'block',
+											}}
+										>
+											<h2 className='habitat-name'>
+												{habitatName}
+											</h2>
+											<div className='animal-grid'>
+												{animals.map((animal) => (
+													<div
+														key={animal.animalId}
+														className='animal-card'
+													>
+														<img
+															src={
+																animal.imageUrl
+															}
+															alt={
+																animal.commonName
+															}
+															className='animal-img'
+														/>
+														<div>
+															<h3 className='animal-name'>
+																{
+																	animal.firstName
+																}{' '}
+																the{' '}
+																{
+																	animal.commonName
+																}
+															</h3>
+															<p className='animal-behavior'>
+																{
+																	animal.behavior
+																}
+															</p>
+														</div>
+														<p className='animal-scientific-name'>
+															<i>
+																{animal.species}
+															</i>
 														</p>
 													</div>
-													<p className='animal-scientific-name'>
-														<i>{animal.species}</i>
-													</p>
-												</div>
-											))}
+												))}
+											</div>
 										</div>
-									</div>
-								)
-							)
-						)}
+									)
+								)}
 					</div>
 				</div>
 			</div>

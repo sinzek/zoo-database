@@ -17,6 +17,7 @@ export async function fetchAnimals() {
 				animals.push({
 					...animal,
 					habitatName: habitatGroup.habitatName,
+					habitatDeletedAt: habitatGroup.habitatDeletedAt,
 				});
 			}
 		}

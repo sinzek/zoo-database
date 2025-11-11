@@ -75,9 +75,9 @@ async function purchaseItems(req, _res) {
 
 	await sendNotificationToUser(
 		req.user.data.id,
-		`Thank you for your purchase totalling $${
-			total
-		}! Your items have been thrown into the void.`
+		`Thank you for your purchase totalling $${total.toFixed(
+			2
+		)}! Your items have been thrown into the void.`
 	);
 
 	return [{ transactions, purchasedItems }];
@@ -179,7 +179,7 @@ async function purchaseMembership(req, _res) {
 
 				await sendNotificationToUser(
 					userId,
-					`Thank you for purchasing the ${newMembershipData.level} membership! Your membership is valid until ${newMembershipData.expireDate}. Enjoy your benefits at The Zoo™! No refunds. Lol.`
+					`Thank you for purchasing the ${newMembershipData.level} membership for a total of ${newTransaction.amount.toFixed(2)}! Your membership is valid until ${newMembershipData.expireDate}. Enjoy your benefits at The Zoo™! No refunds. Lol.`
 				);
 
 				return [

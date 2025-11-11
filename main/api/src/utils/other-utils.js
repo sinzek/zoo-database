@@ -60,12 +60,25 @@ export async function incrementNumEmployees(businessId) {
 export async function notifyAndUpdateAssignedZookeepersOfAnimalDeletion(
 	animalId
 ) {
-	const takesCareOfRecords = await getNByKeyQuery(
-		'TakesCareOf',
-		'animalId',
-		animalId,
-		false
-	);
+	let takesCareOfRecords;
+
+	try {
+		takesCareOfRecords = await getNByKeyQuery(
+			'TakesCareOf',
+			'animalId',
+			animalId,
+			false
+		);
+	} catch (err) {
+		if (err.message.includes('No records found')) {
+			// do nothing if no zookeepers assigned
+			return;
+		}
+		throw err;
+	}
+
+	if (!takesCareOfRecords) return;
+	if (takesCareOfRecords.length === 0) return;
 
 	const employeeIds = takesCareOfRecords.map((record) => record.employeeId);
 

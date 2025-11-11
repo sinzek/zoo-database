@@ -7,6 +7,8 @@ import { Frown } from 'lucide-react';
 import { api } from '../../../utils/client-api-utils';
 import { useUserData } from '../../../context/userDataContext';
 import { showToast } from '../../../components/toast/showToast';
+import { useState } from 'react';
+import { useRouter } from '../../../context/routerContext';
 
 export function CartPage() {
 	const {
@@ -17,7 +19,10 @@ export function CartPage() {
 		cartItemCount,
 	} = useShoppingCart();
 
+	const { navigate } = useRouter();
+
 	const { userEntityData, userEntityType } = useUserData();
+	const [loading, setLoading] = useState(false);
 
 	const currencyFormatter = useMemo(
 		() =>
@@ -35,6 +40,8 @@ export function CartPage() {
 	);
 
 	const handleCheckout = async () => {
+		setLoading(true);
+
 		const result = await api('/api/purchase/items', 'POST', {
 			customerId: userEntityData.customerId,
 			items: cart.flatMap((item) =>
@@ -54,11 +61,14 @@ export function CartPage() {
 			showToast(
 				`Error: ${result.error || 'Failed to complete purchase.'}`
 			);
+			setLoading(false);
 			return;
 		}
 
 		showToast('Purchase completed successfully!');
 		clearCart();
+		navigate('/portal/notifications');
+		setLoading(false);
 	};
 
 	if (userEntityType !== 'customer') {
@@ -313,6 +323,7 @@ export function CartPage() {
 							size='lg'
 							onClick={handleCheckout}
 							style={{ marginTop: '16px' }}
+							loading={loading}
 						>
 							Proceed to Checkout
 						</Button>
