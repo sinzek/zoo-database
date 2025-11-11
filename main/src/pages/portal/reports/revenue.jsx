@@ -364,7 +364,10 @@ export function PortalRevenueReportPage() {
 																				{!t.itemName &&
 																					!t.membershipId && (
 																						<span>
-																							-
+																							Membership
+																							cancelled
+																							or
+																							deleted
 																						</span>
 																					)}
 																			</td>

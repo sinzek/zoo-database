@@ -158,7 +158,7 @@ async function getRevenueReport(req, _res) {
 
 			const transactionsWithCorrectCustomerIdPromises = transactions.map(
 				async (t) => {
-					if (t.description && t.description.includes('customerId')) {
+					if (t.description && t.description.includes('customer ')) {
 						// extract customerId from description
 						const customerId = t.description
 							.split('customer ')[1]
