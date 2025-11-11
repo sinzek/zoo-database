@@ -94,7 +94,10 @@ async function login(req, _res) {
 	let membership = null;
 
 	if (relatedInfo.type === 'customer') {
-		membership = await getMembershipByCustomerId(user.userId);
+		console.log("GETTING CUSTOMER'S MEMBERSHIP");
+		membership = await getMembershipByCustomerId(
+			relatedInfo.data.customerId
+		);
 	}
 
 	const token = signJWT({ id: user.userId });

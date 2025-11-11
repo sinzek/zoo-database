@@ -9,9 +9,20 @@ import {
 	fetchHabitats,
 	deleteAnimal,
 } from './utils';
-import { Plus, Edit2, Save, X, Skull, Trash } from 'lucide-react';
+import {
+	Plus,
+	Edit2,
+	Save,
+	X,
+	Trash,
+	Frown,
+	BriefcaseMedical,
+	Apple,
+	ArrowRight,
+} from 'lucide-react';
 import './animals.css';
 import { getAllDeletedAnimals } from './extra';
+import { Link } from '../../../components/link';
 
 export function PortalAnimalsPage() {
 	const { userEntityData, userEntityType } = useUserData();
@@ -495,10 +506,11 @@ export function PortalAnimalsPage() {
 									<div className='animal-actions'>
 										{animal.deathDate && (
 											<span className='status-badge dead'>
-												<Skull size={14} />
-												Deceased
+												<Frown size={16} />
+												DECEASED
 											</span>
 										)}
+
 										<Button
 											onClick={() => handleEdit(animal)}
 											className='btn-icon'
@@ -569,6 +581,41 @@ export function PortalAnimalsPage() {
 											{animal.behavior}
 										</p>
 									)}
+								</div>
+								<div
+									style={{
+										marginTop: '2rem',
+										display: 'flex',
+										gap: '0.5rem',
+										justifyContent: 'end',
+									}}
+								>
+									<Link
+										to={`/portal/medical-records/${animal.animalId}`}
+										href={`/portal/medical-records/${animal.animalId}`}
+									>
+										<Button
+											size='sm'
+											variant='lgreen'
+										>
+											<BriefcaseMedical size={16} />
+											Records
+											<ArrowRight size={16} />
+										</Button>
+									</Link>
+									<Link
+										to={`/portal/feeding-schedules/${animal.animalId}`}
+										href={`/portal/feeding-schedules/${animal.animalId}`}
+									>
+										<Button
+											variant='lgreen'
+											size='sm'
+										>
+											<Apple size={16} />
+											Diet
+											<ArrowRight size={16} />
+										</Button>
+									</Link>
 								</div>
 							</div>
 						))}

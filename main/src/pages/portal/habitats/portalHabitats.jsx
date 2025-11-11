@@ -129,8 +129,7 @@ export function PortalHabitatsPage() {
 
 			if (result.success) {
 				showToast(
-					result.data.message || 'Habitat archived successfully',
-					'success'
+					result.data.message || 'Habitat archived successfully'
 				);
 				loadData();
 			} else {

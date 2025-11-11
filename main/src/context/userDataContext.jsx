@@ -30,7 +30,7 @@ const UserDataContext = createContext({
 	businessEmployeeWorksFor: null, // { businessId, name, ... } | null
 	clockedInSince: null,
 	clock: (_inStatus) => {},
-	membership: null, // membership data for customers (if any)
+	membership: null, // membership data for customer (if any)
 	setUserEntityData: (_data) => {},
 	refetchUserInfo: async () => {},
 });

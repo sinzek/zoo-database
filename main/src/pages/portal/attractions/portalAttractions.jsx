@@ -3,7 +3,7 @@ import { useUserData } from '../../../context/userDataContext';
 import { showToast } from '../../../components/toast/showToast';
 import { Loader } from '../../../components/loader/loader';
 import { api } from '../../../utils/client-api-utils';
-import { Plus, Edit2, Save, X, Trash2 } from 'lucide-react';
+import { Plus, Edit2, Save, X, Trash2, XCircle } from 'lucide-react';
 import './portalAttractions.css';
 import { Button } from '../../../components/button';
 
@@ -304,9 +304,15 @@ export function PortalAttractionsPage() {
 		<div className='portal-attractions-page'>
 			<div
 				className='attractions-header'
-				style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+					gap: '2rem',
+				}}
 			>
-				<h1>Manage Attractions</h1>
+				<h1 style={{ color: 'var(--color-lgreen)' }}>
+					Manage Attractions
+				</h1>
 				{isManagerPlus && (
 					<Button
 						onClick={() => {
@@ -315,12 +321,15 @@ export function PortalAttractionsPage() {
 								handleCancel();
 							}
 						}}
-						className='add-button'
-						variant='green'
-						size='lg'
+						variant='lgreen'
+						size='sm'
 					>
-						<Plus size={20} />
-						{showAddForm ? 'Cancel' : 'Add Attraction'}
+						{showAddForm ? (
+							<XCircle size={20} />
+						) : (
+							<Plus size={20} />
+						)}
+						{showAddForm ? 'Cancel' : 'New Attraction'}
 					</Button>
 				)}
 			</div>
