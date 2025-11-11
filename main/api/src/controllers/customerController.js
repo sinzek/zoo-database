@@ -69,6 +69,7 @@ async function updateOne(req, _res) {
 	// making a copy to avoid mutating the original object
 	const updatedCustomerData = { ...updatedCustomer };
 	delete updatedCustomerData.userId; // prevent updating userId
+	delete updatedCustomerData.joinDate; // prevent updating joinDate (set once at creation)
 
 	await updateOneQuery('Customer', updatedCustomerData, 'customerId');
 
