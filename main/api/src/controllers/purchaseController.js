@@ -2,6 +2,7 @@ import {
 	createOneQuery,
 	getNByKeyQuery,
 	updateOneQuery,
+	hardDeleteOneQuery,
 } from '../utils/query-utils.js';
 import { MEMBERSHIP_LEVELS } from '../constants/membershipLevels.js';
 import crypto from 'crypto';
@@ -125,6 +126,31 @@ async function purchaseMembership(req, _res) {
 	};
 
 	try {
+		try {
+			const [mem] = await getNByKeyQuery(
+				'Membership',
+				'customerId',
+				newMembershipData.customerId,
+				false
+			);
+
+			if (mem && !mem.deletedAt) {
+				throw new Error('Customer already has an active membership');
+			} else if (mem && mem.deletedAt) {
+				// allow re-activating a previously cancelled membership by deleting the old record
+				await hardDeleteOneQuery(
+					'Membership',
+					'membershipId',
+					mem.membershipId
+				);
+			}
+		} catch (err) {
+			if (!err.message.includes('No records found')) {
+				throw err;
+			}
+			console.error('Error checking existing membership:', err);
+		}
+
 		await createOneQuery('Membership', newMembershipData);
 	} catch (err) {
 		if (err.code === 'ER_DUP_ENTRY') {
