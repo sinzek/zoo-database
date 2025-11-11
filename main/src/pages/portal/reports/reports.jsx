@@ -7,11 +7,14 @@ import { BarChart2, Calendar, DollarSign, Apple } from 'lucide-react';
 export function PortalReportsPage() {
 	const { userEntityData } = useUserData();
 
-	if (!hasMinAccessLvl('manager', userEntityData)) {
+	const isZookeeper = hasMinAccessLvl('zookeeper', userEntityData);
+	const isManager = hasMinAccessLvl('manager', userEntityData);
+
+	if (!isZookeeper) {
 		return (
 			<div className='portal-page-container'>
 				<p className='error-message'>
-					This page is only available for managers.
+					This page is only available for zookeepers and above.
 				</p>
 			</div>
 		);
@@ -37,23 +40,27 @@ export function PortalReportsPage() {
 			</p>
 
 			<div className='options-grid'>
-				<Link
-					to='/portal/reports/shifts'
-					href='/portal/reports/shifts'
-					className='option-card'
-				>
-					<Calendar size={32} />
-					Labor (Shifts)
-				</Link>
+				{isManager && (
+					<Link
+						to='/portal/reports/shifts'
+						href='/portal/reports/shifts'
+						className='option-card'
+					>
+						<Calendar size={32} />
+						Labor (Shifts)
+					</Link>
+				)}
 
-				<Link
-					to='/portal/reports/revenue'
-					href='/portal/reports/revenue'
-					className='option-card'
-				>
-					<DollarSign size={32} />
-					Revenue
-				</Link>
+				{isManager && (
+					<Link
+						to='/portal/reports/revenue'
+						href='/portal/reports/revenue'
+						className='option-card'
+					>
+						<DollarSign size={32} />
+						Revenue
+					</Link>
+				)}
 
 				<Link
 					to='/portal/reports/animal'

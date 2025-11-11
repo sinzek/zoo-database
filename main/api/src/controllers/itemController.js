@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { query } from '../db/mysql.js';
 import {
 	createOneQuery,
 	deleteOneQuery,
@@ -72,7 +73,13 @@ async function getNByBusiness(req, _res) {
 
 	if (!businessId) throw new Error('Missing businessId');
 
-	const items = await getNByKeyQuery('Item', 'businessId', businessId);
+	// Get items - it's valid to have zero items, so use direct query instead of getNByKeyQuery
+	// which throws an error when no records are found
+	const items = await query(
+		`SELECT * FROM Item WHERE businessId = ? AND deletedAt IS NULL`,
+		[businessId]
+	) || [];
+
 	const [business] = await getNByKeyQuery(
 		'Business',
 		'businessId',

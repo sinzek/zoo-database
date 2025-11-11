@@ -32,7 +32,8 @@ export function availableLinksForAccessLevel(uedata) {
 				to: '/portal/feeding-schedules',
 				label: 'Feeding Schedules',
 				icon: Apple,
-			}
+			},
+			{ to: '/portal/reports', label: 'Reports', icon: BarChart }
 			// { to: '#', label: 'File Complaints', icon: Smile } // troll face moment
 		);
 	}
@@ -50,7 +51,6 @@ export function availableLinksForAccessLevel(uedata) {
 				icon: Building,
 			},
 			{ to: '/portal/employees', label: 'Employees', icon: Users },
-			{ to: '/portal/reports', label: 'Reports', icon: BarChart },
 			{
 				to: '/portal/habitats',
 				label: 'Manage Habitats',
