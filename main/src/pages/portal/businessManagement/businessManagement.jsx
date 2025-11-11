@@ -293,11 +293,11 @@ export function BusinessManagementPage() {
 
 	const loadBusinesses = useCallback(async () => {
 		setLoading(true);
-		setHasFetchedDeleted(false); 
+		setHasFetchedDeleted(false);
 		const result = await api('/api/business/get-all-with-hours', 'POST');
 		if (result.success) {
 			//setBusinesses(result.data);
-			setBusinesses(result.data || []); 
+			setBusinesses(result.data || []);
 		} else {
 			showToast('Failed to load businesses.');
 		}
@@ -312,33 +312,31 @@ export function BusinessManagementPage() {
 		}
 	}, [hasAccess, loadBusinesses]);
 
-    //NEW
-    const handleIncludeDeleted = async () => {
-        if (hasFetchedDeleted) return;
-        setLoading(true);
+	//NEW
+	const handleIncludeDeleted = async () => {
+		if (hasFetchedDeleted) return;
+		setLoading(true);
 
+		const result = await api('/api/business/get-all-deleted', 'GET');
 
-        const result = await api('/api/business/get-all-deleted', 'GET');
-        
-        if (result.success && result.data?.length > 0) {
-            const deletedBusinesses = result.data; 
-            
-            
-            setBusinesses((current) => {
-                const existingIds = new Set(current.map(b => b.businessId));
-                //Duplicate filter
-                const newBusinesses = deletedBusinesses.filter(
-                    b => !existingIds.has(b.businessId) 
-                );
-                return [...current, ...newBusinesses];
-            });
-        } else if (!result.success) {
-            showToast(result.error || 'Failed to fetch deleted businesses.');
-        }
+		if (result.success && result.data?.length > 0) {
+			const deletedBusinesses = result.data;
 
-        setHasFetchedDeleted(true);
-        setLoading(false);
-    };
+			setBusinesses((current) => {
+				const existingIds = new Set(current.map((b) => b.businessId));
+				//Duplicate filter
+				const newBusinesses = deletedBusinesses.filter(
+					(b) => !existingIds.has(b.businessId)
+				);
+				return [...current, ...newBusinesses];
+			});
+		} else if (!result.success) {
+			showToast(result.error || 'Failed to fetch deleted businesses.');
+		}
+
+		setHasFetchedDeleted(true);
+		setLoading(false);
+	};
 
 	const handleCreate = () => {
 		setEditingBusiness(null);
@@ -371,7 +369,11 @@ export function BusinessManagementPage() {
 	const handleSave = async (formData) => {
 		if (formData.businessId) {
 			// Update existing business
-			const result = await api('/api/business/update-one', 'PUT', formData);
+			const result = await api(
+				'/api/business/update-one',
+				'PUT',
+				formData
+			);
 
 			if (result.success) {
 				showToast('Business updated successfully.');
@@ -413,7 +415,11 @@ export function BusinessManagementPage() {
 				// If closed, don't include the fields (backend will skip creating records)
 			});
 
-			const result = await api('/api/business/create', 'POST', businessData);
+			const result = await api(
+				'/api/business/create',
+				'POST',
+				businessData
+			);
 
 			if (result.success) {
 				showToast('Business created successfully.');
@@ -445,27 +451,35 @@ export function BusinessManagementPage() {
 		<div className='page business-management-page'>
 			<header className='business-header'>
 				<h1>Business Management</h1>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    {isDbAdmin && (
-                        <Button
-                            onClick={handleIncludeDeleted}
-                            variant='outline'
-                            size='sm'
-                            disabled={hasFetchedDeleted}
-                            loading={loading && hasFetchedDeleted}
-                        		>
-                            {hasFetchedDeleted ? 'Deleted Included' : 'Include Deleted Businesses'}
-                        </Button>
-                    )}
-                    {isDbAdmin && (
-                        <Button
-                            variant='green'
-                            onClick={handleCreate}
-                        >
-                            <Plus size={16} /> Create Business
-                        </Button>
-                    )}
-                </div>
+				<div
+					style={{
+						display: 'flex',
+						alignItems: 'center',
+						gap: '10px',
+					}}
+				>
+					{isDbAdmin && (
+						<Button
+							onClick={handleIncludeDeleted}
+							variant='outline'
+							size='sm'
+							disabled={hasFetchedDeleted}
+							loading={loading && hasFetchedDeleted}
+						>
+							{hasFetchedDeleted
+								? 'Deleted Included'
+								: 'Include Deleted Businesses'}
+						</Button>
+					)}
+					{isDbAdmin && (
+						<Button
+							variant='green'
+							onClick={handleCreate}
+						>
+							<Plus size={16} /> Create Business
+						</Button>
+					)}
+				</div>
 			</header>
 
 			<div className='businesses-grid'>
@@ -490,18 +504,21 @@ export function BusinessManagementPage() {
 								<span className='business-type'>
 									{business.type}
 									{business.businessId ===
-										userEntityData.businessId &&
-										' (You work here)'}
+										userEntityData.businessId && (
+										<b> (You work here)</b>
+									)}
 								</span>
 							</div>
 							<p>{business.address}</p>
 							<p>
 								{business.email} | {business.phone}
 							</p>
-							{business.uiDescription && (
+							{business.uiDescription ? (
 								<p className='description'>
 									{business.uiDescription}
 								</p>
+							) : (
+								'No description set.'
 							)}
 							<h4 className='op-hours'>Operating Hours:</h4>
 							{business.hours && business.hours.length > 0 ? (

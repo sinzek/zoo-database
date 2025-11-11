@@ -67,10 +67,7 @@ export function PortalHabitatsPage() {
 			resetForm();
 			loadData();
 		} else {
-			showToast(
-				`Failed to ${editingId ? 'update' : 'create'} habitat`,
-				'error'
-			);
+			showToast(`Failed to ${editingId ? 'update' : 'create'} habitat`);
 		}
 	};
 
@@ -137,10 +134,10 @@ export function PortalHabitatsPage() {
 				);
 				loadData();
 			} else {
-				showToast(result.error || 'Failed to archive habitat', 'error');
+				showToast(result.error || 'Failed to archive habitat');
 			}
 		} catch (error) {
-			showToast(error.message || 'Failed to archive habitat.', 'error');
+			showToast(error.message || 'Failed to archive habitat.');
 		}
 	};
 

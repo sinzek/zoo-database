@@ -26,8 +26,13 @@ async function createOne(req, _res) {
 	const accessLevel = employee.accessLevel;
 
 	// managers can only add expenses to their own business
-	if (accessLevel !== 'manager') {
-		throw new Error('Invalid access level');
+	if (
+		accessLevel !== 'manager' ||
+		employee.businessId !== newExpense.businessId
+	) {
+		throw new Error(
+			'You do not have permission to add expenses for this business'
+		);
 	}
 
 	const expenseId = crypto.randomUUID();
@@ -156,25 +161,18 @@ async function updateOne(req, _res) {
 		throw new Error('Missing expense data or expenseId');
 	}
 
-	// Get current employee data
+	// get current employee data
 	const employee = req.user.employeeData;
 	const accessLevel = employee.accessLevel;
 
-	// For managers, verify they can only update expenses for their own business
-	if (accessLevel === 'manager') {
-		const [existingExpense] = await getNByKeyQuery(
-			'Expense',
-			'expenseId',
-			updatedExpense.expenseId
+	// for managers, verify they can only update expenses for their own business
+	if (
+		accessLevel === 'manager' &&
+		employee.businessId !== updatedExpense.businessId
+	) {
+		throw new Error(
+			'You do not have permission to update expenses for this business'
 		);
-		if (
-			!existingExpense ||
-			existingExpense.businessId !== employee.businessId
-		) {
-			throw new Error(
-				'Managers can only update expenses for their own business'
-			);
-		}
 	}
 
 	const newExpenseData = { ...updatedExpense };
