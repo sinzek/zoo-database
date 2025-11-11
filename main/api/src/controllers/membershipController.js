@@ -5,6 +5,7 @@ import {
 	updateOneQuery,
 	getAllQuery,
 	deleteOneQuery,
+	hardDeleteOneQuery,
 } from '../utils/query-utils.js';
 import { MEMBERSHIP_LEVELS } from '../constants/membershipLevels.js';
 import { sendNotificationToUser } from '../utils/notif-utils.js';
@@ -31,6 +32,30 @@ async function createOne(req, _res) {
 		autoRenew: newMembership.autoRenew,
 		transactionId: newMembership.transactionId,
 	};
+
+	try {
+		const [membership] = await getNByKeyQuery(
+			'Membership',
+			'customerId',
+			newMembership.customerId
+		);
+
+		if (membership && !membership.deletedAt) {
+			throw new Error('Customer already has an active membership');
+		} else if (membership && membership.deletedAt) {
+			// allow re-activating a previously cancelled membership by deleting the old record
+			await hardDeleteOneQuery(
+				'Membership',
+				'membershipId',
+				membership.membershipId
+			);
+		}
+	} catch (err) {
+		if (!err.message.includes('No records found')) {
+			throw err;
+		}
+		console.error('Error checking existing membership:', err);
+	}
 
 	await createOneQuery('Membership', newMembershipData);
 
@@ -90,6 +115,7 @@ async function deleteOne(req, _res) {
 
 async function cancelMembership(req, _res) {
 	const { membershipId } = req.body;
+	const userId = req.user.data.id;
 
 	if (!membershipId) throw new Error('Missing membershipId');
 
@@ -110,7 +136,7 @@ async function cancelMembership(req, _res) {
 	);
 
 	await sendNotificationToUser(
-		membership.userId,
+		userId,
 		'Membership cancelled! Sorry to see you go little buddy. You can always rejoin later I guess? Idk bro.'
 	);
 
