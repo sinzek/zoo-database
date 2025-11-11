@@ -377,6 +377,19 @@ async function updateOne(req, _res) {
 	return [{ ...businessData }];
 }
 
+
+async function getAllDeleted(_req, _res) {
+	const deletedBusinesses = await query(
+		'SELECT * FROM Business WHERE deletedAt IS NOT NULL'
+	);
+	
+	if (!deletedBusinesses || deletedBusinesses.length === 0) {
+        throw new Error('No deleted businesses found');
+    }
+
+	return [deletedBusinesses];
+}
+
 export default {
 	createOne,
 	updateOneInfo,
@@ -386,4 +399,5 @@ export default {
 	getAll,
 	getAllWithHours,
 	updateOne,
+	getAllDeleted,
 };

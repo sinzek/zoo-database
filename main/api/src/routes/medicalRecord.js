@@ -14,6 +14,27 @@ export function registerMedicalRecordRoutes(app) {
 		'/api/medical-record/delete',
 		withAccessLevel('zookeeper', medicalRecordController.deleteOne)
 	);
+
+//New
+app.post(
+        '/api/medical-record/get-for-animal',
+        withAccessLevel('zookeeper', medicalRecordController.getForAnimal)
+    );
+    app.post(
+        '/api/medical-record/get-all-deleted-for-animal',
+        withAccessLevel(
+            'zookeeper',
+            medicalRecordController.getAllDeletedForAnimal
+        )
+    );
+
+	app.post(
+		'/api/medical-record/delete',
+		withAccessLevel('zookeeper', medicalRecordController.deleteOne)
+	);
+
+	//New
+
 	app.post('/api/medical-record/get-by-id', medicalRecordController.getOneById);
 	app.post('/api/medical-record/get-by-animal', medicalRecordController.getNyByAnimal);
 	app.post('/api/medical-record/get-active', medicalRecordController.getActiveRecords);

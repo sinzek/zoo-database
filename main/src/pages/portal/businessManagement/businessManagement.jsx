@@ -285,14 +285,19 @@ export function BusinessManagementPage() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [editingBusiness, setEditingBusiness] = useState(null);
 
+	//NEW
+	const [hasFetchedDeleted, setHasFetchedDeleted] = useState(false);
+
 	const hasAccess = hasMinAccessLvl('manager', userEntityData);
 	const isDbAdmin = userEntityData?.accessLevel === 'db_admin';
 
 	const loadBusinesses = useCallback(async () => {
 		setLoading(true);
+		setHasFetchedDeleted(false); 
 		const result = await api('/api/business/get-all-with-hours', 'POST');
 		if (result.success) {
-			setBusinesses(result.data);
+			//setBusinesses(result.data);
+			setBusinesses(result.data || []); 
 		} else {
 			showToast('Failed to load businesses.');
 		}
@@ -306,6 +311,34 @@ export function BusinessManagementPage() {
 			setLoading(false);
 		}
 	}, [hasAccess, loadBusinesses]);
+
+    //NEW
+    const handleIncludeDeleted = async () => {
+        if (hasFetchedDeleted) return;
+        setLoading(true);
+
+
+        const result = await api('/api/business/get-all-deleted', 'GET');
+        
+        if (result.success && result.data?.length > 0) {
+            const deletedBusinesses = result.data; 
+            
+            
+            setBusinesses((current) => {
+                const existingIds = new Set(current.map(b => b.businessId));
+                //Duplicate filter
+                const newBusinesses = deletedBusinesses.filter(
+                    b => !existingIds.has(b.businessId) 
+                );
+                return [...current, ...newBusinesses];
+            });
+        } else if (!result.success) {
+            showToast(result.error || 'Failed to fetch deleted businesses.');
+        }
+
+        setHasFetchedDeleted(true);
+        setLoading(false);
+    };
 
 	const handleCreate = () => {
 		setEditingBusiness(null);
@@ -412,14 +445,27 @@ export function BusinessManagementPage() {
 		<div className='page business-management-page'>
 			<header className='business-header'>
 				<h1>Business Management</h1>
-				{isDbAdmin && (
-					<Button
-						variant='green'
-						onClick={handleCreate}
-					>
-						<Plus size={16} /> Create Business
-					</Button>
-				)}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {isDbAdmin && (
+                        <Button
+                            onClick={handleIncludeDeleted}
+                            variant='outline'
+                            size='sm'
+                            disabled={hasFetchedDeleted}
+                            loading={loading && hasFetchedDeleted}
+                        		>
+                            {hasFetchedDeleted ? 'Deleted Included' : 'Include Deleted Businesses'}
+                        </Button>
+                    )}
+                    {isDbAdmin && (
+                        <Button
+                            variant='green'
+                            onClick={handleCreate}
+                        >
+                            <Plus size={16} /> Create Business
+                        </Button>
+                    )}
+                </div>
 			</header>
 
 			<div className='businesses-grid'>
@@ -427,6 +473,10 @@ export function BusinessManagementPage() {
 					const canEdit =
 						isDbAdmin ||
 						userEntityData.businessId === business.businessId;
+
+					//NEW
+					const isDeleted = !!business.deletedAt;
+
 					return (
 						<div
 							key={business.businessId}
@@ -435,6 +485,7 @@ export function BusinessManagementPage() {
 							<div className='business-card-header'>
 								<h3>
 									<Building size={20} /> {business.name}
+									{isDeleted && ' (Deleted)'}
 								</h3>
 								<span className='business-type'>
 									{business.type}
@@ -478,7 +529,7 @@ export function BusinessManagementPage() {
 								<p>No operating hours available.</p>
 							)}
 
-							{canEdit && (
+							{canEdit && !isDeleted && (
 								<div className='card-actions'>
 									<Button
 										variant='green'
