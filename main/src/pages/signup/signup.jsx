@@ -173,6 +173,21 @@ export function SignupPage() {
 										});
 										setError(null);
 									}}
+									onKeyDown={(e) => {
+										if (
+											!formData.email.trim() ||
+											!formData.password.trim() ||
+											!formData.confirmPassword.trim() ||
+											formData.password !==
+												formData.confirmPassword ||
+											!testEmailRegex.test(formData.email)
+										)
+											return;
+
+										if (e.key === 'Enter') {
+											handleNext();
+										}
+									}}
 									placeholder='Confirm your password'
 								/>
 							</div>
@@ -251,6 +266,18 @@ export function SignupPage() {
 										setError(null);
 									}}
 									placeholder='Last name'
+									onKeyDown={(e) => {
+										if (
+											!formData.firstName.trim() ||
+											!formData.lastName.trim() ||
+											!testEmailRegex.test(formData.email)
+										)
+											return;
+
+										if (e.key === 'Enter') {
+											handleFinalSubmit();
+										}
+									}}
 								/>
 							</div>
 
