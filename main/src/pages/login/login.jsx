@@ -88,6 +88,17 @@ export default function LoginPage() {
 							setError(null);
 						}}
 						placeholder='Enter your password'
+						onKeyDown={(e) => {
+							if (
+								!formData.email.trim() ||
+								!formData.password.trim()
+							)
+								return;
+
+							if (e.key === 'Enter') {
+								handleSubmit();
+							}
+						}}
 					/>
 				</div>
 				<Button
