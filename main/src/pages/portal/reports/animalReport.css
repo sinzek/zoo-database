@@ -50,24 +50,6 @@
 	font-size: 1em;
 }
 
-.report-filter-form .form-group input,
-.report-filter-form .form-group select {
-	width: 100%;
-	padding: 0.75rem;
-	background-color: var(--color-dbrown);
-	border: 2px solid var(--color-lbrown);
-	border-radius: 8px;
-	color: var(--color-foreground);
-	font-size: 0.9rem;
-	transition: all 0.2s;
-}
-
-.report-filter-form .form-group input:focus,
-.report-filter-form .form-group select:focus {
-	outline: none;
-	border-color: var(--color-green);
-}
-
 .centered-loader {
 	display: flex;
 	justify-content: center;
@@ -188,4 +170,3 @@
 	color: var(--color-lbrown);
 	transition: color 0.2s;
 }
-

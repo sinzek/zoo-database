@@ -17,7 +17,7 @@ import { query } from '../db/mysql.js';
 async function getShiftReport(req, _res) {
 	const { employeeIds, businessId, startDate, endDate } = req.body;
 
-	// Build the base query for shifts with employee and business information
+	// builds the base query for shifts with employee and business information
 	let baseQuery = `
 		SELECT 
 			s.shiftId,
@@ -46,20 +46,20 @@ async function getShiftReport(req, _res) {
 
 	const params = [];
 
-	// Add employee ID filtering if provided
+	// adds employee ID filtering if provided
 	if (employeeIds && Array.isArray(employeeIds) && employeeIds.length > 0) {
 		const placeholders = employeeIds.map(() => '?').join(', ');
 		baseQuery += ` AND ets.employeeId IN (${placeholders})`;
 		params.push(...employeeIds);
 	}
 
-	// Add business filtering if provided
+	// adds business filtering if provided
 	if (businessId) {
 		baseQuery += ` AND b.businessId = ?`;
 		params.push(businessId);
 	}
 
-	// Add date range filtering if provided
+	// adds date range filtering if provided
 	if (startDate) {
 		baseQuery += ` AND s.start >= ?`;
 		params.push(startDate);
@@ -69,7 +69,7 @@ async function getShiftReport(req, _res) {
 		params.push(endDate);
 	}
 
-	// Order by shift start date
+	// orders by shift start date
 	baseQuery += ` ORDER BY b.businessId, s.start DESC`;
 
 	const shifts = await query(baseQuery, params);
@@ -78,7 +78,7 @@ async function getShiftReport(req, _res) {
 		return [];
 	}
 
-	// Derive the set of employees and an expanded time window to fetch candidate clock times
+	// derives the set of employees and an expanded time window to fetch candidate clock times
 	const employeeSet = Array.from(new Set(shifts.map((s) => s.employeeId)));
 	const minShiftStart = new Date(
 		shifts.reduce(
@@ -93,14 +93,14 @@ async function getShiftReport(req, _res) {
 		)
 	);
 
-	// Tolerance window (e.g., 6 hours before/after shift window)
+	// tolerance window (e.g., 6 hours before/after shift window)
 	const PRE_MS = 6 * 60 * 60 * 1000;
 	const POST_MS = 6 * 60 * 60 * 1000;
 
 	const expandedStart = new Date(minShiftStart.getTime() - PRE_MS);
 	const expandedEnd = new Date(maxShiftEnd.getTime() + POST_MS);
 
-	// Fetch all relevant clock times for those employees in one shot
+	// fetches all relevant clock times for those employees in one shot
 	let clockTimes = [];
 	if (employeeSet.length > 0) {
 		const placeholders = employeeSet.map(() => '?').join(', ');
@@ -115,7 +115,7 @@ async function getShiftReport(req, _res) {
 		);
 	}
 
-	// Group clock times by employee for faster matching
+	// groups clock times by employee for faster matching
 	const clockByEmployee = new Map();
 	for (const ct of clockTimes) {
 		if (!clockByEmployee.has(ct.employeeId))
@@ -123,7 +123,7 @@ async function getShiftReport(req, _res) {
 		clockByEmployee.get(ct.employeeId).push(ct);
 	}
 
-	// Helper to check overlap with a padded shift window
+	// helpers to check overlap with a padded shift window
 	function overlapsPadded(
 		shiftStart,
 		shiftEnd,
@@ -139,7 +139,7 @@ async function getShiftReport(req, _res) {
 		return cStart <= winEnd && cEnd >= winStart;
 	}
 
-	// Attach clock times to each shift by overlap and employee match
+	// attaches clock times to each shift by overlap and employee match
 	const shiftsWithClockTimes = shifts.map((shift) => {
 		const candidate = clockByEmployee.get(shift.employeeId) || [];
 		const matches = candidate.filter((ct) =>
@@ -153,7 +153,7 @@ async function getShiftReport(req, _res) {
 			)
 		);
 
-		// sort and keep only those with at least minimal overlap
+		// sorts and keeps only those with at least minimal overlap
 		matches.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
 
 		return {
@@ -162,7 +162,7 @@ async function getShiftReport(req, _res) {
 		};
 	});
 
-	// Group by business
+	// groups by business
 	const businessMap = new Map();
 
 	shiftsWithClockTimes.forEach((shift) => {
@@ -177,7 +177,7 @@ async function getShiftReport(req, _res) {
 			});
 		}
 
-		// Format the shift data
+		// formats the shift data
 		const formattedShift = {
 			shiftId: shiftData.shiftId,
 			shiftStart: shiftData.start,
@@ -207,7 +207,7 @@ async function getShiftReport(req, _res) {
 		businessMap.get(businessId).shifts.push(formattedShift);
 	});
 
-	// Convert map to array and sort by business name
+	// converts map to array and sorts by business name
 	const reports = Array.from(businessMap.values()).sort((a, b) =>
 		a.businessName.localeCompare(b.businessName)
 	);
@@ -225,7 +225,7 @@ async function getShiftReport(req, _res) {
  * @param {string} req.body.startDate - Optional start date for filtering
  * @param {string} req.body.endDate - Optional end date for filtering
  *
- * @returns {Promise<Array>} Array of summary reports (without detailed shift arrays)
+ * @returns {Promise<any[]>} Array of summary reports (without detailed shift arrays)
  */
 async function getShiftReportSummary(req, _res) {
 	const fullReport = await getShiftReport(req, _res);
@@ -266,7 +266,7 @@ async function getShiftReportSummary(req, _res) {
  * @param {string} req.body.startDate - Optional start date for filtering
  * @param {string} req.body.endDate - Optional end date for filtering
  *
- * @returns {Promise<Object>} Single aggregated report with grand totals
+ * @returns {Promise<object>} Single aggregated report with grand totals
  */
 async function getAllBusinessesShiftReport(req, _res) {
 	const reports = await getShiftReport(req, _res);
@@ -337,9 +337,6 @@ async function getFullShiftReport(req, res) {
 	return [data];
 }
 
-/**
- * Express handler: Summary shift report
- */
 async function getShiftSummaryReport(req, res) {
 	const data = await getShiftReportSummary(req, res);
 
@@ -348,9 +345,6 @@ async function getShiftSummaryReport(req, res) {
 	return [data];
 }
 
-/**
- * Express handler: Aggregated shift report
- */
 async function getAggregatedShiftReport(req, res) {
 	const data = await getAllBusinessesShiftReport(req, res);
 
