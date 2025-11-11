@@ -106,6 +106,8 @@ export function useAuth() {
 			return result; // { success: false, error: '...'}
 		}
 
+		localStorage.clear();
+
 		setUserInfo(null);
 		setUserEntityData(null);
 		setUserEntityType(null);
