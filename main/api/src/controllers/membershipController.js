@@ -37,7 +37,8 @@ async function createOne(req, _res) {
 		const [membership] = await getNByKeyQuery(
 			'Membership',
 			'customerId',
-			newMembership.customerId
+			newMembership.customerId,
+			false
 		);
 
 		if (membership && !membership.deletedAt) {
