@@ -7,6 +7,7 @@ import { showToast } from '../../../../components/toast/showToast';
 import { Loader } from '../../../../components/loader/loader';
 import { Button } from '../../../../components/button';
 import './shiftReport.css';
+import { ArrowRight } from 'lucide-react';
 
 export function ShiftReportPage() {
 	const { userEntityData } = useUserData();
@@ -441,7 +442,7 @@ export function ShiftReportPage() {
 										{totalHrs.toFixed(2)}
 									</div>
 									<div>
-										<strong>Est. Labor Cost:</strong>{' '}
+										<strong>Total Est. Labor Cost:</strong>{' '}
 										{formatCurrency(totalCost)}
 									</div>
 								</div>
@@ -515,7 +516,7 @@ export function ShiftReportPage() {
 														textAlign: 'right',
 													}}
 												>
-													Labor Cost
+													Est. Labor Cost
 												</th>
 												<th
 													style={{
@@ -572,7 +573,17 @@ export function ShiftReportPage() {
 																	color: 'var(--color-lgreen)',
 																}}
 															>
-																→{' '}
+																<span>
+																	<ArrowRight
+																		size={
+																			14
+																		}
+																		style={{
+																			verticalAlign:
+																				'middle',
+																		}}
+																	/>
+																</span>
 																{formatDateTime(
 																	s.shiftEnd
 																)}
@@ -591,17 +602,6 @@ export function ShiftReportPage() {
 																{
 																	s.employee
 																		?.lastName
-																}
-															</div>
-															<div
-																style={{
-																	color: 'var(--color-lgreen)',
-																	fontSize: 12,
-																}}
-															>
-																{
-																	s.employee
-																		?.employeeId
 																}
 															</div>
 														</td>
@@ -902,8 +902,8 @@ export function ShiftReportPage() {
 						Shift Reports
 					</h1>
 					<p style={{ margin: 0, color: 'var(--color-lgreen)' }}>
-						Use filters below to generate reports. Full, Aggregated, and Summary
-						require manager access.
+						Use filters below to generate reports. Full, Aggregated,
+						and Summary require manager access.
 					</p>
 				</header>
 

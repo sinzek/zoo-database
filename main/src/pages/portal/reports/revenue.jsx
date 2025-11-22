@@ -340,8 +340,22 @@ export function PortalRevenueReportPage() {
 																						'break-word',
 																				}}
 																			>
-																				{t.description ||
-																					'No description'}
+																				{t.description?.startsWith(
+																					'Membership'
+																				)
+																					? t.description.slice(
+																							0,
+																							31
+																						)
+																					: t.description?.startsWith(
+																								'Purchase'
+																						  )
+																						? t.description.slice(
+																								0,
+																								21
+																							)
+																						: t.description ||
+																							'No description'}
 																			</td>
 																			<td>
 																				{t.itemName && (
