@@ -9,12 +9,10 @@ import { Button } from '../../../../components/button';
 import './shiftReport.css';
 
 export function ShiftReportPage() {
-	// Access control
 	const { userEntityData } = useUserData();
 	const isManager = hasMinAccessLvl('manager', userEntityData);
 	const isExecutive = hasMinAccessLvl('executive', userEntityData);
 
-	// Filters
 	const [businesses, setBusinesses] = useState([]);
 	const [employees, setEmployees] = useState([]);
 
@@ -36,12 +34,10 @@ export function ShiftReportPage() {
 			.slice(0, 16);
 	});
 
-	// Report state
 	const [loading, setLoading] = useState(false);
 	const [reportType, setReportType] = useState('full'); // 'full' | 'summary' | 'aggregated'
 	const [reportData, setReportData] = useState(null);
 
-	// Fetch businesses
 	useEffect(() => {
 		let ignore = false;
 		(async () => {
@@ -59,7 +55,6 @@ export function ShiftReportPage() {
 		};
 	}, []);
 
-	// Fetch employees when business changes
 	useEffect(() => {
 		let ignore = false;
 		setEmployees([]);
@@ -480,14 +475,6 @@ export function ShiftReportPage() {
 														textAlign: 'left',
 													}}
 												>
-													Shift
-												</th>
-												<th
-													style={{
-														padding: 8,
-														textAlign: 'left',
-													}}
-												>
 													When
 												</th>
 												<th
@@ -570,13 +557,6 @@ export function ShiftReportPage() {
 																'1px solid var(--color-lbrown)',
 														}}
 													>
-														<td
-															style={{
-																padding: 8,
-															}}
-														>
-															{s.shiftId}
-														</td>
 														<td
 															style={{
 																padding: 8,
