@@ -7,14 +7,13 @@ import { showToast } from '../../../../components/toast/showToast';
 import { Loader } from '../../../../components/loader/loader';
 import { Button } from '../../../../components/button';
 import './shiftReport.css';
+import { ArrowRight } from 'lucide-react';
 
 export function ShiftReportPage() {
-	// Access control
 	const { userEntityData } = useUserData();
 	const isManager = hasMinAccessLvl('manager', userEntityData);
 	const isExecutive = hasMinAccessLvl('manager', userEntityData);
 
-	// Filters
 	const [businesses, setBusinesses] = useState([]);
 	const [employees, setEmployees] = useState([]);
 
@@ -36,12 +35,10 @@ export function ShiftReportPage() {
 			.slice(0, 16);
 	});
 
-	// Report state
 	const [loading, setLoading] = useState(false);
 	const [reportType, setReportType] = useState('full'); // 'full' | 'summary' | 'aggregated'
 	const [reportData, setReportData] = useState(null);
 
-	// Fetch businesses
 	useEffect(() => {
 		let ignore = false;
 		(async () => {
@@ -59,7 +56,6 @@ export function ShiftReportPage() {
 		};
 	}, []);
 
-	// Fetch employees when business changes
 	useEffect(() => {
 		let ignore = false;
 		setEmployees([]);
@@ -446,7 +442,7 @@ export function ShiftReportPage() {
 										{totalHrs.toFixed(2)}
 									</div>
 									<div>
-										<strong>Est. Labor Cost:</strong>{' '}
+										<strong>Total Est. Labor Cost:</strong>{' '}
 										{formatCurrency(totalCost)}
 									</div>
 								</div>
@@ -474,14 +470,6 @@ export function ShiftReportPage() {
 														'var(--color-dbrown)',
 												}}
 											>
-												<th
-													style={{
-														padding: 8,
-														textAlign: 'left',
-													}}
-												>
-													Shift
-												</th>
 												<th
 													style={{
 														padding: 8,
@@ -528,7 +516,7 @@ export function ShiftReportPage() {
 														textAlign: 'right',
 													}}
 												>
-													Labor Cost
+													Est. Labor Cost
 												</th>
 												<th
 													style={{
@@ -575,13 +563,6 @@ export function ShiftReportPage() {
 																padding: 8,
 															}}
 														>
-															{s.shiftId}
-														</td>
-														<td
-															style={{
-																padding: 8,
-															}}
-														>
 															<div>
 																{formatDateTime(
 																	s.shiftStart
@@ -592,7 +573,17 @@ export function ShiftReportPage() {
 																	color: 'var(--color-lgreen)',
 																}}
 															>
-																→{' '}
+																<span>
+																	<ArrowRight
+																		size={
+																			14
+																		}
+																		style={{
+																			verticalAlign:
+																				'middle',
+																		}}
+																	/>
+																</span>
 																{formatDateTime(
 																	s.shiftEnd
 																)}
@@ -611,17 +602,6 @@ export function ShiftReportPage() {
 																{
 																	s.employee
 																		?.lastName
-																}
-															</div>
-															<div
-																style={{
-																	color: 'var(--color-lgreen)',
-																	fontSize: 12,
-																}}
-															>
-																{
-																	s.employee
-																		?.employeeId
 																}
 															</div>
 														</td>
@@ -922,8 +902,8 @@ export function ShiftReportPage() {
 						Shift Reports
 					</h1>
 					<p style={{ margin: 0, color: 'var(--color-lgreen)' }}>
-						Use filters below to generate reports. Full, Aggregated, and Summary
-						require manager access.
+						Use filters below to generate reports. Full, Aggregated,
+						and Summary require manager access.
 					</p>
 				</header>
 

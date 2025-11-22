@@ -31,6 +31,14 @@ function CreateShiftModal({ onClose, onShiftCreated }) {
 			return;
 		}
 
+		if (
+			new Date(start).getTime() < Date.now() ||
+			new Date(end).getTime() < Date.now()
+		) {
+			setError('Start and times must be in the future.');
+			return;
+		}
+
 		const result = await createShift({
 			start: new Date(start),
 			end: new Date(end),
