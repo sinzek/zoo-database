@@ -35,7 +35,7 @@
 
 .topmenu-logo-text:hover {
 	color: var(--color-lgreen);
-	box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.5);
+	box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .topmenu-logo:hover {
@@ -74,7 +74,7 @@
 	top: 120%;
 	left: 0;
 	background-color: var(--color-brown);
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	box-shadow: 2 2px 10px rgba(0, 0, 0, 0.9);
 	list-style: none;
 	padding: 0;
 	margin: 0;

@@ -6,8 +6,17 @@ import { api } from '../../../utils/client-api-utils';
 import { showToast } from '../../../components/toast/showToast';
 import { Loader } from '../../../components/loader/loader';
 import { Button } from '../../../components/button';
-import { Building, Edit, Trash2, Plus, Save, X } from 'lucide-react';
+import {
+	Building,
+	Edit,
+	Trash2,
+	Plus,
+	Save,
+	X,
+	ShoppingBag,
+} from 'lucide-react';
 import './businessManagement.css';
+import { Link } from '../../../components/link';
 
 const initialFormData = {
 	name: '',
@@ -276,16 +285,21 @@ export function BusinessManagementPage() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [editingBusiness, setEditingBusiness] = useState(null);
 
-	const hasAccess = hasMinAccessLvl('executive', userEntityData);
+	//NEW
+	const [hasFetchedDeleted, setHasFetchedDeleted] = useState(false);
+
+	const hasAccess = hasMinAccessLvl('manager', userEntityData);
 	const isDbAdmin = userEntityData?.accessLevel === 'db_admin';
 
 	const loadBusinesses = useCallback(async () => {
 		setLoading(true);
+		setHasFetchedDeleted(false);
 		const result = await api('/api/business/get-all-with-hours', 'POST');
 		if (result.success) {
-			setBusinesses(result.data);
+			//setBusinesses(result.data);
+			setBusinesses(result.data || []);
 		} else {
-			showToast('Failed to load businesses.', 'error');
+			showToast('Failed to load businesses.');
 		}
 		setLoading(false);
 	}, []);
@@ -297,6 +311,32 @@ export function BusinessManagementPage() {
 			setLoading(false);
 		}
 	}, [hasAccess, loadBusinesses]);
+
+	//NEW
+	const handleIncludeDeleted = async () => {
+		if (hasFetchedDeleted) return;
+		setLoading(true);
+
+		const result = await api('/api/business/get-all-deleted', 'GET');
+
+		if (result.success && result.data?.length > 0) {
+			const deletedBusinesses = result.data;
+
+			setBusinesses((current) => {
+				const existingIds = new Set(current.map((b) => b.businessId));
+				//Duplicate filter
+				const newBusinesses = deletedBusinesses.filter(
+					(b) => !existingIds.has(b.businessId)
+				);
+				return [...current, ...newBusinesses];
+			});
+		} else if (!result.success) {
+			showToast(result.error || 'Failed to fetch deleted businesses.');
+		}
+
+		setHasFetchedDeleted(true);
+		setLoading(false);
+	};
 
 	const handleCreate = () => {
 		setEditingBusiness(null);
@@ -318,34 +358,76 @@ export function BusinessManagementPage() {
 				businessId,
 			});
 			if (result.success) {
-				showToast('Business deleted successfully.', 'success');
+				showToast('Business deleted successfully.');
 				loadBusinesses();
 			} else {
-				showToast(
-					result.error || 'Failed to delete business.',
-					'error'
-				);
+				showToast(result.error || 'Failed to delete business.');
 			}
 		}
 	};
 
 	const handleSave = async (formData) => {
-		const endpoint = formData.businessId
-			? '/api/business/update-one'
-			: '/api/business/create-one';
-		const method = formData.businessId ? 'PUT' : 'POST';
-
-		const result = await api(endpoint, method, formData);
-
-		if (result.success) {
-			showToast(
-				`Business ${formData.businessId ? 'updated' : 'created'} successfully.`,
-				'success'
+		if (formData.businessId) {
+			// Update existing business
+			const result = await api(
+				'/api/business/update-one',
+				'PUT',
+				formData
 			);
-			setIsModalOpen(false);
-			loadBusinesses();
+
+			if (result.success) {
+				showToast('Business updated successfully.');
+				setIsModalOpen(false);
+				loadBusinesses();
+			} else {
+				showToast(result.error || 'Failed to save business.');
+			}
 		} else {
-			showToast(result.error || 'Failed to save business.', 'error');
+			// Create new business - transform data to match backend expectations
+			const dayMapping = {
+				Monday: 'monday',
+				Tuesday: 'tuesday',
+				Wednesday: 'wednesday',
+				Thursday: 'thursday',
+				Friday: 'friday',
+				Saturday: 'saturday',
+				Sunday: 'sunday',
+			};
+
+			const businessData = {
+				name: formData.name,
+				address: formData.address,
+				phone: formData.phone,
+				email: formData.email,
+				uiDesc: formData.uiDescription || null,
+				businessType: formData.type,
+				createdAt: new Date().toISOString().split('T')[0],
+				ownerID: formData.ownerId || null,
+			};
+
+			// Add hours in the format backend expects (only for open days)
+			Object.entries(formData.hours).forEach(([day, times]) => {
+				const dayKey = dayMapping[day];
+				if (times.openTime && times.closeTime) {
+					businessData[`${dayKey}Open`] = times.openTime + ':00';
+					businessData[`${dayKey}Close`] = times.closeTime + ':00';
+				}
+				// If closed, don't include the fields (backend will skip creating records)
+			});
+
+			const result = await api(
+				'/api/business/create',
+				'POST',
+				businessData
+			);
+
+			if (result.success) {
+				showToast('Business created successfully.');
+				setIsModalOpen(false);
+				loadBusinesses();
+			} else {
+				showToast(result.error || 'Failed to save business.');
+			}
 		}
 	};
 
@@ -369,14 +451,35 @@ export function BusinessManagementPage() {
 		<div className='page business-management-page'>
 			<header className='business-header'>
 				<h1>Business Management</h1>
-				{isDbAdmin && (
-					<Button
-						variant='green'
-						onClick={handleCreate}
-					>
-						<Plus size={16} /> Create Business
-					</Button>
-				)}
+				<div
+					style={{
+						display: 'flex',
+						alignItems: 'center',
+						gap: '10px',
+					}}
+				>
+					{isDbAdmin && (
+						<Button
+							onClick={handleIncludeDeleted}
+							variant='outline'
+							size='sm'
+							disabled={hasFetchedDeleted}
+							loading={loading && hasFetchedDeleted}
+						>
+							{hasFetchedDeleted
+								? 'Deleted Included'
+								: 'Include Deleted Businesses'}
+						</Button>
+					)}
+					{isDbAdmin && (
+						<Button
+							variant='green'
+							onClick={handleCreate}
+						>
+							<Plus size={16} /> Create Business
+						</Button>
+					)}
+				</div>
 			</header>
 
 			<div className='businesses-grid'>
@@ -384,6 +487,10 @@ export function BusinessManagementPage() {
 					const canEdit =
 						isDbAdmin ||
 						userEntityData.businessId === business.businessId;
+
+					//NEW
+					const isDeleted = !!business.deletedAt;
+
 					return (
 						<div
 							key={business.businessId}
@@ -392,19 +499,26 @@ export function BusinessManagementPage() {
 							<div className='business-card-header'>
 								<h3>
 									<Building size={20} /> {business.name}
+									{isDeleted && ' (Deleted)'}
 								</h3>
 								<span className='business-type'>
 									{business.type}
+									{business.businessId ===
+										userEntityData.businessId && (
+										<b> (You work here)</b>
+									)}
 								</span>
 							</div>
 							<p>{business.address}</p>
 							<p>
 								{business.email} | {business.phone}
 							</p>
-							{business.uiDescription && (
+							{business.uiDescription ? (
 								<p className='description'>
 									{business.uiDescription}
 								</p>
+							) : (
+								'No description set.'
 							)}
 							<h4 className='op-hours'>Operating Hours:</h4>
 							{business.hours && business.hours.length > 0 ? (
@@ -432,19 +546,34 @@ export function BusinessManagementPage() {
 								<p>No operating hours available.</p>
 							)}
 
-							{canEdit && (
+							{canEdit && !isDeleted && (
 								<div className='card-actions'>
 									<Button
-										variant='outline'
-										size='small'
+										variant='green'
+										size='sm'
 										onClick={() => handleEdit(business)}
 									>
 										<Edit size={14} /> Edit
 									</Button>
+									<Link
+										to={`/portal/inventory-management/${business.businessId}`}
+										href={`/portal/inventory-management/${business.businessId}`}
+										style={{ width: '100%' }}
+									>
+										<Button
+											variant='outline'
+											size='sm'
+											style={{ width: '100%' }}
+											onClick={() => handleEdit(business)}
+										>
+											<ShoppingBag size={14} /> Manage
+											Inventory
+										</Button>
+									</Link>
 									{isDbAdmin && (
 										<Button
-											variant='danger'
-											size='small'
+											variant='outline'
+											size='sm'
 											onClick={() =>
 												handleDelete(
 													business.businessId

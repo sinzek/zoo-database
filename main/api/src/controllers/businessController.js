@@ -61,6 +61,7 @@ async function createOne(req, _res) {
 		type: businessType,
 		createdAt,
 		ownerId: ownerID,
+		numEmployees: 0,
 	});
 
 	const {
@@ -92,12 +93,16 @@ async function createOne(req, _res) {
 	];
 
 	for (const [dayOfWeek, openTime, closeTime] of hours) {
-		await createOneQuery('BusinessHoursDay', {
-			businessId: newBusinessID,
-			dayOfWeek,
-			openTime,
-			closeTime,
-		});
+		// Only create hours record if both openTime and closeTime are provided
+		if (openTime && closeTime) {
+			await createOneQuery('BusinessHoursDay', {
+				businessHoursDayId: crypto.randomUUID(),
+				businessId: newBusinessID,
+				dayOfWeek,
+				openTime,
+				closeTime,
+			});
+		}
 	}
 
 	return [{ businessId: newBusinessID, ...newBusiness }];
@@ -105,15 +110,15 @@ async function createOne(req, _res) {
 
 /**
  * Soft deletes a business by setting its deletedAt timestamp.
- * @param {string} req.body.businessID - UUID of the business to delete
+ * @param {string} req.body.businessId - UUID of the business to delete
  * @returns {Promise<Array>} Array containing success message
- * @throws {Error} If businessID is missing
+ * @throws {Error} If businessId is missing
  */
 async function deleteOne(req, _res) {
 	const deleteBusiness = req.body;
-	const deleteBusinessID = deleteBusiness.businessID;
+	const deleteBusinessID = deleteBusiness.businessId || deleteBusiness.businessID;
 
-	if (!deleteBusinessID) throw new Error('Missing businessID');
+	if (!deleteBusinessID) throw new Error('Missing businessId');
 
 	// using query for soft delete
 	await query(
@@ -372,6 +377,19 @@ async function updateOne(req, _res) {
 	return [{ ...businessData }];
 }
 
+
+async function getAllDeleted(_req, _res) {
+	const deletedBusinesses = await query(
+		'SELECT * FROM Business WHERE deletedAt IS NOT NULL'
+	);
+	
+	if (!deletedBusinesses || deletedBusinesses.length === 0) {
+        throw new Error('No deleted businesses found');
+    }
+
+	return [deletedBusinesses];
+}
+
 export default {
 	createOne,
 	updateOneInfo,
@@ -381,4 +399,5 @@ export default {
 	getAll,
 	getAllWithHours,
 	updateOne,
+	getAllDeleted,
 };

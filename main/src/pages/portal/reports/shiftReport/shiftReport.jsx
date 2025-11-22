@@ -11,7 +11,7 @@ import './shiftReport.css';
 export function ShiftReportPage() {
 	const { userEntityData } = useUserData();
 	const isManager = hasMinAccessLvl('manager', userEntityData);
-	const isExecutive = hasMinAccessLvl('executive', userEntityData);
+	const isExecutive = hasMinAccessLvl('manager', userEntityData);
 
 	const [businesses, setBusinesses] = useState([]);
 	const [employees, setEmployees] = useState([]);
@@ -902,9 +902,8 @@ export function ShiftReportPage() {
 						Shift Reports
 					</h1>
 					<p style={{ margin: 0, color: 'var(--color-lgreen)' }}>
-						Use filters below to generate reports. Full and Summary
-						require manager access. Aggregated requires executive
-						access.
+						Use filters below to generate reports. Full, Aggregated, and Summary
+						require manager access.
 					</p>
 				</header>
 

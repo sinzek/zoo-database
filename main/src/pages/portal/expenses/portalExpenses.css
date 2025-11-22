@@ -1,0 +1,175 @@
+.portal-expenses-page {
+	max-width: 1400px;
+	margin: auto;
+	padding: 24px;
+	padding-top: 80px;
+	color: var(--color-foreground);
+}
+
+.expenses-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 2rem;
+}
+
+.expenses-header h1 {
+	color: var(--color-green);
+	margin: 0;
+}
+
+.expense-form-container {
+	background-color: rgba(37, 31, 26, 0.8);
+	border-radius: 12px;
+	border: 2px solid var(--color-brown);
+	padding: 1.5rem;
+	margin-bottom: 2rem;
+	max-width: 600px;
+}
+
+.expense-form-container h2 {
+	color: var(--color-green);
+	margin-bottom: 1.5rem;
+}
+
+.expense-form .form-group {
+	margin-bottom: 1.5rem;
+}
+
+.expense-form .form-group label {
+	display: block;
+	margin-bottom: 0.5rem;
+	color: var(--color-lgreen);
+	font-weight: 600;
+	font-size: 1em;
+}
+
+.expense-form .form-group input,
+.expense-form .form-group select {
+	width: 100%;
+	padding: 0.75rem;
+	background-color: var(--color-dbrown);
+	border: 2px solid var(--color-lbrown);
+	border-radius: 8px;
+	color: var(--color-foreground);
+	font-size: 0.9rem;
+	transition: all 0.2s;
+}
+
+.expense-form .form-group input:focus,
+.expense-form .form-group select:focus {
+	outline: none;
+	border-color: var(--color-green);
+}
+
+.expense-form .form-group input[type='number'] {
+	-moz-appearance: textfield;
+}
+
+.expense-form .form-group input[type='number']::-webkit-outer-spin-button,
+.expense-form .form-group input[type='number']::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.expense-form-actions {
+	display: flex;
+	gap: 1rem;
+	margin-top: 2rem;
+}
+
+.error-message {
+	color: #ff6b6b;
+	font-weight: 600;
+	font-size: 1.2rem;
+	text-align: center;
+	margin-top: 2rem;
+}
+
+.expense-filter-container {
+	background-color: rgba(37, 31, 26, 0.8);
+	border-radius: 12px;
+	border: 2px solid var(--color-brown);
+	padding: 1.5rem;
+	margin-bottom: 2rem;
+	max-width: 600px;
+}
+
+.form-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1.5rem;
+}
+
+.form-header h2 {
+	color: var(--color-green);
+	margin: 0;
+}
+
+.expenses-list h2 {
+	color: var(--color-green);
+	margin-bottom: 1.5rem;
+}
+
+.expenses-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	gap: 1.5rem;
+}
+
+.expense-card {
+	background-color: rgba(37, 31, 26, 0.8);
+	border: 2px solid var(--color-brown);
+	border-radius: 12px;
+	padding: 1.5rem;
+	transition:
+		transform 0.2s,
+		box-shadow 0.2s;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.expense-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.expense-info h3 {
+	color: var(--color-lgreen);
+	margin: 0 0 0.5rem 0;
+	font-size: 1.1rem;
+}
+
+.expense-cost {
+	color: var(--color-green);
+	font-size: 1.5rem;
+	font-weight: 600;
+	margin: 0.5rem 0;
+}
+
+.expense-date {
+	color: var(--color-lbrown);
+	font-size: 0.9rem;
+	margin: 0;
+}
+
+.expense-actions {
+	display: flex;
+	gap: 0.5rem;
+}
+
+.no-expenses {
+	text-align: center;
+	color: var(--color-lbrown);
+	padding: 3rem;
+	font-size: 1.1rem;
+}
+
+.centered-loader {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 200px;
+}

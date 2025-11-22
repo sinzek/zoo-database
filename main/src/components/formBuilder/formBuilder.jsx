@@ -22,7 +22,7 @@ const loginFields = [
 
 /**
  *
- * @param {{ fields: Array<{ name: string; label: string; type: string; placeholder: string; autoComplete: string; }>; formData: object; setFormData: (formData: object) => void; isEditing: boolean; }} param0
+ * @param {{ fields: Array<{ name: string; label: string; type: string; placeholder: string; autoComplete: string; onChange?: (e: ChangeEvent<HTMLInputElement>) => void; }>; formData: object; setFormData: (formData: object) => void; isEditing: boolean; }} param0
  * @returns
  */
 export function FormBuilder({
@@ -32,12 +32,14 @@ export function FormBuilder({
 	isEditing = true,
 	style,
 }) {
-	const handleChange = (e) => {
+	const handleChange = (e, onChange) => {
 		const { name, value, type, checked } = e.target;
 		setFormData((prev) => ({
 			...prev,
 			[name]: type === 'checkbox' ? checked : value,
 		}));
+
+		onChange?.(e);
 	};
 
 	return (
@@ -58,7 +60,7 @@ export function FormBuilder({
 							type={field.type}
 							placeholder={field.placeholder}
 							value={formData[field.name] || ''}
-							onChange={handleChange}
+							onChange={(e) => handleChange(e, field.onChange)}
 							autoComplete={field.autoComplete || 'off'}
 							disabled={field.disabled}
 						/>

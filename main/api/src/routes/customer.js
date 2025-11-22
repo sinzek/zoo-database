@@ -1,4 +1,4 @@
-import { withAuth } from '../utils/auth-utils';
+import { withAuth } from '../utils/auth-utils.js';
 import customerController from '../controllers/customerController.js';
 
 export function registerCustomerRoutes(app) {

@@ -226,7 +226,12 @@ async function getScheduleDaysByDiet(req, _res) {
 
 	if (!dietId) throw new Error('Missing dietId');
 
-	const rows = await getNByKeyQuery('DietScheduleDay', 'dietId', dietId, false);
+	const rows = await getNByKeyQuery(
+		'DietScheduleDay',
+		'dietId',
+		dietId,
+		false
+	);
 
 	return rows;
 }
@@ -250,7 +255,8 @@ async function updateScheduleDay(req, _res) {
 	await updateOneQuery(
 		'DietScheduleDay',
 		updatedScheduleDay,
-		'dietScheduleDayId'
+		'dietScheduleDayId',
+		false
 	);
 
 	return [updatedScheduleDay];
@@ -318,4 +324,3 @@ export default {
 	deleteScheduleDay,
 	getScheduleByDayOfWeek,
 };
-

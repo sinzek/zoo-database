@@ -85,3 +85,20 @@ h1 {
 	margin-top: 10px;
 	font-style: italic;
 }
+
+.home-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-lbrown);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.home-button:hover {
+    color: var(--color-green);
+}

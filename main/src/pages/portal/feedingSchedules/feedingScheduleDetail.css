@@ -1,171 +1,173 @@
 .feeding-schedule-detail-page {
 	max-width: 1200px;
-	margin: auto;
-	margin-top: 120px;
-	padding: 24px;
-	color: var(--color-foreground);
-}
-
-.centered-loader {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: 400px;
-}
-
-.animal-header {
-	display: flex;
-	gap: 2rem;
-	margin-bottom: 3rem;
-	padding: 2rem;
-	background-color: rgba(37, 31, 26, 0.8);
-	border-radius: 12px;
-	border: 2px solid var(--color-brown);
-}
-
-.animal-header-image {
-	width: 200px;
-	height: 200px;
-	object-fit: cover;
-	border-radius: 8px;
-	border: 2px solid var(--color-lgreen);
-}
-
-.animal-header-info h1 {
-	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-	color: var(--color-green);
-	margin-bottom: 0.5rem;
-}
-
-.animal-header-info .common-name {
-	font-size: 1.2rem;
-	color: var(--color-lbrown);
-}
-
-.schedule-section {
-	margin-top: 2rem;
-}
-
-.schedule-actions {
-	margin-bottom: 2rem;
-}
-
-.new-day-form {
-	background-color: rgba(37, 31, 26, 0.8);
-	border-radius: 12px;
-	border: 2px solid var(--color-brown);
-	padding: 1.5rem;
-	margin-bottom: 2rem;
-}
-
-.form-row {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-	gap: 1rem;
-}
-
-.form-group {
-	margin-bottom: 1rem;
-}
-
-.form-actions {
-	display: flex;
-	gap: 1rem;
-	margin-top: 1rem;
-}
-
-.no-diet-container {
-	text-align: center;
-	padding: 3rem;
-}
-
-.no-diet,
-.no-schedule {
-	color: var(--color-lbrown);
-	font-size: 1.1rem;
-	margin-bottom: 0.5rem;
-}
-
-.no-diet-hint {
-	color: var(--color-brown);
-	font-size: 0.9rem;
-	font-style: italic;
-}
-
-.create-diet-form {
-	background-color: rgba(37, 31, 26, 0.8);
-	border-radius: 12px;
-	border: 2px solid var(--color-brown);
-	padding: 1.5rem;
-	margin-top: 1rem;
-	width: 100%;
-	max-width: 500px;
+	width: 60%;
 	margin-left: auto;
 	margin-right: auto;
-}
+	margin-top: 120px;
+	padding: 24px;
+	color: var(--color-lgreen);
 
-.create-diet-form h3 {
-	color: var(--color-green);
-	margin-bottom: 1rem;
-}
+	.centered-loader {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 400px;
+	}
 
-.create-diet-form .form-group textarea {
-	background-color: var(--color-dbrown);
-	color: var(--color-foreground);
-}
+	.animal-header-2 {
+		display: flex;
+		gap: 1rem;
+		margin-bottom: 1rem;
+		background-color: rgba(37, 31, 26, 0.8);
+		border-radius: 12px;
+		border: 2px solid var(--color-brown);
+		padding: 1rem;
+	}
 
-.schedule-days {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
-}
+	.animal-header-image {
+		width: 200px;
+		height: 200px;
+		object-fit: cover;
+		border-radius: 8px;
+		border: 2px solid var(--color-lgreen);
+	}
 
-.schedule-day-card {
-	background-color: rgba(37, 31, 26, 0.8);
-	border-radius: 12px;
-	border: 2px solid var(--color-brown);
-	padding: 1.5rem;
-	transition: border-color 0.2s;
-}
+	.animal-header-info h1 {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		color: var(--color-green);
+		margin-bottom: 0.5rem;
+	}
 
-.schedule-day-card:hover {
-	border-color: var(--color-lgreen);
-}
+	.animal-header-info .common-name {
+		font-size: 1.2rem;
+		color: var(--color-lbrown);
+	}
 
-.schedule-day-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 1rem;
-}
+	.schedule-section {
+		margin-top: 2rem;
+	}
 
-.schedule-day-header h3 {
-	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-	color: var(--color-green);
-	margin: 0;
-}
+	.schedule-actions {
+		margin-bottom: 2rem;
+	}
 
-.action-buttons {
-	display: flex;
-	gap: 0.5rem;
-}
+	.new-day-form {
+		background-color: rgba(37, 31, 26, 0.8);
+		border-radius: 12px;
+		border: 2px solid var(--color-brown);
+		padding: 1.5rem;
+		margin-bottom: 2rem;
+	}
 
-.schedule-day-info {
-	display: flex;
-	flex-direction: column;
-	gap: 0.75rem;
-}
+	.form-row {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: 1rem;
+	}
 
-.info-item {
-	color: var(--color-lbrown);
-}
+	.form-group {
+		margin-bottom: 1rem;
+	}
 
-.edit-form {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
+	.form-actions {
+		display: flex;
+		gap: 1rem;
+		margin-top: 1rem;
+	}
+
+	.no-diet-container {
+		text-align: center;
+		padding: 3rem;
+	}
+
+	.no-diet,
+	.no-schedule {
+		color: var(--color-lbrown);
+		font-size: 1.1rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.no-diet-hint {
+		color: var(--color-brown);
+		font-size: 0.9rem;
+		font-style: italic;
+	}
+
+	.create-diet-form {
+		background-color: rgba(37, 31, 26, 0.8);
+		border-radius: 12px;
+		border: 2px solid var(--color-brown);
+		padding: 1.5rem;
+		margin-top: 1rem;
+		width: 100%;
+		max-width: 500px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.create-diet-form h3 {
+		color: var(--color-green);
+		margin-bottom: 1rem;
+	}
+
+	.create-diet-form .form-group textarea {
+		background-color: var(--color-dbrown);
+		color: var(--color-foreground);
+	}
+
+	.schedule-days {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.schedule-day-card {
+		background-color: rgba(37, 31, 26, 0.8);
+		border-radius: 12px;
+		border: 2px solid var(--color-brown);
+		padding: 1.5rem;
+		transition: border-color 0.2s;
+	}
+
+	.schedule-day-card:hover {
+		border-color: var(--color-lgreen);
+	}
+
+	.schedule-day-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 1rem;
+	}
+
+	.schedule-day-header h3 {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		color: var(--color-green);
+		margin: 0;
+	}
+
+	.action-buttons {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.schedule-day-info {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.info-item {
+		color: var(--color-lbrown);
+	}
+
+	.edit-form {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
 }

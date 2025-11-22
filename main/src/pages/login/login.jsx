@@ -1,4 +1,8 @@
 import { useState } from 'react';
+
+import { Link } from '../../components/link';
+import { ArrowLeft } from 'lucide-react';
+
 import './login.css';
 import { useUserData } from '../../context/userDataContext';
 import { Button } from '../../components/button';
@@ -26,7 +30,15 @@ export default function LoginPage() {
 
 	return (
 		<div className='main-container'>
-			<h1>Welcome back to</h1>
+			<Link
+				to='/'
+				className='btn btn-outline btn-sm'
+			>
+				<ArrowLeft size={16} />
+				Back to Home
+			</Link>
+
+			<h1 style={{ marginTop: '20px' }}>Welcome back to</h1>
 			<h1 className='the-zoo-text'>The Zoo™</h1>
 			<p className='login-subtext'>
 				Log in to access your account and explore the wild side!
@@ -76,6 +88,17 @@ export default function LoginPage() {
 							setError(null);
 						}}
 						placeholder='Enter your password'
+						onKeyDown={(e) => {
+							if (
+								!formData.email.trim() ||
+								!formData.password.trim()
+							)
+								return;
+
+							if (e.key === 'Enter') {
+								handleSubmit();
+							}
+						}}
 					/>
 				</div>
 				<Button

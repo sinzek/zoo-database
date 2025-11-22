@@ -1,5 +1,6 @@
 .portal-revenue-page {
 	max-width: 1400px;
+	width: 80%;
 	margin: auto;
 	padding: 24px;
 	padding-top: 80px;
@@ -61,7 +62,7 @@
 	border-color: var(--color-green);
 }
 
-.revenue-form .form-group input[type="checkbox"] {
+.revenue-form .form-group input[type='checkbox'] {
 	width: auto;
 	margin-right: 0.5rem;
 }
@@ -93,7 +94,7 @@
 	margin-bottom: 0;
 }
 
-.business-checkbox-item input[type="checkbox"] {
+.business-checkbox-item input[type='checkbox'] {
 	width: auto;
 }
 
@@ -150,7 +151,9 @@
 	border: 2px solid var(--color-brown);
 	border-radius: 12px;
 	padding: 1.5rem;
-	transition: transform 0.2s, box-shadow 0.2s;
+	transition:
+		transform 0.2s,
+		box-shadow 0.2s;
 }
 
 .revenue-card:hover {
@@ -234,4 +237,3 @@
 	margin: 1rem 0 0.5rem 0;
 	font-size: 1rem;
 }
-

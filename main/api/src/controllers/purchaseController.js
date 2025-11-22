@@ -1,4 +1,9 @@
-import { createOneQuery } from '../utils/query-utils.js';
+import {
+	createOneQuery,
+	getNByKeyQuery,
+	updateOneQuery,
+	hardDeleteOneQuery,
+} from '../utils/query-utils.js';
 import { MEMBERSHIP_LEVELS } from '../constants/membershipLevels.js';
 import crypto from 'crypto';
 import {
@@ -70,9 +75,9 @@ async function purchaseItems(req, _res) {
 
 	await sendNotificationToUser(
 		req.user.data.id,
-		`Thank you for your purchase totalling $${
-			total
-		}! Your items have been thrown into the void.`
+		`Thank you for your purchase totalling $${total.toFixed(
+			2
+		)}! Your items have been thrown into the void.`
 	);
 
 	return [{ transactions, purchasedItems }];
@@ -117,12 +122,74 @@ async function purchaseMembership(req, _res) {
 		expireDate: newMembership.expireDate,
 		autoRenew: newMembership.autoRenew,
 		transactionId: newTransaction.transactionId,
+		deletedAt: null,
 	};
 
 	try {
+		try {
+			const [mem] = await getNByKeyQuery(
+				'Membership',
+				'customerId',
+				newMembershipData.customerId,
+				false
+			);
+
+			if (mem && !mem.deletedAt) {
+				throw new Error('Customer already has an active membership');
+			} else if (mem && mem.deletedAt) {
+				// allow re-activating a previously cancelled membership by deleting the old record
+				await hardDeleteOneQuery(
+					'Membership',
+					'membershipId',
+					mem.membershipId
+				);
+			}
+		} catch (err) {
+			if (!err.message.includes('No records found')) {
+				throw err;
+			}
+			console.error('Error checking existing membership:', err);
+		}
+
 		await createOneQuery('Membership', newMembershipData);
 	} catch (err) {
 		if (err.code === 'ER_DUP_ENTRY') {
+			let membership;
+
+			try {
+				[membership] = await getNByKeyQuery(
+					'Membership',
+					'customerId',
+					newMembership.customerId
+				);
+			} catch {
+				throw err;
+			}
+
+			if (membership && membership.deletedAt) {
+				// reactivate the cancelled membership
+				await updateOneQuery(
+					'Membership',
+					{
+						...newMembershipData,
+						membershipId: membership.membershipId,
+					},
+					'membershipId'
+				);
+
+				await sendNotificationToUser(
+					userId,
+					`Thank you for purchasing the ${newMembershipData.level} membership for a total of ${newTransaction.amount.toFixed(2)}! Your membership is valid until ${newMembershipData.expireDate}. Enjoy your benefits at The Zoo™! No refunds. Lol.`
+				);
+
+				return [
+					{
+						transaction: newTransaction,
+						membership: newMembershipData,
+					},
+				];
+			}
+
 			throw new Error(
 				'You already have an active membership. Head to /portal to view it.'
 			);

@@ -90,7 +90,7 @@
 
 .navbar-link:hover {
 	color: var(--color-lgreen);
-	text-decoration: none;
+	text-decoration: none !important;
 }
 
 .navbar-underline {

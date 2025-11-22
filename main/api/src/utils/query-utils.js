@@ -156,3 +156,19 @@ export async function deleteOneQuery(tableName, keyColumn, keyValue) {
 		);
 	}
 }
+
+export async function hardDeleteOneQuery(tableName, keyColumn, keyValue) {
+	const result = await query(
+		`
+		DELETE FROM ${tableName}
+		WHERE ${keyColumn} = ?
+		`,
+		[keyValue]
+	);
+
+	if (result.affectedRows === 0) {
+		throw new Error(
+			`Failed to hard delete record in ${tableName} where ${keyColumn} = ${keyValue}`
+		);
+	}
+}

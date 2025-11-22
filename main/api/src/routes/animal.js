@@ -7,6 +7,10 @@ export function registerAnimalRoutes(app) {
 		'/api/animal/create',
 		withAccessLevel('zookeeper', animalController.createOne)
 	);
+	app.get(
+		'/api/animal/get-all-deleted',
+		withAccessLevel('zookeeper', animalController.getAllDeleted)
+	);
 	app.put(
 		'/api/animal/update',
 		withAccessLevel('zookeeper', animalController.updateOne)

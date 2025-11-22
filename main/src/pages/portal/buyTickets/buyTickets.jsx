@@ -5,6 +5,7 @@ import { useUserData } from '../../../context/userDataContext';
 import { Button } from '../../../components/button';
 import { Link } from '../../../components/link';
 import { Check } from 'lucide-react';
+import { showToast } from '../../../components/toast/showToast';
 
 const EXAMPLE_TICKET = {
 	itemId: 'general-admission',
@@ -30,6 +31,9 @@ export function BuyTicketsPage() {
 	const [quantity, setQuantity] = useState(0);
 	const [feedback, setFeedback] = useState('');
 
+	// Get today's date in YYYY-MM-DD format for min date restriction
+	const today = new Date().toISOString().split('T')[0];
+
 	const contactFields = useMemo(
 		() => [
 			{
@@ -52,9 +56,10 @@ export function BuyTicketsPage() {
 				type: 'date',
 				placeholder: '',
 				autoComplete: 'off',
+				min: today, // Prevent selecting past dates
 			},
 		],
-		[]
+		[today]
 	);
 
 	const currencyFormatter = useMemo(
@@ -82,6 +87,21 @@ export function BuyTicketsPage() {
 			setFeedback(
 				'Please complete visitor details before adding tickets.'
 			);
+			return;
+		}
+
+		// Validate that visit date is not in the past
+		const selectedDate = new Date(visitDate);
+		const today = new Date();
+		today.setHours(0, 0, 0, 0); // Reset time to compare dates only
+		
+		if (selectedDate < today) {
+			showToast('Cannot purchase tickets for past dates. Please select today or a future date.');
+			// Reset to today's date
+			setFormData(prev => ({
+				...prev,
+				visitDate: new Date().toISOString().split('T')[0]
+			}));
 			return;
 		}
 
@@ -281,14 +301,35 @@ export function BuyTicketsPage() {
 										<input
 											type='number'
 											min={1}
+											max={9}
 											step={1}
 											value={quantity}
-											onChange={(event) =>
+											onChange={(event) => {
+												if (
+													Number(event.target.value) <
+													0
+												) {
+													handleQuantityChange(
+														EXAMPLE_TICKET.itemId,
+														0
+													);
+													return;
+												} else if (
+													Number(event.target.value) >
+													9
+												) {
+													handleQuantityChange(
+														EXAMPLE_TICKET.itemId,
+														9
+													);
+													return;
+												}
+
 												handleQuantityChange(
 													EXAMPLE_TICKET.itemId,
 													event.target.value
-												)
-											}
+												);
+											}}
 											style={{
 												width: '82px',
 												textAlign: 'center',

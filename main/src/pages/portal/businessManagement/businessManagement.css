@@ -78,6 +78,7 @@
 	gap: 0.5rem;
 	border-top: 2px solid var(--color-lbrown);
 	padding-top: 1rem;
+	flex-direction: column;
 }
 
 /* Modal Styles */

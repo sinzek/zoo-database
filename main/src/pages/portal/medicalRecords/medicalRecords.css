@@ -78,6 +78,7 @@
 			transform 0.2s,
 			box-shadow 0.2s;
 		cursor: default;
+		transition: all 0.15s ease;
 	}
 
 	.animal-card.clickable {
@@ -87,7 +88,13 @@
 	.animal-card.clickable:hover {
 		transform: translateY(-4px);
 		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-		border-color: var(--color-lgreen);
+		border-color: var(--color-green);
+		background-color: var(--color-brown); /* fallback for older browsers */
+		background-color: color-mix(
+			in srgb,
+			var(--color-brown) 95%,
+			transparent 5%
+		);
 	}
 
 	.animal-image {

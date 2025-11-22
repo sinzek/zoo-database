@@ -45,13 +45,7 @@ export function FeedingScheduleDetailPage({ animalId }) {
 	useEffect(() => {
 		// Check if user can edit (zookeeper+)
 		if (userEntityData?.accessLevel) {
-			const zookeeperLevels = [
-				'zookeeper',
-				'veterinarian',
-				'manager',
-				'executive',
-				'db_admin',
-			];
+			const zookeeperLevels = ['zookeeper', 'manager', 'db_admin'];
 			setIsZookeeperPlus(
 				zookeeperLevels.includes(userEntityData.accessLevel)
 			);
@@ -104,7 +98,7 @@ export function FeedingScheduleDetailPage({ animalId }) {
 		e.preventDefault();
 
 		if (!diet?.dietId) {
-			showToast('Animal does not have a diet assigned', 'error');
+			showToast('Animal does not have a diet assigned');
 			return;
 		}
 
@@ -114,7 +108,7 @@ export function FeedingScheduleDetailPage({ animalId }) {
 		});
 
 		if (result.success) {
-			showToast('Feeding schedule day added successfully', 'success');
+			showToast('Feeding schedule day added successfully');
 			setShowNewForm(false);
 			setNewDayFormData({
 				dayOfWeek: 'Monday',
@@ -123,7 +117,7 @@ export function FeedingScheduleDetailPage({ animalId }) {
 			});
 			loadData();
 		} else {
-			showToast('Failed to add feeding schedule day', 'error');
+			showToast('Failed to add feeding schedule day');
 		}
 	};
 
@@ -143,11 +137,11 @@ export function FeedingScheduleDetailPage({ animalId }) {
 		});
 
 		if (result.success) {
-			showToast('Feeding schedule updated successfully', 'success');
+			showToast('Feeding schedule updated successfully');
 			setEditingDayId(null);
 			loadData();
 		} else {
-			showToast('Failed to update feeding schedule', 'error');
+			showToast('Failed to update feeding schedule');
 		}
 	};
 
@@ -174,10 +168,10 @@ export function FeedingScheduleDetailPage({ animalId }) {
 		});
 
 		if (result.success) {
-			showToast('Feeding schedule day deleted successfully', 'success');
+			showToast('Feeding schedule day deleted successfully');
 			loadData();
 		} else {
-			showToast('Failed to delete feeding schedule day', 'error');
+			showToast('Failed to delete feeding schedule day');
 		}
 	};
 
@@ -191,7 +185,7 @@ export function FeedingScheduleDetailPage({ animalId }) {
 
 		if (result.success) {
 			console.log('Diet created successfully:', result);
-			showToast('Diet created successfully', 'success');
+			showToast('Diet created successfully');
 			setShowCreateDietForm(false);
 			setNewDietFormData({
 				specialNotes: '',
@@ -199,7 +193,7 @@ export function FeedingScheduleDetailPage({ animalId }) {
 			// Reload data to fetch the newly created diet
 			await loadData();
 		} else {
-			showToast('Failed to create diet', 'error');
+			showToast('Failed to create diet');
 		}
 	};
 
@@ -239,7 +233,7 @@ export function FeedingScheduleDetailPage({ animalId }) {
 			</Button>
 
 			{animal && (
-				<div className='animal-header'>
+				<div className='animal-header-2'>
 					{animal.imageUrl && (
 						<img
 							src={animal.imageUrl}
@@ -339,7 +333,6 @@ export function FeedingScheduleDetailPage({ animalId }) {
 								<div className='form-actions'>
 									<Button
 										type='submit'
-										className='save-button'
 										variant='green'
 									>
 										<Save size={16} />
@@ -356,7 +349,6 @@ export function FeedingScheduleDetailPage({ animalId }) {
 											});
 										}}
 										variant='outline'
-										className='cancel-button'
 									>
 										<X size={16} />
 										Cancel
@@ -410,7 +402,6 @@ export function FeedingScheduleDetailPage({ animalId }) {
 										<div className='form-actions'>
 											<Button
 												type='submit'
-												className='save-button'
 												variant='green'
 											>
 												<Save size={16} />
@@ -426,7 +417,6 @@ export function FeedingScheduleDetailPage({ animalId }) {
 														specialNotes: '',
 													});
 												}}
-												className='cancel-button'
 												variant='outline'
 											>
 												<X size={16} />
@@ -543,7 +533,6 @@ export function FeedingScheduleDetailPage({ animalId }) {
 																day.dietScheduleDayId
 															)
 														}
-														className='save-button'
 														variant='green'
 													>
 														<Save size={16} />
@@ -551,8 +540,7 @@ export function FeedingScheduleDetailPage({ animalId }) {
 													</Button>
 													<Button
 														onClick={handleCancel}
-														className='cancel-button'
-														variant='green'
+														variant='outline'
 													>
 														<X size={16} />
 														Cancel
@@ -574,7 +562,6 @@ export function FeedingScheduleDetailPage({ animalId }) {
 																		day
 																	)
 																}
-																className='edit-button'
 																variant='green'
 															>
 																<Edit
@@ -587,7 +574,6 @@ export function FeedingScheduleDetailPage({ animalId }) {
 																		day.dietScheduleDayId
 																	)
 																}
-																className='delete-button'
 																variant='outline'
 															>
 																<Trash2

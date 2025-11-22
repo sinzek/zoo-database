@@ -35,6 +35,10 @@ import { MembershipTransactionPage } from './pages/portal/membershipTransaction/
 
 import { PortalEmployeesPage } from './pages/portal/employees/employees';
 import { ShiftReportPage } from './pages/portal/reports/shiftReport/shiftReport';
+import { PortalExpensesPage } from './pages/portal/expenses/portalExpenses';
+import { PortalAnimalReportPage } from './pages/portal/reports/animalReport';
+import { SignupPage } from './pages/signup/signup';
+import { InventoryManagementPage } from './pages/portal/inventoryManagement/inventoryManagement';
 
 export default function Router() {
 	const { path, match } = useRouter();
@@ -50,12 +54,16 @@ export default function Router() {
 	const membershipTransactionMatch = match(
 		'/portal/membership-transaction/:transactionId'
 	);
+	const inventoryManagementMatch = match(
+		'/portal/inventory-management/:businessId'
+	);
 
 	let content = null;
 
 	const pathMap = {
 		'/': HomePage,
 		'/login': LoginPage,
+		'/signup': SignupPage,
 
 		'/habitats': HabitatsPage,
 		'/attractions': AttractionsPage,
@@ -70,6 +78,7 @@ export default function Router() {
 		'/portal/feeding-schedules': FeedingSchedulesPage,
 		'/portal/attractions': PortalAttractionsPage,
 		'/portal/habitats': PortalHabitatsPage,
+		'/portal/expenses': PortalExpensesPage,
 		'/portal/buy-tickets': BuyTicketsPage,
 		'/portal/cart': CartPage,
 		'/portal/shop': ShopPage,
@@ -77,10 +86,10 @@ export default function Router() {
 		'/portal/schedule-management': ScheduleManagementPage,
 		'/portal/reports': PortalReportsPage,
 		'/portal/reports/revenue': PortalRevenueReportPage,
+		'/portal/reports/animal': PortalAnimalReportPage,
 		'/portal/business-management': BusinessManagementPage,
 		'/portal/notifications': NotificationsPage,
 		'/portal/reports/shifts': ShiftReportPage,
-		'/portal/reports/animals': <div>Animals & Medical report</div>,
 
 		'/testing': TestingPage,
 	};
@@ -104,6 +113,12 @@ export default function Router() {
 	} else if (pathMap[path]) {
 		const Component = pathMap[path];
 		content = <Component />;
+	} else if (inventoryManagementMatch) {
+		content = (
+			<InventoryManagementPage
+				businessId={inventoryManagementMatch.businessId}
+			/>
+		);
 	} else {
 		content = <NotFoundPage />;
 	}

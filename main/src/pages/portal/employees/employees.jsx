@@ -9,16 +9,16 @@ import {
 	updateEmployee,
 	fetchBusinesses,
 	fetchSupervisors,
+	fetchAnimals,           // New
+    updateAssignedAnimals,   // New
+
 } from './utils';
 import { Plus, Edit2, Save, X, Briefcase, CalendarOff } from 'lucide-react';
 import './employees.css';
 
 const ACCESS_LEVELS = [
-	'worker',
 	'zookeeper',
-	'veterinarian',
 	'manager',
-	'executive',
 	'db_admin',
 ];
 const REQUIRED_ACCESS_LEVEL = 'manager';
@@ -28,6 +28,10 @@ export function PortalEmployeesPage() {
 	const [employees, setEmployees] = useState([]);
 	const [businesses, setBusinesses] = useState([]);
 	const [supervisors, setSupervisors] = useState([]);
+
+	const [animals, setAnimals] = useState([]);                     // New
+    const [assignedAnimalIds, setAssignedAnimalIds] = useState([]);    // New
+
 	const [loading, setLoading] = useState(true);
 	const [showAddForm, setShowAddForm] = useState(false);
 	const [editingId, setEditingId] = useState(null);
@@ -37,7 +41,7 @@ export function PortalEmployeesPage() {
 		lastName: '',
 		middleInitial: '',
 		jobTitle: '',
-		accessLevel: 'worker',
+		accessLevel: 'zookeeper',
 		hourlyWage: '',
 		ssn: '',
 		sex: 'male',
@@ -83,14 +87,16 @@ export function PortalEmployeesPage() {
 	const loadData = async () => {
 		setLoading(true);
 
-		const [employeesData, businessesData, supervisorsData] =
+		const [employeesData, businessesData, supervisorsData, animalsData] =
 			await Promise.all([
 				fetchEmployees(),
 				fetchBusinesses(),
 				fetchSupervisors(),
+				fetchAnimals(), // New
 			]);
 		setEmployees(employeesData);
 		setBusinesses(businessesData);
+		setAnimals(animalsData); // New:
 
 		setSupervisors(
 			supervisorsData.filter((emp) => emp.employeeId !== editingId)
@@ -150,6 +156,18 @@ export function PortalEmployeesPage() {
 			? await updateEmployee(editingId, employeeData)
 			: await createEmployee(employeeData);
 
+		if (result.success && result.data?.employeeId) {
+            const employeeId = editingId || result.data.employeeId; 
+            
+            //New: API for animal assignments
+            const assignResult = await updateAssignedAnimals(employeeId, assignedAnimalIds);
+
+            if (!assignResult.success) {
+                
+                showToast(`Warning: Employee updated, but failed to update animal assignments: ${assignResult.error}`);
+            }
+        }
+
 		if (result.success) {
 			setShowAddForm(false);
 			setEditingId(null);
@@ -165,7 +183,7 @@ export function PortalEmployeesPage() {
 			lastName: '',
 			middleInitial: '',
 			jobTitle: '',
-			accessLevel: 'worker',
+			accessLevel: 'zookeeper',
 			hourlyWage: '',
 			ssn: '',
 			sex: 'male',
@@ -184,6 +202,7 @@ export function PortalEmployeesPage() {
 			payInfoRoutingNum: '',
 			payInfoPaymentMethod: 'check',
 		});
+		setAssignedAnimalIds([]);
 	};
 
 	const handleEdit = (employee) => {
@@ -194,7 +213,7 @@ export function PortalEmployeesPage() {
 			lastName: employee.lastName || '',
 			middleInitial: employee.middleInitial || '',
 			jobTitle: employee.jobTitle || '',
-			accessLevel: employee.accessLevel || 'worker',
+			accessLevel: employee.accessLevel || 'zookeeper',
 			hourlyWage: employee.hourlyWage || '',
 			ssn: employee.ssn || '', //
 			sex: employee.sex || 'male',
@@ -214,6 +233,11 @@ export function PortalEmployeesPage() {
 			payInfoPaymentMethod: employee.payInfoPaymentMethod || 'check',
 		});
 		setShowAddForm(true);
+
+		// New
+		const currentAssignedIds = (employee.assignedAnimals || [])
+			.map(a => (a.animalId ? a.animalId : a).toString());
+		setAssignedAnimalIds(currentAssignedIds);
 
 		setSupervisors(
 			employees.filter((emp) => emp.employeeId !== employee.employeeId)
@@ -237,6 +261,12 @@ export function PortalEmployeesPage() {
 		setEditingId(null);
 		resetForm();
 	};
+
+	// New
+	const handleAnimalSelection = (e) => {
+        const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+        setAssignedAnimalIds(selectedOptions);
+    };
 
 	if (loading) {
 		return (
@@ -466,7 +496,7 @@ export function PortalEmployeesPage() {
 											})
 										}
 										required
-										placeholder='worker, zookeeper, manager, etc.'
+										placeholder='zookeeper, manager, etc.'
 									>
 										{ACCESS_LEVELS.map((level) => (
 											<option
@@ -586,6 +616,30 @@ export function PortalEmployeesPage() {
 										}
 									/>
 								</div>
+
+
+								{/*New: Animal Assignment*/}
+                                <div className='form-group full-width'>
+                                    <label htmlFor="assignedAnimals">Assigned Animals (Hold CTRL/CMD to select multiple)</label>
+                                    <select 
+                                        id="assignedAnimals" 
+                                        multiple 
+                                        size={6} 
+                                        value={assignedAnimalIds} 
+                                        onChange={handleAnimalSelection} 
+                                    >
+                                        {animals.length === 0 ? (
+                                            <option disabled>No animals available</option>
+                                        ) : (
+                                            animals.map(animal => (
+                                               	<option key={animal.animalId} value={animal.animalId.toString()}>
+                                                    {animal.name} ({animal.species})
+                                                </option>
+                                            ))
+                                        )}
+                                    </select>
+                                </div>
+                                
 
 								{/*Contact Info  */}
 								<div className='form-group'>

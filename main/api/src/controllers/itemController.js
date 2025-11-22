@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { query } from '../db/mysql.js';
 import {
 	createOneQuery,
 	deleteOneQuery,
@@ -11,7 +12,7 @@ import {
  * @param {string} req.body.name - Item name
  * @param {string} [req.body.description] - Item description
  * @param {number} req.body.price - Item price
- * @param {string} [req.body.uiImage] - Image URL for UI
+ * @param {string} [req.body.uiPhotoUrl] - Image URL for UI
  * @param {string} req.body.businessId - UUID of the associated business
  * @returns {Promise<Array>} Array containing the created item object with generated itemId
  * @throws {Error} If item data is missing
@@ -26,7 +27,7 @@ async function createOne(req, _res) {
 		name: newItem.name,
 		description: newItem.description || null,
 		price: newItem.price,
-		uiImage: newItem.uiImage, // ! CHANGE UIPHOTOURL TO UIIMAGE BLOB TYPE
+		uiPhotoUrl: newItem.uiPhotoUrl || null,
 		businessId: newItem.businessId,
 	};
 
@@ -72,9 +73,20 @@ async function getNByBusiness(req, _res) {
 
 	if (!businessId) throw new Error('Missing businessId');
 
-	const items = await getNByKeyQuery('Item', 'businessId', businessId);
+	// Get items - it's valid to have zero items, so use direct query instead of getNByKeyQuery
+	// which throws an error when no records are found
+	const items = await query(
+		`SELECT * FROM Item WHERE businessId = ? AND deletedAt IS NULL`,
+		[businessId]
+	) || [];
 
-	return items;
+	const [business] = await getNByKeyQuery(
+		'Business',
+		'businessId',
+		businessId
+	);
+
+	return [{ items, business }];
 }
 
 async function getNAndBusinesses(_req, _res) {

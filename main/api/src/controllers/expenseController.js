@@ -8,17 +8,32 @@ import {
 
 /**
  * Creates a new expense record.
+ * Managers can only add expenses to their own business.
+ * Executives and above can add expenses to any business.
  * @param {string} req.body.expenseDescription - Description of the expense
  * @param {number} req.body.cost - Cost of the expense
  * @param {string} req.body.purchaseDate - Date/time of purchase
  * @param {string} req.body.businessId - UUID of the associated business
  * @returns {Promise<Array>} Array containing the created expense object with generated expenseId
- * @throws {Error} If expense data is missing
+ * @throws {Error} If expense data is missing or user doesn't have permission
  */
 async function createOne(req, _res) {
 	const newExpense = req.body;
 
 	if (!newExpense) throw new Error('Missing expense data');
+
+	const employee = req.user.employeeData;
+	const accessLevel = employee.accessLevel;
+
+	// managers can only add expenses to their own business
+	if (
+		accessLevel !== 'manager' ||
+		employee.businessId !== newExpense.businessId
+	) {
+		throw new Error(
+			'You do not have permission to add expenses for this business'
+		);
+	}
 
 	const expenseId = crypto.randomUUID();
 
@@ -33,7 +48,7 @@ async function createOne(req, _res) {
 
 	await createOneQuery('Expense', expenseData);
 
-	return [{ expenseId, ...newExpense }];
+	return [expenseData];
 }
 
 /**
@@ -54,6 +69,8 @@ async function getOneById(req, _res) {
 
 /**
  * Retrieves all expenses for a specific business.
+ * Managers can only view expenses for their own business.
+ * Executives and above can view expenses for any business.
  * @param {string} req.body.businessId - UUID of the business
  * @returns {Promise<Array>} Array of expense objects
  * @throws {Error} If businessId is missing or no expenses are found
@@ -128,18 +145,34 @@ async function getTotalByBusiness(req, _res) {
 
 /**
  * Updates an existing expense record.
+ * Managers can only update expenses for their own business.
+ * Executives and above can update expenses for any business.
  * @param {string} req.body.expenseId - UUID of the expense to update
  * @param {string} [req.body.expenseDescription] - Updated description
  * @param {number} [req.body.cost] - Updated cost
  * @param {string} [req.body.purchaseDate] - Updated purchase date
  * @returns {Promise<Array>} Array containing the updated expense object
- * @throws {Error} If expense data or expenseId is missing
+ * @throws {Error} If expense data or expenseId is missing or user doesn't have permission
  */
 async function updateOne(req, _res) {
 	const updatedExpense = req.body;
 
 	if (!updatedExpense || !updatedExpense.expenseId) {
 		throw new Error('Missing expense data or expenseId');
+	}
+
+	// get current employee data
+	const employee = req.user.employeeData;
+	const accessLevel = employee.accessLevel;
+
+	// for managers, verify they can only update expenses for their own business
+	if (
+		accessLevel === 'manager' &&
+		employee.businessId !== updatedExpense.businessId
+	) {
+		throw new Error(
+			'You do not have permission to update expenses for this business'
+		);
 	}
 
 	const newExpenseData = { ...updatedExpense };
@@ -151,9 +184,10 @@ async function updateOne(req, _res) {
 
 /**
  * Soft deletes an expense by setting its deletedAt timestamp.
+ * Only admins can delete expenses.
  * @param {string} req.body.expenseId - UUID of the expense to delete
  * @returns {Promise<Array>} Array containing success message
- * @throws {Error} If expenseId is missing
+ * @throws {Error} If expenseId is missing or user doesn't have permission
  */
 async function deleteOne(req, _res) {
 	const { expenseId } = req.body;
@@ -173,6 +207,30 @@ async function deleteOne(req, _res) {
 	return [{ message: 'Expense successfully deleted' }];
 }
 
+/**
+ * Retrieves all deleted expenses from the database, optionally filtered by businessId.
+ * Only admins can view deleted expenses.
+ * @param {string} [req.body.businessId] - UUID of the business (optional filter)
+ * @returns {Promise<Array>} Array of deleted expense objects
+ * @throws {Error} If no deleted expenses are found
+ */
+async function getAllDeleted(req, _res) {
+	const { businessId } = req.body || {};
+
+	let query = `SELECT * FROM Expense WHERE deletedAt IS NOT NULL`;
+	const params = [];
+
+	if (businessId) {
+		query += ` AND businessId = ?`;
+		params.push(businessId);
+	}
+
+	const deletedExpenses = await db.query(query, params);
+
+	// Return empty array if no deleted expenses found (don't throw error)
+	return [deletedExpenses || []];
+}
+
 export default {
 	createOne,
 	getOneById,
@@ -181,4 +239,5 @@ export default {
 	getTotalByBusiness,
 	updateOne,
 	deleteOne,
+	getAllDeleted,
 };

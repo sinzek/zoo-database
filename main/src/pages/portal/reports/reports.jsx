@@ -2,16 +2,19 @@ import { useUserData } from '../../../context/userDataContext';
 import { hasMinAccessLvl } from '../../../utils/access';
 import { Link } from '../../../components/link';
 import '../portal.css';
-import { BarChart2, Calendar, DollarSign, HeartPulse } from 'lucide-react';
+import { BarChart2, Calendar, DollarSign, Apple } from 'lucide-react';
 
 export function PortalReportsPage() {
 	const { userEntityData } = useUserData();
 
-	if (!hasMinAccessLvl('manager', userEntityData)) {
+	const isZookeeper = hasMinAccessLvl('zookeeper', userEntityData);
+	const isManager = hasMinAccessLvl('manager', userEntityData);
+
+	if (!isZookeeper) {
 		return (
 			<div className='portal-page-container'>
 				<p className='error-message'>
-					This page is only available for managers.
+					This page is only available for zookeepers and above.
 				</p>
 			</div>
 		);
@@ -37,31 +40,35 @@ export function PortalReportsPage() {
 			</p>
 
 			<div className='options-grid'>
-				<Link
-					to='/portal/reports/shifts'
-					href='/portal/reports/shifts'
-					className='option-card'
-				>
-					<Calendar size={32} />
-					Labor (Shifts)
-				</Link>
+				{isManager && (
+					<Link
+						to='/portal/reports/shifts'
+						href='/portal/reports/shifts'
+						className='option-card'
+					>
+						<Calendar size={32} />
+						Labor (Shifts)
+					</Link>
+				)}
+
+				{isManager && (
+					<Link
+						to='/portal/reports/revenue'
+						href='/portal/reports/revenue'
+						className='option-card'
+					>
+						<DollarSign size={32} />
+						Revenue
+					</Link>
+				)}
 
 				<Link
-					to='/portal/reports/revenue'
-					href='/portal/reports/revenue'
+					to='/portal/reports/animal'
+					href='/portal/reports/animal'
 					className='option-card'
 				>
-					<DollarSign size={32} />
-					Revenue
-				</Link>
-
-				<Link
-					to='/portal/reports/animals'
-					href='/portal/reports/animals'
-					className='option-card'
-				>
-					<HeartPulse size={32} />
-					Animals & Medical
+					<Apple size={32} />
+					Diet Report
 				</Link>
 			</div>
 		</div>

@@ -1,4 +1,5 @@
-import { getNByKeyQuery } from '../utils/query-utils.js';
+import { query } from '../db/mysql.js';
+import { getNByKeyQuery, updateOneQuery } from '../utils/query-utils.js';
 
 async function getNByUser(req, _res) {
 	const userId = req.user.data.id;
@@ -23,4 +24,55 @@ async function getNByUser(req, _res) {
 	}
 }
 
-export default { getNByUser };
+async function markAsRead(req, _res) {
+	const { notificationId } = req.body;
+
+	if (!notificationId) {
+		throw new Error('Missing notificationId');
+	}
+
+	await updateOneQuery(
+		'Notification',
+		{ notificationId, seen: true },
+		'notificationId',
+		false
+	);
+
+	return [{ message: 'Notification marked as read' }];
+}
+
+async function deleteOne(req, _res) {
+	const { notificationId } = req.body;
+
+	if (!notificationId) {
+		throw new Error('Missing notificationId');
+	}
+
+	const result = await query(
+		'DELETE FROM Notification WHERE notificationId = ?',
+		[notificationId]
+	);
+
+	if (result.affectedRows === 0) {
+		throw new Error('Notification not found or already deleted');
+	}
+
+	return [{ message: 'Notification successfully deleted' }];
+}
+
+async function getNumUnread(req, _res) {
+	const userId = req.user.data.id;
+
+	if (!userId) {
+		throw new Error('Missing userId');
+	}
+
+	const result = await query(
+		'SELECT COUNT(*) AS numUnread FROM Notification WHERE userId = ? AND seen = FALSE',
+		[userId]
+	);
+
+	return [{ numUnread: result[0].numUnread }];
+}
+
+export default { getNByUser, markAsRead, deleteOne, getNumUnread };

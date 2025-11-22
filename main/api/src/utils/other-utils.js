@@ -14,8 +14,16 @@ export async function getMembershipByCustomerId(customerId) {
 			'Membership',
 			'customerId',
 			customerId,
-			false
+			true
 		);
+		if (
+			membership &&
+			membership.expiresAt &&
+			new Date(membership.expiresAt) < new Date()
+		) {
+			return null;
+		}
+
 		return membership || null;
 	} catch (err) {
 		if (err.message.includes('No records found')) {
@@ -37,9 +45,14 @@ export async function incrementNumEmployees(businessId) {
 
 	const newNumEmployees = (business.numEmployees || 0) + 1;
 
-	await updateOneQuery('Business', 'businessId', businessId, {
-		numEmployees: newNumEmployees,
-	});
+	await updateOneQuery(
+		'Business',
+		{
+			businessId,
+			numEmployees: newNumEmployees,
+		},
+		'businessId'
+	);
 
 	return newNumEmployees;
 }
@@ -47,12 +60,25 @@ export async function incrementNumEmployees(businessId) {
 export async function notifyAndUpdateAssignedZookeepersOfAnimalDeletion(
 	animalId
 ) {
-	const takesCareOfRecords = await getNByKeyQuery(
-		'TakesCareOf',
-		'animalId',
-		animalId,
-		false
-	);
+	let takesCareOfRecords;
+
+	try {
+		takesCareOfRecords = await getNByKeyQuery(
+			'TakesCareOf',
+			'animalId',
+			animalId,
+			false
+		);
+	} catch (err) {
+		if (err.message.includes('No records found')) {
+			// do nothing if no zookeepers assigned
+			return;
+		}
+		throw err;
+	}
+
+	if (!takesCareOfRecords) return;
+	if (takesCareOfRecords.length === 0) return;
 
 	const employeeIds = takesCareOfRecords.map((record) => record.employeeId);
 

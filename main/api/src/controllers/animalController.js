@@ -128,10 +128,9 @@ async function getNByHandler(req, _res) {
 async function getAllGroupedByHabitat(_req, _res) {
 	const rows = await query(
 		`
-		SELECT Habitat.habitatId, Habitat.name AS habitatName, Animal.*
+		SELECT Habitat.habitatId, Habitat.name AS habitatName, Habitat.deletedAt AS habitatDeletedAt, Animal.*
 		FROM Habitat
 		LEFT JOIN Animal ON Habitat.habitatId = Animal.habitatId AND Animal.deletedAt IS NULL
-		WHERE Habitat.deletedAt IS NULL
 		ORDER BY Habitat.habitatId;
 		`
 	);
@@ -149,6 +148,7 @@ async function getAllGroupedByHabitat(_req, _res) {
 			habitatMap.set(habitatId, {
 				habitatId: habitatId,
 				habitatName: row.habitatName,
+				habitatDeletedAt: row.habitatDeletedAt,
 				animals: [],
 			});
 		}
@@ -211,6 +211,18 @@ async function deleteOne(req, _res) {
 	return [{ message: 'Animal successfully deleted' }];
 }
 
+async function getAllDeleted(_req, _res) {
+	const deletedAnimals = await query(
+		`SELECT * FROM Animal WHERE deletedAt IS NOT NULL`
+	);
+
+	if (deletedAnimals.length === 0) {
+		throw new Error('No deleted animals found');
+	}
+
+	return [deletedAnimals];
+}
+
 export default {
 	createOne,
 	updateOne,
@@ -219,4 +231,5 @@ export default {
 	getNByHandler,
 	getAllGroupedByHabitat,
 	deleteOne,
+	getAllDeleted,
 };
