@@ -620,7 +620,7 @@ export function PortalEmployeesPage() {
 
 								{/*New: Animal Assignment*/}
                                 <div className='form-group full-width'>
-                                    <label htmlFor="assignedAnimals">Assigned Animals (Hold CTRL/CMD to select multiple)</label>
+                                    <label htmlFor="assignedAnimals">Assigned Animals (Hold CTRL/CMD to select multiple or deselect)</label>
                                     <select 
                                         id="assignedAnimals" 
                                         multiple 
