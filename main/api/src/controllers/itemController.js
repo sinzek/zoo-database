@@ -96,12 +96,21 @@ async function getNAndBusinesses(_req, _res) {
 
 	const businesses = {};
 	for (const businessId of businessIds) {
-		const [business] = await getNByKeyQuery(
-			'Business',
-			'businessId',
-			businessId
-		);
-		businesses[businessId] = business;
+		try {
+			const [business] = await getNByKeyQuery(
+				'Business',
+				'businessId',
+				businessId
+			);
+			if (business) {
+				businesses[businessId] = business;
+			}
+		} catch (error) {
+			// Skip businesses that don't exist or are soft-deleted
+			// This can happen if a business was deleted but items still reference it
+			console.warn(`Business ${businessId} not found or deleted, skipping...`);
+			continue;
+		}
 	}
 
 	return [{ items, businesses }];

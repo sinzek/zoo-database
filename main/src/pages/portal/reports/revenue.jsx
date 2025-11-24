@@ -106,9 +106,11 @@ export function PortalRevenueReportPage() {
 		(acc, r) => ({
 			revenue: acc.revenue + (r.totalRevenue || 0),
 			expenses: acc.expenses + (r.totalExpenses || 0),
+			laborCost: acc.laborCost + (r.totalLaborCost || 0),
+			expensesWithLabor: acc.expensesWithLabor + (r.totalExpensesWithLabor || 0),
 			profit: acc.profit + (r.netProfit || 0),
 		}),
-		{ revenue: 0, expenses: 0, profit: 0 }
+		{ revenue: 0, expenses: 0, laborCost: 0, expensesWithLabor: 0, profit: 0 }
 	);
 
 	if (!isAuthorized) {
@@ -258,6 +260,14 @@ export function PortalRevenueReportPage() {
 										<p>
 											<strong>Total Expenses:</strong> $
 											{r.totalExpenses?.toFixed(2)}
+										</p>
+										<p>
+											<strong>Total Labor Cost:</strong> $
+											{r.totalLaborCost?.toFixed(2)}
+										</p>
+										<p>
+											<strong>Total Expenses (with Labor):</strong> $
+											{r.totalExpensesWithLabor?.toFixed(2)}
 										</p>
 										<p>
 											<strong>Net Profit:</strong> $
@@ -472,6 +482,129 @@ export function PortalRevenueReportPage() {
 													</div>
 												</div>
 											)}
+
+										{!useSummary &&
+											r.shiftEntries &&
+											r.shiftEntries.length > 0 && (
+												<div className='table-section'>
+													<h4>
+														Employee Shifts (
+														{r.shiftEntries.length})
+													</h4>
+													<div className='table-container'>
+														<table className='expenses-table'>
+															<thead>
+																<tr>
+																	<th
+																		style={{
+																			minWidth:
+																				'180px',
+																		}}
+																	>
+																		Date/Time
+																	</th>
+																	<th
+																		style={{
+																			minWidth:
+																				'150px',
+																		}}
+																	>
+																		Employee
+																	</th>
+																	<th
+																		style={{
+																			minWidth:
+																				'150px',
+																		}}
+																	>
+																		Job Title
+																	</th>
+																	<th
+																		style={{
+																			minWidth:
+																				'100px',
+																		}}
+																	>
+																		Hourly Wage
+																	</th>
+																	<th
+																		style={{
+																			minWidth:
+																				'100px',
+																		}}
+																	>
+																		Hours
+																	</th>
+																	<th
+																		style={{
+																			minWidth:
+																				'120px',
+																		}}
+																	>
+																		Cost
+																	</th>
+																</tr>
+															</thead>
+															<tbody>
+																{r.shiftEntries.map(
+																	(
+																		shift,
+																		idx
+																	) => (
+																		<tr
+																			key={
+																				shift.shiftId ||
+																				idx
+																			}
+																		>
+																			<td>
+																				{shift.shiftStart
+																					? new Date(
+																							shift.shiftStart
+																						).toLocaleString()
+																					: '-'}
+																			</td>
+																			<td>
+																				{
+																					shift.employeeName
+																				}
+																			</td>
+																			<td>
+																				{
+																					shift.jobTitle
+																				}
+																			</td>
+																			<td>
+																				$
+																				{parseFloat(
+																					shift.hourlyWage ||
+																						0
+																				).toFixed(
+																					2
+																				)}
+																			</td>
+																			<td>
+																				{
+																					shift.hours
+																				}
+																			</td>
+																			<td>
+																				$
+																				{parseFloat(
+																					shift.cost ||
+																						0
+																				).toFixed(
+																					2
+																				)}
+																			</td>
+																		</tr>
+																	)
+																)}
+															</tbody>
+														</table>
+													</div>
+												</div>
+											)}
 									</div>
 								</div>
 							))}
@@ -483,6 +616,8 @@ export function PortalRevenueReportPage() {
 						<div className='revenue-info'>
 							<p>Total Revenue: ${totals.revenue.toFixed(2)}</p>
 							<p>Total Expenses: ${totals.expenses.toFixed(2)}</p>
+							<p>Total Labor Cost: ${totals.laborCost.toFixed(2)}</p>
+							<p>Total Expenses (with Labor): ${totals.expensesWithLabor.toFixed(2)}</p>
 							<p>Net Profit: ${totals.profit.toFixed(2)}</p>
 						</div>
 					</div>
