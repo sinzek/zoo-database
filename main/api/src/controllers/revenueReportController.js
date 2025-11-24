@@ -145,6 +145,66 @@ async function getRevenueReport(req, _res) {
 
 			const expenses = await sqlQuery(expensesQuery, expenseParams);
 
+			// Get employee shifts and calculate labor costs for this business
+			let employeeShiftsQuery = `
+				SELECT 
+					s.shiftId,
+					e.employeeId,
+					e.firstName,
+					e.lastName,
+					e.jobTitle,
+					e.hourlyWage,
+					ets.totalHours,
+					s.start as shiftStart,
+					s.end as shiftEnd
+				FROM EmployeeTakesShift ets
+				JOIN Shift s ON ets.shiftId = s.shiftId
+				JOIN Employee e ON ets.employeeId = e.employeeId
+				WHERE e.businessId = ? 
+					AND e.deletedAt IS NULL 
+					AND s.deletedAt IS NULL
+			`;
+			const employeeShiftParams = [business.businessId];
+
+			// Add date range filtering for shifts if provided
+			if (startDate) {
+				employeeShiftsQuery += ` AND s.start >= ?`;
+				employeeShiftParams.push(startDate);
+			}
+			if (endDate) {
+				employeeShiftsQuery += ` AND s.start <= ?`;
+				employeeShiftParams.push(endDate);
+			}
+
+			employeeShiftsQuery += ` ORDER BY s.start DESC`;
+
+			const employeeShifts = await sqlQuery(employeeShiftsQuery, employeeShiftParams) || [];
+
+			// Create individual shift entries with cost calculations (sorted by date/time)
+			const shiftEntries = employeeShifts.map((shift) => {
+				const hours = parseFloat(shift.totalHours) || 0;
+				const wage = parseFloat(shift.hourlyWage) || 0;
+				const cost = hours * wage;
+
+				return {
+					shiftId: shift.shiftId || null,
+					employeeId: shift.employeeId,
+					employeeName: `${shift.firstName} ${shift.lastName}`,
+					jobTitle: shift.jobTitle,
+					hourlyWage: parseFloat(wage.toFixed(2)),
+					hours: parseFloat(hours.toFixed(2)),
+					cost: parseFloat(cost.toFixed(2)),
+					shiftStart: shift.shiftStart,
+					shiftEnd: shift.shiftEnd,
+				};
+			});
+
+			// Calculate total labor cost from all shift entries
+			const totalLaborCost = shiftEntries.reduce(
+				(sum, shift) => sum + shift.cost,
+				0
+			);
+
 			// Calculate totals
 			const totalRevenue = transactions.reduce(
 				(sum, t) => sum + parseFloat(t.amount || 0),
@@ -154,7 +214,8 @@ async function getRevenueReport(req, _res) {
 				(sum, e) => sum + parseFloat(e.cost || 0),
 				0
 			);
-			const netProfit = totalRevenue - totalExpenses;
+			const totalExpensesWithLabor = totalExpenses + totalLaborCost;
+			const netProfit = totalRevenue - totalExpensesWithLabor;
 
 			const transactionsWithCorrectCustomerIdPromises = transactions.map(
 				async (t) => {
@@ -199,11 +260,15 @@ async function getRevenueReport(req, _res) {
 				businessType: business.businessType,
 				totalRevenue: parseFloat(totalRevenue.toFixed(2)),
 				totalExpenses: parseFloat(totalExpenses.toFixed(2)),
+				totalLaborCost: parseFloat(totalLaborCost.toFixed(2)),
+				totalExpensesWithLabor: parseFloat(totalExpensesWithLabor.toFixed(2)),
 				netProfit: parseFloat(netProfit.toFixed(2)),
 				transactionCount: transactions.length,
 				expenseCount: expenses.length,
+				shiftCount: shiftEntries.length,
 				transactions: finalTransactions,
 				expenses,
+				shiftEntries,
 				dateRange: {
 					startDate: startDate || null,
 					endDate: endDate || null,
@@ -238,9 +303,12 @@ async function getRevenueReportSummary(req, _res) {
 			businessType: report.businessType,
 			totalRevenue: report.totalRevenue,
 			totalExpenses: report.totalExpenses,
+			totalLaborCost: report.totalLaborCost,
+			totalExpensesWithLabor: report.totalExpensesWithLabor,
 			netProfit: report.netProfit,
 			transactionCount: report.transactionCount,
 			expenseCount: report.expenseCount,
+			shiftCount: report.shiftCount,
 			dateRange: report.dateRange,
 		})),
 	];
@@ -264,18 +332,22 @@ async function getAllBusinessesRevenueReport(req, _res) {
 		(acc, report) => ({
 			totalRevenue: acc.totalRevenue + report.totalRevenue,
 			totalExpenses: acc.totalExpenses + report.totalExpenses,
+			totalLaborCost: acc.totalLaborCost + (report.totalLaborCost || 0),
 			netProfit: acc.netProfit + report.netProfit,
 			businessCount: acc.businessCount + 1,
 			transactionCount: acc.transactionCount + report.transactionCount,
 			expenseCount: acc.expenseCount + report.expenseCount,
+			shiftCount: acc.shiftCount + (report.shiftCount || 0),
 		}),
 		{
 			totalRevenue: 0,
 			totalExpenses: 0,
+			totalLaborCost: 0,
 			netProfit: 0,
 			businessCount: 0,
 			transactionCount: 0,
 			expenseCount: 0,
+			employeeCount: 0,
 		}
 	);
 
@@ -285,6 +357,8 @@ async function getAllBusinessesRevenueReport(req, _res) {
 			...aggregated,
 			totalRevenue: parseFloat(aggregated.totalRevenue.toFixed(2)),
 			totalExpenses: parseFloat(aggregated.totalExpenses.toFixed(2)),
+			totalLaborCost: parseFloat(aggregated.totalLaborCost.toFixed(2)),
+			totalExpensesWithLabor: parseFloat((aggregated.totalExpenses + aggregated.totalLaborCost).toFixed(2)),
 			netProfit: parseFloat(aggregated.netProfit.toFixed(2)),
 			dateRange: {
 				startDate: req.body.startDate || null,

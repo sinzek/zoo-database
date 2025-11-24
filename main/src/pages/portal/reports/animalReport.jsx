@@ -69,13 +69,6 @@ export function PortalAnimalReportPage() {
 		}
 	}, [isAuthorized, selectedHabitatId]);
 
-	// Load report on mount and when filters change
-	useEffect(() => {
-		if (isAuthorized) {
-			loadReport();
-		}
-	}, [isAuthorized, loadReport]);
-
 	// Filter by selected days (habitat filtering is done on backend)
 	useEffect(() => {
 		// If no day filters, show all data
@@ -115,14 +108,6 @@ export function PortalAnimalReportPage() {
 		<div className='animal-report-page'>
 			<div className='report-header'>
 				<h1>Diet Report</h1>
-				<Button
-					onClick={loadReport}
-					variant='green'
-					loading={loading}
-					className='load-button'
-				>
-					Refresh Report
-				</Button>
 			</div>
 
 			<div className='report-filter-container'>
@@ -165,6 +150,16 @@ export function PortalAnimalReportPage() {
 							))}
 						</div>
 					</div>
+				</div>
+				<div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
+					<Button
+						onClick={loadReport}
+						variant='green'
+						loading={loading}
+						className='load-button'
+					>
+						Generate Report
+					</Button>
 				</div>
 			</div>
 
