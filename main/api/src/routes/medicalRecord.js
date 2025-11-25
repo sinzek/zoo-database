@@ -15,7 +15,7 @@ export function registerMedicalRecordRoutes(app) {
 		withAccessLevel('zookeeper', medicalRecordController.deleteOne)
 	);
 
-//New
+
 app.post(
         '/api/medical-record/get-for-animal',
         withAccessLevel('zookeeper', medicalRecordController.getForAnimal)
@@ -33,7 +33,7 @@ app.post(
 		withAccessLevel('zookeeper', medicalRecordController.deleteOne)
 	);
 
-	//New
+
 
 	app.post('/api/medical-record/get-by-id', medicalRecordController.getOneById);
 	app.post('/api/medical-record/get-by-animal', medicalRecordController.getNyByAnimal);

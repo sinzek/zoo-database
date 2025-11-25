@@ -323,7 +323,7 @@ async function getVeterinarianByRecord(req, _res) {
 }
 
 
-// 💡 NEW FUNCTION: Get all non-deleted records for one animal
+//Get all non-deleted records for an animal
 async function getForAnimal(req, _res) {
     const { animalId } = req.body;
     if (!animalId) throw new Error('Missing animalId');
@@ -331,17 +331,19 @@ async function getForAnimal(req, _res) {
     const records = await query(
         `SELECT * FROM MedicalRecord 
          WHERE animalId = ? AND deletedAt IS NULL 
-         ORDER BY visitDate DESC`, // Order by most recent
+         ORDER BY visitDate DESC`, 
         [animalId]
     );
-    // Return records, even if it's an empty array
+   
     return [records];
 }
 
-// 💡 NEW FUNCTION: Get all DELETED records for one animal
+//Get all deleted records for an animal
 async function getAllDeletedForAnimal(req, _res) {
     const { animalId } = req.body;
-    if (!animalId) throw new Error('Missing animalId');
+    if (!animalId) {
+		throw new Error('Missing animalId');
+	}
 
     const records = await query(
         `SELECT * FROM MedicalRecord 
@@ -349,7 +351,7 @@ async function getAllDeletedForAnimal(req, _res) {
          ORDER BY visitDate DESC`,
         [animalId]
     );
-    // Return records, even if it's an empty array
+	
     return [records];
 }
 
