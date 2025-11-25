@@ -256,7 +256,6 @@ async function getAllHandlers(_req, _res) {
 //Get Access Level
 //Update Employee
 
-//new function
 async function assignAnimals(req, _res) {
 	const { employeeId, animalIds } = req.body;
 
@@ -264,7 +263,13 @@ async function assignAnimals(req, _res) {
 		throw new Error('Missing employeeId');
 	}
 
-	const animalsToAssign = Array.isArray(animalIds) ? animalIds : [];
+	let animalsToAssign;
+
+	if (Array.isArray(animalIds)) {
+		animalsToAssign = animalIds;
+	} else {
+		animalsToAssign = [];
+	}
 
 	await query('DELETE FROM TakesCareOf WHERE employeeId = ?', [employeeId]);
 
@@ -278,7 +283,7 @@ async function assignAnimals(req, _res) {
 		]);
 	}
 
-	return [{ success: true, message: 'Animal assignments updated.' }];
+	return [{success: true, message: 'Animal assignments updated.' }];
 }
 
 export default {
