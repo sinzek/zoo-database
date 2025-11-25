@@ -10,6 +10,8 @@ After cloning this repo, run `npm install` in the project root (npm is the Node 
 
 To spin up a dev server, run `vercel dev` when in the project root.
 
+For each environment variable, run `vercel env add <name>`, and then insert the value.
+
 *NOTE: Running `npm run dev` will prevent the serverless functions in our backend from being recognized by Vite. Use `vercel dev` instead.*
 
 ## For Team Members
